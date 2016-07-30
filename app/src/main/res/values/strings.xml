@@ -1,0 +1,36 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="app_name" tools:ignore="Typos">Nock Nock</string>
+
+    <string name="everything_checks_out">Everything checks out!</string>
+    <string name="something_wrong">Something\'s wrong!</string>
+    <string name="checking_status">Checking status…</string>
+    <string name="waiting">Waiting</string>
+
+    <string name="no_sites_added">No sites added!</string>
+
+    <string name="about">About</string>
+    <string name="about_body"><![CDATA[
+        <b>Nock Nock</b>, a simple app designed by <b>Aidan Follestad</b>.<br/>
+        <a href=\'http://aidanfollestad.com\'>Website</a>&nbsp;&nbsp;
+        <a href=\'https://twitter.com/afollestad\'>Twitter</a>&nbsp;&nbsp;
+        <a href=\'https://google.com/+AidanFollestad\'>Google+</a>&nbsp;&nbsp;
+        <a href=\'https://github.com/afollestad\'>GitHub</a>&nbsp;&nbsp;
+        <a href=\'https://www.linkedin.com/in/afollestad\'>LinkedIn</a>
+    ]]></string>
+    <string name="dismiss">Dismiss</string>
+    <string name="add_site">Add Site</string>
+    <string name="site_name">Site Name</string>
+    <string name="site_url">Site URL</string>
+    <string name="check_interval">Check Interval</string>
+    <string name="done">Done</string>
+    <string name="never_refresh">Never Refresh</string>
+
+    <string-array name="interval_options">
+        <item>Minute(s)</item>
+        <item>Hour(s)</item>
+        <item>Day(s)</item>
+        <item>Weeks(s)</item>
+    </string-array>
+
+</resources>

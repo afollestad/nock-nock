@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="colorPrimary">#455A64</color>
+    <color name="colorPrimaryDark">#37474F</color>
+    <color name="colorAccent">#FF6E40</color>
+
+    <color name="dividerColor">#B6B6B6</color>
+
+    <color name="md_red">#E53935</color>
+    <color name="md_yellow">#FDD835</color>
+    <color name="md_green">#43A047</color>
+
+</resources>
