@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 mFab.postDelayed(() -> {
                     mFab.setX(mOrigFabX);
                     mFab.setY(mOrigFabY);
-                }, 1000);
+                }, 600);
             }
         });
         mFabAnimator.start();
