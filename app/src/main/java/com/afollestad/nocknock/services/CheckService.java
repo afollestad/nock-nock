@@ -1,11 +1,16 @@
 package com.afollestad.nocknock.services;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -18,6 +23,7 @@ import com.afollestad.nocknock.R;
 import com.afollestad.nocknock.api.ServerModel;
 import com.afollestad.nocknock.api.ServerStatus;
 import com.afollestad.nocknock.ui.MainActivity;
+import com.afollestad.nocknock.ui.ViewSiteActivity;
 
 import java.util.Locale;
 
@@ -29,6 +35,7 @@ public class CheckService extends Service {
     public static String ACTION_CHECK_UPDATE = BuildConfig.APPLICATION_ID + ".CHECK_UPDATE";
     public static String ACTION_RUNNING = BuildConfig.APPLICATION_ID + ".CHECK_RUNNING";
     public static String MODEL_ID = "model_id";
+    public static int NOTI_ID = 3456;
 
     private static void LOG(String msg, Object... format) {
         if (format != null)
@@ -43,6 +50,9 @@ public class CheckService extends Service {
     }
 
     private void processError(BridgeException e, ServerModel site) {
+        site.status = ServerStatus.OK;
+        site.reason = null;
+
         switch (e.reason()) {
             case BridgeException.REASON_REQUEST_CANCELLED:
                 // Shouldn't happen
@@ -54,7 +64,6 @@ public class CheckService extends Service {
                 //noinspection ConstantConditions
                 if (e.response() != null && e.response().code() == 401) {
                     // Don't consider 401 unsuccessful here
-                    site.status = ServerStatus.OK;
                     site.reason = null;
                 } else {
                     site.status = ServerStatus.ERROR;
@@ -70,7 +79,11 @@ public class CheckService extends Service {
                 // Not used
                 break;
         }
-        LOG("%s error: %s", site.name, site.reason);
+
+        if (site.status != ServerStatus.OK) {
+            LOG("%s error: %s", site.name, site.reason);
+            showNotification(this, site);
+        }
     }
 
     private void updateStatus(ServerModel site) {
@@ -91,6 +104,40 @@ public class CheckService extends Service {
     public static boolean isRunning(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context)
                 .getBoolean("check_service_running", false);
+    }
+
+    public static void isAppOpen(Context context, boolean open) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit().putBoolean("is_app_open", open).commit();
+    }
+
+    public static boolean isAppOpen(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean("is_app_open", false);
+    }
+
+    private static void showNotification(Context context, ServerModel site) {
+        if (isAppOpen(context)) {
+            // Don't show notifications while the app is open
+            return;
+        }
+
+        final NotificationManagerCompat nm = NotificationManagerCompat.from(context);
+        final PendingIntent openIntent = PendingIntent.getActivity(context, 9669,
+                new Intent(context, ViewSiteActivity.class)
+                        .putExtra("model", site)
+                        .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
+                PendingIntent.FLAG_CANCEL_CURRENT);
+        final Notification noti = new NotificationCompat.Builder(context)
+                .setContentTitle(site.name)
+                .setContentText(context.getString(R.string.something_wrong))
+                .setContentIntent(openIntent)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher))
+                .setPriority(Notification.PRIORITY_HIGH)
+                .setDefaults(Notification.DEFAULT_VIBRATE)
+                .build();
+        nm.notify(site.url, NOTI_ID, noti);
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.afollestad.nocknock.ui;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
+import android.app.ActivityOptions;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.content.IntentFilter;
 import android.graphics.Path;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -22,7 +24,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.PathInterpolator;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.inquiry.Inquiry;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -38,6 +39,7 @@ import com.afollestad.nocknock.views.DividerItemDecoration;
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener, ServerAdapter.ClickListener {
 
     private final static int ADD_SITE_RQ = 6969;
+    private final static int VIEW_SITE_RQ = 6923;
     public final static String DB_NAME = "nock_nock";
     public final static String SITES_TABLE_NAME = "sites";
 
@@ -90,12 +92,13 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         mFab.setOnClickListener(this);
 
         Inquiry.init(this, DB_NAME, 1);
-        refreshModels();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        CheckService.isAppOpen(this, true);
+
         try {
             final IntentFilter filter = new IntentFilter();
             filter.addAction(CheckService.ACTION_CHECK_UPDATE);
@@ -104,11 +107,16 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         } catch (Throwable t) {
             t.printStackTrace();
         }
+
+        refreshModels();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        CheckService.isAppOpen(this, false);
+
+        NotificationManagerCompat.from(this).cancel(CheckService.NOTI_ID);
         try {
             unregisterReceiver(mReceiver);
         } catch (Throwable t) {
@@ -186,38 +194,52 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
-            ServerModel model = (ServerModel) data.getSerializableExtra("model");
-            mAdapter.add(model);
-            mEmptyText.setVisibility(View.GONE);
-
-            Inquiry.get().insertInto(SITES_TABLE_NAME, ServerModel.class)
-                    .values(model)
-                    .run(changed -> {
-                        AlarmUtil.setSiteChecks(MainActivity.this, model);
-                        checkSite(model);
-                    });
+            final ServerModel model = (ServerModel) data.getSerializableExtra("model");
+            if (requestCode == ADD_SITE_RQ) {
+                mAdapter.add(model);
+                mEmptyText.setVisibility(View.GONE);
+                Inquiry.get().insertInto(SITES_TABLE_NAME, ServerModel.class)
+                        .values(model)
+                        .run(inserted -> {
+                            AlarmUtil.setSiteChecks(MainActivity.this, model);
+                            checkSite(MainActivity.this, model);
+                        });
+            } else if(requestCode == VIEW_SITE_RQ) {
+                Inquiry.get()
+                        .update(MainActivity.SITES_TABLE_NAME, ServerModel.class)
+                        .where("_id = ?", model.id)
+                        .values(model)
+                        .run(changed -> {
+                            mAdapter.update(model);
+                            AlarmUtil.setSiteChecks(MainActivity.this, model);
+                            checkSite(MainActivity.this, model);
+                        });
+            }
         }
     }
 
-    private void removeSite(final int index, final ServerModel model) {
-        Inquiry.init(this, DB_NAME, 1);
-        new MaterialDialog.Builder(this)
+    public static void removeSite(final Context context, final ServerModel model, final Runnable onRemoved) {
+        Inquiry.init(context, DB_NAME, 1);
+        new MaterialDialog.Builder(context)
                 .title(R.string.remove_site)
-                .content(Html.fromHtml(getString(R.string.remove_site_prompt, model.name)))
+                .content(Html.fromHtml(context.getString(R.string.remove_site_prompt, model.name)))
                 .positiveText(R.string.remove)
                 .negativeText(android.R.string.cancel)
                 .onPositive((dialog, which) -> {
-                    AlarmUtil.cancelSiteChecks(MainActivity.this, model);
+                    AlarmUtil.cancelSiteChecks(context, model);
+                    final NotificationManagerCompat nm = NotificationManagerCompat.from(context);
+                    nm.cancel(model.url, CheckService.NOTI_ID);
                     Inquiry.get()
                             .deleteFrom(SITES_TABLE_NAME, ServerModel.class)
                             .where("_id = ?", model.id)
                             .run();
-                    mAdapter.remove(index);
+                    if (onRemoved != null)
+                        onRemoved.run();
                 }).show();
     }
 
-    private void checkSite(ServerModel model) {
-        startService(new Intent(this, CheckService.class)
+    public static void checkSite(Context context, ServerModel model) {
+        context.startService(new Intent(context, CheckService.class)
                 .putExtra(CheckService.MODEL_ID, model.id));
     }
 
@@ -230,13 +252,15 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                     .negativeText(android.R.string.cancel)
                     .itemsCallback((dialog, itemView, which, text) -> {
                         if (which == 0) {
-                            checkSite(model);
+                            checkSite(MainActivity.this, model);
                         } else {
-                            removeSite(index, model);
+                            removeSite(MainActivity.this, model, null);
                         }
                     }).show();
         } else {
-            Toast.makeText(this, "Coming soon", Toast.LENGTH_SHORT).show();
+            startActivityForResult(new Intent(this, ViewSiteActivity.class)
+                            .putExtra("model", model), VIEW_SITE_RQ,
+                    ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
         }
     }
 }

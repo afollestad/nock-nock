@@ -17,6 +17,7 @@
         android:layout_gravity="center_vertical"
         android:layout_marginEnd="@dimen/content_inset"
         android:scaleType="centerInside"
+        android:transitionName="status_image_view"
         tools:ignore="ContentDescription" />
 
     <LinearLayout
@@ -41,6 +42,7 @@
                 android:singleLine="true"
                 android:textColor="?android:textColorPrimary"
                 android:textSize="@dimen/title_font_size"
+                android:transitionName="site_name"
                 tools:text="Website Name" />
 
             <TextView
@@ -66,6 +68,7 @@
             android:singleLine="true"
             android:textColor="?android:textColorSecondary"
             android:textSize="@dimen/body_font_size"
+            android:transitionName="site_url"
             tools:text="https://yourwebsitehere.com" />
 
         <TextView

@@ -14,7 +14,9 @@
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
 
-        <activity android:name=".ui.MainActivity">
+        <activity
+            android:name=".ui.MainActivity"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,7 +27,16 @@
         <activity
             android:name=".ui.AddSiteActivity"
             android:label="@string/add_site"
-            android:theme="@style/AppTheme.Transparent" />
+            android:launchMode="singleTop"
+            android:theme="@style/AppTheme.Transparent"
+            android:windowSoftInputMode="stateHidden" />
+
+        <activity
+            android:name=".ui.ViewSiteActivity"
+            android:label="@string/view_site"
+            android:launchMode="singleTop"
+            android:theme="@style/AppTheme.Ink"
+            android:windowSoftInputMode="stateHidden" />
 
         <service
             android:name=".services.CheckService"

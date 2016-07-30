@@ -115,10 +115,14 @@ public class ServerAdapter extends RecyclerView.Adapter<ServerAdapter.ServerVH> 
                 break;
         }
 
-        final long now = System.currentTimeMillis();
-        final long nextCheck = model.lastCheck + model.checkInterval;
-        final long difference = nextCheck - now;
-        holder.textInterval.setText(TimeUtil.str(difference));
+        if (model.checkInterval <= 0) {
+            holder.textInterval.setText("");
+        } else {
+            final long now = System.currentTimeMillis();
+            final long nextCheck = model.lastCheck + model.checkInterval;
+            final long difference = nextCheck - now;
+            holder.textInterval.setText(TimeUtil.str(difference));
+        }
     }
 
     @Override

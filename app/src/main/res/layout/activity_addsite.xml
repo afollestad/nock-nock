@@ -44,7 +44,8 @@
                     android:hint="@string/site_name"
                     android:inputType="textPersonName|textCapWords|textAutoCorrect"
                     android:textColor="?android:textColorPrimary"
-                    android:textColorHint="?android:textColorSecondary" />
+                    android:textColorHint="?android:textColorSecondary"
+                    android:textSize="@dimen/body_font_size" />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -63,54 +64,49 @@
                     android:hint="@string/site_url"
                     android:inputType="textUri"
                     android:textColor="?android:textColorPrimary"
-                    android:textColorHint="?android:textColorSecondary" />
+                    android:textColorHint="?android:textColorSecondary"
+                    android:textSize="@dimen/body_font_size" />
 
             </android.support.design.widget.TextInputLayout>
+
+            <TextView
+                android:id="@+id/checkIntervalLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/list_text_spacing"
+                android:layout_marginTop="@dimen/content_inset_more"
+                android:fontFamily="sans-serif"
+                android:text="@string/check_interval"
+                android:textColor="?colorAccent"
+                android:textSize="@dimen/caption_font_size" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/content_inset_more"
-                android:orientation="vertical">
+                android:orientation="horizontal"
+                android:weightSum="2">
 
-                <TextView
-                    android:id="@+id/checkIntervalLabel"
-                    android:layout_width="wrap_content"
+                <EditText
+                    android:id="@+id/checkIntervalInput"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/list_text_spacing"
-                    android:fontFamily="sans-serif"
-                    android:text="@string/check_interval"
-                    android:textColor="?colorAccent"
-                    android:textSize="@dimen/caption_font_size" />
+                    android:layout_gravity="start|center_vertical"
+                    android:layout_marginEnd="@dimen/content_inset_half"
+                    android:layout_marginStart="-4dp"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif-light"
+                    android:hint="0"
+                    android:inputType="number"
+                    android:textSize="@dimen/body_font_size"
+                    tools:ignore="HardcodedText,LabelFor" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <Spinner
+                    android:id="@+id/checkIntervalSpinner"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:weightSum="2">
-
-                    <EditText
-                        android:id="@+id/checkIntervalInput"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="start|center_vertical"
-                        android:layout_marginEnd="@dimen/content_inset_half"
-                        android:layout_marginStart="-4dp"
-                        android:layout_weight="1"
-                        android:fontFamily="sans-serif-light"
-                        android:hint="@string/never_refresh"
-                        android:inputType="number"
-                        tools:ignore="LabelFor" />
-
-                    <Spinner
-                        android:id="@+id/checkIntervalSpinner"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end|center_vertical"
-                        android:layout_marginEnd="-4dp"
-                        android:layout_weight="1" />
-
-                </LinearLayout>
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginEnd="-4dp"
+                    android:layout_weight="1" />
 
             </LinearLayout>
 

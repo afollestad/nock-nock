@@ -39,6 +39,7 @@ public class AlarmUtil {
 
     public static void setSiteChecks(Context context, ServerModel site) {
         cancelSiteChecks(context, site);
+        if (site.checkInterval <= 0) return;
         if (site.lastCheck <= 0)
             site.lastCheck = System.currentTimeMillis();
         final long nextCheck = site.lastCheck + site.checkInterval;
@@ -46,7 +47,8 @@ public class AlarmUtil {
         final PendingIntent serviceIntent = getSiteIntent(context, site);
         aMgr.setRepeating(AlarmManager.RTC_WAKEUP, nextCheck, site.checkInterval, serviceIntent);
         final SimpleDateFormat df = new SimpleDateFormat("EEE MMM dd hh:mm:ssa z yyyy", Locale.getDefault());
-        Log.d("AlarmUtil", String.format(Locale.getDefault(), "Set site check alarm for %s (%s), next check: %s", site.name, site.url, df.format(new Date(nextCheck))));
+        Log.d("AlarmUtil", String.format(Locale.getDefault(), "Set site check alarm for %s (%s), check interval: %d, next check: %s",
+                site.name, site.url, site.checkInterval, df.format(new Date(nextCheck))));
     }
 
     public static void setSiteChecks(Context context, ServerModel[] sites) {

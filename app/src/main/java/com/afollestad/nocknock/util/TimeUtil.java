@@ -5,24 +5,26 @@ package com.afollestad.nocknock.util;
  */
 public class TimeUtil {
 
-    private static long SECOND = 1000;
-    private static long MINUTE = SECOND * 60;
-    private static long HOUR = MINUTE * 60;
-    private static long DAY = HOUR * 24;
-    private static long WEEK = DAY * 7;
-    private static long MONTH = WEEK * 4;
+    public final static long SECOND = 1000;
+    public final static long MINUTE = SECOND * 60;
+    public final static long HOUR = MINUTE * 60;
+    public final static long DAY = HOUR * 24;
+    public final static long WEEK = DAY * 7;
+    public final static long MONTH = WEEK * 4;
 
     public static String str(long duration) {
-        if (duration >= MONTH) {
-            return (duration / MONTH) + "mo";
+        if (duration <= 0) {
+            return "";
+        } else if (duration >= MONTH) {
+            return (int) Math.ceil(((float) duration / (float) MONTH)) + "mo";
         } else if (duration >= WEEK) {
-            return (duration / WEEK) + "w";
+            return (int) Math.ceil(((float) duration / (float) WEEK)) + "w";
         } else if (duration >= DAY) {
-            return (duration / DAY) + "d";
+            return (int) Math.ceil(((float) duration / (float) DAY)) + "d";
         } else if (duration >= HOUR) {
-            return (duration / HOUR) + "h";
+            return (int) Math.ceil(((float) duration / (float) HOUR)) + "h";
         } else if (duration >= MINUTE) {
-            return (duration / MINUTE) + "m";
+            return (int) Math.ceil(((float) duration / (float) MINUTE)) + "m";
         } else {
             return "<1m";
         }
