@@ -83,7 +83,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:weightSum="5">
+                    android:weightSum="2">
 
                     <EditText
                         android:id="@+id/checkIntervalInput"
@@ -92,7 +92,7 @@
                         android:layout_gravity="start|center_vertical"
                         android:layout_marginEnd="@dimen/content_inset_half"
                         android:layout_marginStart="-4dp"
-                        android:layout_weight="3"
+                        android:layout_weight="1"
                         android:fontFamily="sans-serif-light"
                         android:hint="@string/never_refresh"
                         android:inputType="number"
@@ -104,7 +104,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="end|center_vertical"
                         android:layout_marginEnd="-4dp"
-                        android:layout_weight="2" />
+                        android:layout_weight="1" />
 
                 </LinearLayout>
 
