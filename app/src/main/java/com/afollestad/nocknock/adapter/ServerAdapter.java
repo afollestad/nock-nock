@@ -65,6 +65,10 @@ public class ServerAdapter extends RecyclerView.Adapter<ServerAdapter.ServerVH> 
     }
 
     public void set(ServerModel[] models) {
+        if (models == null || models.length == 0) {
+            mServers.clear();
+            return;
+        }
         mServers = new ArrayList<>(models.length);
         Collections.addAll(mServers, models);
         notifyDataSetChanged();
