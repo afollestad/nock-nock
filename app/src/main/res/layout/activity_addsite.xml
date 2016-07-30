@@ -42,7 +42,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-light"
                     android:hint="@string/site_name"
-                    android:inputType="textPersonName"
+                    android:inputType="textPersonName|textCapWords"
                     android:textColor="?android:textColorPrimary"
                     android:textColorHint="?android:textColorSecondary" />
 
