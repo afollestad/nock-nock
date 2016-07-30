@@ -15,7 +15,7 @@
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
 
         <activity
-            android:name=".ui.MainActivity"
+            android:name="com.afollestad.nocknock.ui.MainActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,23 +25,29 @@
         </activity>
 
         <activity
-            android:name=".ui.AddSiteActivity"
+            android:name="com.afollestad.nocknock.ui.AddSiteActivity"
             android:label="@string/add_site"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.Transparent"
             android:windowSoftInputMode="stateHidden" />
 
         <activity
-            android:name=".ui.ViewSiteActivity"
+            android:name="com.afollestad.nocknock.ui.ViewSiteActivity"
             android:label="@string/view_site"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.Ink"
             android:windowSoftInputMode="stateHidden" />
 
         <service
-            android:name=".services.CheckService"
+            android:name="com.afollestad.nocknock.services.CheckService"
             android:enabled="true"
             android:label="Site Check Service" />
+
+        <receiver android:name=".services.BootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
     </application>
 
