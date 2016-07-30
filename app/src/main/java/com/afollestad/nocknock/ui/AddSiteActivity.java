@@ -121,7 +121,6 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
         ServerModel model = new ServerModel();
         model.name = inputName.getText().toString().trim();
         model.url = inputUrl.getText().toString().trim();
-        model.lastCheck = -1;
         model.status = ServerStatus.WAITING;
 
         String intervalStr = inputInterval.getText().toString().trim();
@@ -142,6 +141,8 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
                 model.checkInterval *= (60 * 60 * 24 * 7 * 1000);
                 break;
         }
+
+        model.lastCheck = System.currentTimeMillis() - model.checkInterval;
 
         setResult(RESULT_OK, new Intent()
                 .putExtra("model", model));

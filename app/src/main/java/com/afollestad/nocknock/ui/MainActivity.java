@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private RecyclerView mList;
     private ServerAdapter mAdapter;
     private TextView mEmptyText;
+    private SwipeRefreshLayout mRefreshLayout;
 
     private ObjectAnimator mFabAnimator;
     private float mOrigFabX;
@@ -51,9 +52,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         mList.setLayoutManager(new LinearLayoutManager(this));
         mList.setAdapter(mAdapter);
 
-        SwipeRefreshLayout sr = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
-        sr.setOnRefreshListener(this);
-        sr.setColorSchemeColors(ContextCompat.getColor(this, R.color.md_green),
+        mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+        mRefreshLayout.setOnRefreshListener(this);
+        mRefreshLayout.setColorSchemeColors(ContextCompat.getColor(this, R.color.md_green),
                 ContextCompat.getColor(this, R.color.md_yellow),
                 ContextCompat.getColor(this, R.color.md_red));
 
@@ -61,9 +62,19 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         mFab.setOnClickListener(this);
 
         Inquiry.init(this, "nocknock", 1);
+        refreshModels();
+    }
+
+    private void refreshModels() {
+        mEmptyText.setVisibility(View.GONE);
         Inquiry.get()
                 .selectFrom(SITES_TABLE_NAME, ServerModel.class)
-                .all(result -> mAdapter.set(result));
+                .all(this::setModels);
+    }
+
+    private void setModels(ServerModel[] models) {
+        mAdapter.set(models);
+        mEmptyText.setVisibility(mAdapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -90,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     @Override
     public void onRefresh() {
+        mRefreshLayout.setRefreshing(false);
         // TODO check all servers in order
     }
 
@@ -128,6 +140,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         if (resultCode == RESULT_OK) {
             ServerModel model = (ServerModel) data.getSerializableExtra("model");
             mAdapter.add(model);
+            mEmptyText.setVisibility(View.GONE);
 
             Inquiry.get().insertInto(SITES_TABLE_NAME, ServerModel.class)
                     .values(model)

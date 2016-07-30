@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="?selectableItemBackground"
     android:orientation="horizontal"
     android:paddingLeft="@dimen/content_inset"
     android:paddingRight="@dimen/content_inset">

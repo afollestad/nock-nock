@@ -40,7 +40,9 @@
                     android:id="@+id/inputName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-light"
                     android:hint="@string/site_name"
+                    android:inputType="textPersonName"
                     android:textColor="?android:textColorPrimary"
                     android:textColorHint="?android:textColorSecondary" />
 
@@ -57,7 +59,9 @@
                     android:id="@+id/inputUrl"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-light"
                     android:hint="@string/site_url"
+                    android:inputType="textUri"
                     android:textColor="?android:textColorPrimary"
                     android:textColorHint="?android:textColorSecondary" />
 

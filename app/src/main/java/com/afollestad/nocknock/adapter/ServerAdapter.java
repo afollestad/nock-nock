@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.nocknock.R;
 import com.afollestad.nocknock.api.ServerModel;
@@ -117,7 +118,7 @@ public class ServerAdapter extends RecyclerView.Adapter<ServerAdapter.ServerVH> 
         return mServers.size();
     }
 
-    public static class ServerVH extends RecyclerView.ViewHolder {
+    public static class ServerVH extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         final ImageView iconStatus;
         final TextView textName;
@@ -132,6 +133,13 @@ public class ServerAdapter extends RecyclerView.Adapter<ServerAdapter.ServerVH> 
             textInterval = (TextView) itemView.findViewById(R.id.textInterval);
             textUrl = (TextView) itemView.findViewById(R.id.textUrl);
             textStatus = (TextView) itemView.findViewById(R.id.textStatus);
+
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            Toast.makeText(view.getContext(), "Coming soon", Toast.LENGTH_SHORT).show();
         }
     }
 }
