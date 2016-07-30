@@ -26,12 +26,12 @@ import com.afollestad.nocknock.api.ServerStatus;
 public class AddSiteActivity extends AppCompatActivity implements View.OnClickListener {
 
     private View rootLayout;
-    private Toolbar toolbar;
 
     private EditText inputName;
     private EditText inputUrl;
     private EditText inputInterval;
     private Spinner spinnerInterval;
+    private boolean isClosing;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,7 +44,7 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
         inputInterval = (EditText) findViewById(R.id.checkIntervalInput);
         spinnerInterval = (Spinner) findViewById(R.id.checkIntervalSpinner);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(view -> {
             closeFromNavWithReveal();
         });
@@ -70,7 +70,14 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
         findViewById(R.id.doneBtn).setOnClickListener(this);
     }
 
+    @Override
+    public void onBackPressed() {
+        closeFromCenterWithReveal();
+    }
+
     private void closeFromNavWithReveal() {
+        if (isClosing) return;
+        isClosing = true;
         final int offset = (int) getResources().getDimension(R.dimen.content_inset);
         final int cx = rootLayout.getMeasuredWidth();
         final int cy = rootLayout.getMeasuredHeight();
@@ -83,6 +90,30 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
+                rootLayout.setVisibility(View.INVISIBLE);
+                finish();
+                overridePendingTransition(0, 0);
+            }
+        });
+
+        circularReveal.start();
+    }
+
+    private void closeFromCenterWithReveal() {
+        if (isClosing) return;
+        isClosing = true;
+        final int cx = rootLayout.getMeasuredWidth() / 2;
+        final int cy = rootLayout.getMeasuredHeight() / 2;
+        float initialRadius = Math.max(cx, cy);
+
+        final Animator circularReveal = ViewAnimationUtils.createCircularReveal(rootLayout, cx, cy, initialRadius, 0);
+        circularReveal.setDuration(300);
+        circularReveal.setInterpolator(new AccelerateInterpolator());
+        circularReveal.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                rootLayout.setVisibility(View.INVISIBLE);
                 finish();
                 overridePendingTransition(0, 0);
             }
@@ -94,23 +125,21 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
     private void circularRevealActivity() {
         final int cx = rootLayout.getMeasuredWidth() / 2;
         final int cy = rootLayout.getMeasuredHeight() / 2;
-        final int animDuration = 300;
         final float finalRadius = Math.max(cx, cy);
         final Animator circularReveal = ViewAnimationUtils.createCircularReveal(rootLayout, cx, cy, 0, finalRadius);
 
-        circularReveal.setDuration(animDuration);
+        circularReveal.setDuration(300);
         circularReveal.setInterpolator(new DecelerateInterpolator());
 
-        toolbar.setAlpha(0f);
         rootLayout.setVisibility(View.VISIBLE);
-
-        toolbar.animate().alpha(1f).setDuration(animDuration).start();
         circularReveal.start();
     }
 
     // Done button
     @Override
     public void onClick(View view) {
+        isClosing = true;
+        
         ServerModel model = new ServerModel();
         model.name = inputName.getText().toString().trim();
         model.url = inputUrl.getText().toString().trim();
