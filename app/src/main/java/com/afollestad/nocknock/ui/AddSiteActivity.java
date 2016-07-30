@@ -26,6 +26,7 @@ import com.afollestad.nocknock.api.ServerStatus;
 public class AddSiteActivity extends AppCompatActivity implements View.OnClickListener {
 
     private View rootLayout;
+    private Toolbar toolbar;
 
     private EditText inputName;
     private EditText inputUrl;
@@ -44,9 +45,9 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
         inputInterval = (EditText) findViewById(R.id.checkIntervalInput);
         spinnerInterval = (Spinner) findViewById(R.id.checkIntervalSpinner);
 
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(view -> {
-            closeFromNavWithReveal();
+            closeActivityWithReveal();
         });
 
         if (savedInstanceState == null) {
@@ -72,38 +73,15 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onBackPressed() {
-        closeFromCenterWithReveal();
+        closeActivityWithReveal();
     }
 
-    private void closeFromNavWithReveal() {
+    private void closeActivityWithReveal() {
         if (isClosing) return;
         isClosing = true;
-        final int offset = (int) getResources().getDimension(R.dimen.content_inset);
-        final int cx = rootLayout.getMeasuredWidth();
-        final int cy = rootLayout.getMeasuredHeight();
-        float initialRadius = Math.max(cx, cy);
-
-        final Animator circularReveal = ViewAnimationUtils.createCircularReveal(rootLayout, offset, offset, initialRadius, 0);
-        circularReveal.setDuration(300);
-        circularReveal.setInterpolator(new AccelerateInterpolator());
-        circularReveal.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                rootLayout.setVisibility(View.INVISIBLE);
-                finish();
-                overridePendingTransition(0, 0);
-            }
-        });
-
-        circularReveal.start();
-    }
-
-    private void closeFromCenterWithReveal() {
-        if (isClosing) return;
-        isClosing = true;
-        final int cx = rootLayout.getMeasuredWidth() / 2;
-        final int cy = rootLayout.getMeasuredHeight() / 2;
+        final int fabSize = getIntent().getIntExtra("fab_size", toolbar.getMeasuredHeight());
+        final int cx = (int) getIntent().getFloatExtra("fab_x", rootLayout.getMeasuredWidth() / 2) + (fabSize / 2);
+        final int cy = (int) getIntent().getFloatExtra("fab_y", rootLayout.getMeasuredHeight() / 2) + toolbar.getMeasuredHeight() + (fabSize / 2);
         float initialRadius = Math.max(cx, cy);
 
         final Animator circularReveal = ViewAnimationUtils.createCircularReveal(rootLayout, cx, cy, initialRadius, 0);
@@ -139,7 +117,7 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onClick(View view) {
         isClosing = true;
-        
+
         ServerModel model = new ServerModel();
         model.name = inputName.getText().toString().trim();
         model.url = inputUrl.getText().toString().trim();

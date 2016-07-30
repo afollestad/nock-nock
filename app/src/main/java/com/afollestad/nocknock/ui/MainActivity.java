@@ -18,14 +18,17 @@ import android.view.View;
 import android.view.animation.PathInterpolator;
 import android.widget.TextView;
 
+import com.afollestad.inquiry.Inquiry;
 import com.afollestad.nocknock.R;
 import com.afollestad.nocknock.adapter.ServerAdapter;
 import com.afollestad.nocknock.api.ServerModel;
-import com.afollestad.nocknock.api.ServerStatus;
 import com.afollestad.nocknock.dialogs.AboutDialog;
 import com.afollestad.nocknock.util.MathUtil;
 
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
+
+    private final static int ADD_SITE_RQ = 6969;
+    private final static String SITES_TABLE_NAME = "sites";
 
     private FloatingActionButton mFab;
     private RecyclerView mList;
@@ -57,25 +60,17 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         mFab = (FloatingActionButton) findViewById(R.id.fab);
         mFab.setOnClickListener(this);
 
-        ServerModel model = new ServerModel();
-        model.name = "Personal Site";
-        model.url = "https://aidanfollestad.com";
-        model.id = 1;
-        model.status = ServerStatus.OK;
-        model.checkInterval = 1000 * 60;
-        model.lastCheck = System.currentTimeMillis();
-        mAdapter.add(model);
+        Inquiry.init(this, "nocknock", 1);
+        Inquiry.get()
+                .selectFrom(SITES_TABLE_NAME, ServerModel.class)
+                .all(result -> mAdapter.set(result));
+    }
 
-        model = new ServerModel();
-        model.name = "Polar Request Manager";
-        model.url = "https://polar.aidanfollestad.com";
-        model.id = 2;
-        model.status = ServerStatus.CHECKING;
-        model.checkInterval = 1000 * 60 * 2;
-        model.lastCheck = System.currentTimeMillis();
-        mAdapter.add(model);
-
-        mEmptyText.setVisibility(View.GONE);
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (isFinishing())
+            Inquiry.deinit();
     }
 
     @Override
@@ -113,8 +108,11 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
-                startActivity(new Intent(MainActivity.this, AddSiteActivity.class)
-                        .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));
+                startActivityForResult(new Intent(MainActivity.this, AddSiteActivity.class)
+                        .putExtra("fab_x", mOrigFabX)
+                        .putExtra("fab_y", mOrigFabY)
+                        .putExtra("fab_size", mFab.getMeasuredWidth())
+                        .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION), ADD_SITE_RQ);
                 mFab.postDelayed(() -> {
                     mFab.setX(mOrigFabX);
                     mFab.setY(mOrigFabY);
@@ -122,5 +120,20 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             }
         });
         mFabAnimator.start();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            ServerModel model = (ServerModel) data.getSerializableExtra("model");
+            mAdapter.add(model);
+
+            Inquiry.get().insertInto(SITES_TABLE_NAME, ServerModel.class)
+                    .values(model)
+                    .run(changed -> {
+                        //TODO?
+                    });
+        }
     }
 }
