@@ -27,6 +27,7 @@ import android.view.View;
 import android.view.animation.PathInterpolator;
 import android.widget.TextView;
 
+import com.afollestad.bridge.Bridge;
 import com.afollestad.inquiry.Inquiry;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.nocknock.R;
@@ -94,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         mFab.setOnClickListener(this);
 
         Inquiry.init(this, DB_NAME, 1);
+        Bridge.config()
+                .defaultHeader("User-Agent", getString(R.string.app_name) + " (Android)");
     }
 
     private void showRefreshTutorial() {
@@ -101,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         final SharedPreferences pr = PreferenceManager.getDefaultSharedPreferences(this);
         if (pr.getBoolean("shown_swipe_refresh_tutorial", false)) return;
 
+        mFab.hide();
         final View tutorialView = findViewById(R.id.swipeRefreshTutorial);
         tutorialView.setVisibility(View.VISIBLE);
         tutorialView.setAlpha(0f);
@@ -111,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             view.setOnClickListener(null);
             findViewById(R.id.swipeRefreshTutorial).setVisibility(View.GONE);
             pr.edit().putBoolean("shown_swipe_refresh_tutorial", true).commit();
+            mFab.show();
         });
     }
 

@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.afollestad.bridge.Bridge;
 import com.afollestad.nocknock.R;
 import com.afollestad.nocknock.api.ServerModel;
 import com.afollestad.nocknock.api.ServerStatus;
@@ -80,6 +81,9 @@ public class ViewSiteActivity extends AppCompatActivity implements View.OnClickL
 
         mModel = (ServerModel) getIntent().getSerializableExtra("model");
         update();
+
+        Bridge.config()
+                .defaultHeader("User-Agent", getString(R.string.app_name) + " (Android)");
     }
 
     @Override
