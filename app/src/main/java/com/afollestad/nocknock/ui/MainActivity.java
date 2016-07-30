@@ -3,7 +3,10 @@ package com.afollestad.nocknock.ui;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Path;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -12,23 +15,31 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.PathInterpolator;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.inquiry.Inquiry;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.nocknock.R;
 import com.afollestad.nocknock.adapter.ServerAdapter;
 import com.afollestad.nocknock.api.ServerModel;
 import com.afollestad.nocknock.dialogs.AboutDialog;
+import com.afollestad.nocknock.services.CheckService;
+import com.afollestad.nocknock.util.AlarmUtil;
 import com.afollestad.nocknock.util.MathUtil;
+import com.afollestad.nocknock.views.DividerItemDecoration;
 
-public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener, ServerAdapter.ClickListener {
 
     private final static int ADD_SITE_RQ = 6969;
-    private final static String SITES_TABLE_NAME = "sites";
+    public final static String DB_NAME = "nock_nock";
+    public final static String SITES_TABLE_NAME = "sites";
 
     private FloatingActionButton mFab;
     private RecyclerView mList;
@@ -40,17 +51,34 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private float mOrigFabX;
     private float mOrigFabY;
 
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.v("MainActivity", "Received " + intent.getAction());
+            if (CheckService.ACTION_RUNNING.equals(intent.getAction())) {
+                if (mRefreshLayout != null)
+                    mRefreshLayout.setRefreshing(false);
+            } else {
+                final ServerModel model = (ServerModel) intent.getSerializableExtra("model");
+                if (mAdapter != null && mList != null && model != null) {
+                    mList.post(() -> mAdapter.update(model));
+                }
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mAdapter = new ServerAdapter();
+        mAdapter = new ServerAdapter(this);
         mEmptyText = (TextView) findViewById(R.id.emptyText);
 
         mList = (RecyclerView) findViewById(R.id.list);
         mList.setLayoutManager(new LinearLayoutManager(this));
         mList.setAdapter(mAdapter);
+        mList.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
 
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
         mRefreshLayout.setOnRefreshListener(this);
@@ -61,8 +89,31 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         mFab = (FloatingActionButton) findViewById(R.id.fab);
         mFab.setOnClickListener(this);
 
-        Inquiry.init(this, "nocknock", 1);
+        Inquiry.init(this, DB_NAME, 1);
         refreshModels();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        try {
+            final IntentFilter filter = new IntentFilter();
+            filter.addAction(CheckService.ACTION_CHECK_UPDATE);
+            filter.addAction(CheckService.ACTION_RUNNING);
+            registerReceiver(mReceiver, filter);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        try {
+            unregisterReceiver(mReceiver);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
     }
 
     private void refreshModels() {
@@ -75,13 +126,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private void setModels(ServerModel[] models) {
         mAdapter.set(models);
         mEmptyText.setVisibility(mAdapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (isFinishing())
-            Inquiry.deinit();
+        AlarmUtil.setSiteChecks(this, models);
     }
 
     @Override
@@ -101,8 +146,11 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     @Override
     public void onRefresh() {
-        mRefreshLayout.setRefreshing(false);
-        // TODO check all servers in order
+        if (CheckService.isRunning(this)) {
+            mRefreshLayout.setRefreshing(false);
+            return;
+        }
+        startService(new Intent(this, CheckService.class));
     }
 
     // FAB clicked
@@ -114,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         if (mFabAnimator != null)
             mFabAnimator.cancel();
         mFabAnimator = ObjectAnimator.ofFloat(view, View.X, View.Y, curve);
-        mFabAnimator.setInterpolator(new PathInterpolator(0.4f, 0.4f, 1, 1));
+        mFabAnimator.setInterpolator(new PathInterpolator(.5f, .5f));
         mFabAnimator.setDuration(300);
         mFabAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
@@ -145,8 +193,50 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             Inquiry.get().insertInto(SITES_TABLE_NAME, ServerModel.class)
                     .values(model)
                     .run(changed -> {
-                        //TODO?
+                        AlarmUtil.setSiteChecks(MainActivity.this, model);
+                        checkSite(model);
                     });
+        }
+    }
+
+    private void removeSite(final int index, final ServerModel model) {
+        Inquiry.init(this, DB_NAME, 1);
+        new MaterialDialog.Builder(this)
+                .title(R.string.remove_site)
+                .content(Html.fromHtml(getString(R.string.remove_site_prompt, model.name)))
+                .positiveText(R.string.remove)
+                .negativeText(android.R.string.cancel)
+                .onPositive((dialog, which) -> {
+                    AlarmUtil.cancelSiteChecks(MainActivity.this, model);
+                    Inquiry.get()
+                            .deleteFrom(SITES_TABLE_NAME, ServerModel.class)
+                            .where("_id = ?", model.id)
+                            .run();
+                    mAdapter.remove(index);
+                }).show();
+    }
+
+    private void checkSite(ServerModel model) {
+        startService(new Intent(this, CheckService.class)
+                .putExtra(CheckService.MODEL_ID, model.id));
+    }
+
+    @Override
+    public void onSiteSelected(final int index, final ServerModel model, boolean longClick) {
+        if (longClick) {
+            new MaterialDialog.Builder(this)
+                    .title(R.string.options)
+                    .items(R.array.site_long_options)
+                    .negativeText(android.R.string.cancel)
+                    .itemsCallback((dialog, itemView, which, text) -> {
+                        if (which == 0) {
+                            checkSite(model);
+                        } else {
+                            removeSite(index, model);
+                        }
+                    }).show();
+        } else {
+            Toast.makeText(this, "Coming soon", Toast.LENGTH_SHORT).show();
         }
     }
 }

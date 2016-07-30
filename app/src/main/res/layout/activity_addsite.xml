@@ -42,7 +42,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-light"
                     android:hint="@string/site_name"
-                    android:inputType="textPersonName|textCapWords"
+                    android:inputType="textPersonName|textCapWords|textAutoCorrect"
                     android:textColor="?android:textColorPrimary"
                     android:textColorHint="?android:textColorSecondary" />
 
@@ -70,7 +70,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/content_inset_double"
+                android:layout_marginTop="@dimen/content_inset_more"
                 android:orientation="vertical">
 
                 <TextView

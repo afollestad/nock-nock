@@ -5,7 +5,7 @@
     <color name="colorPrimaryDark">#37474F</color>
     <color name="colorAccent">#FF6E40</color>
 
-    <color name="dividerColor">#B6B6B6</color>
+    <color name="dividerColor">#EEEEEE</color>
 
     <color name="md_red">#E53935</color>
     <color name="md_yellow">#FDD835</color>

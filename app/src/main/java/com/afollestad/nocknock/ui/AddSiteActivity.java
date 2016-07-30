@@ -5,8 +5,10 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Patterns;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewTreeObserver;
@@ -122,6 +124,28 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
         model.name = inputName.getText().toString().trim();
         model.url = inputUrl.getText().toString().trim();
         model.status = ServerStatus.WAITING;
+
+        if (model.name.isEmpty()) {
+            ((TextInputLayout) inputName.getParent()).setError(getString(R.string.please_enter_name));
+            isClosing = false;
+            return;
+        } else {
+            ((TextInputLayout) inputName.getParent()).setError(null);
+        }
+
+        if (model.url.isEmpty()) {
+            ((TextInputLayout) inputUrl.getParent()).setError(getString(R.string.please_enter_url));
+            isClosing = false;
+            return;
+        } else {
+            final TextInputLayout urlTl = (TextInputLayout) inputUrl.getParent();
+            urlTl.setError(null);
+            if (!Patterns.WEB_URL.matcher(model.url).find()) {
+                urlTl.setError(getString(R.string.please_enter_valid_url));
+                isClosing = false;
+                return;
+            }
+        }
 
         String intervalStr = inputInterval.getText().toString().trim();
         if (intervalStr.isEmpty()) intervalStr = "0";

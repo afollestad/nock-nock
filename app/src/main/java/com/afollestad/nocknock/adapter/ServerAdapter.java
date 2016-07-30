@@ -4,14 +4,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.nocknock.R;
 import com.afollestad.nocknock.api.ServerModel;
 import com.afollestad.nocknock.api.ServerStatus;
 import com.afollestad.nocknock.util.TimeUtil;
+import com.afollestad.nocknock.views.StatusImageView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,8 +22,20 @@ public class ServerAdapter extends RecyclerView.Adapter<ServerAdapter.ServerVH> 
 
     private final Object LOCK = new Object();
     private ArrayList<ServerModel> mServers;
+    private ClickListener mListener;
 
-    public ServerAdapter() {
+    public interface ClickListener {
+        void onSiteSelected(int index, ServerModel model, boolean longClick);
+    }
+
+    public void performClick(int index, boolean longClick) {
+        if (mListener != null) {
+            mListener.onSiteSelected(index, mServers.get(index), longClick);
+        }
+    }
+
+    public ServerAdapter(ClickListener listener) {
+        mListener = listener;
         mServers = new ArrayList<>(2);
     }
 
@@ -78,7 +89,7 @@ public class ServerAdapter extends RecyclerView.Adapter<ServerAdapter.ServerVH> 
     @Override
     public ServerAdapter.ServerVH onCreateViewHolder(ViewGroup parent, int viewType) {
         final View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_server, parent, false);
-        return new ServerVH(v);
+        return new ServerVH(v, this);
     }
 
     @Override
@@ -87,23 +98,20 @@ public class ServerAdapter extends RecyclerView.Adapter<ServerAdapter.ServerVH> 
 
         holder.textName.setText(model.name);
         holder.textUrl.setText(model.url);
+        holder.iconStatus.setStatus(model.status);
 
         switch (model.status) {
             case ServerStatus.OK:
                 holder.textStatus.setText(R.string.everything_checks_out);
-                holder.iconStatus.setImageResource(R.drawable.green_circle);
                 break;
             case ServerStatus.WAITING:
                 holder.textStatus.setText(R.string.waiting);
-                holder.iconStatus.setImageResource(R.drawable.yellow_circle);
                 break;
             case ServerStatus.CHECKING:
                 holder.textStatus.setText(R.string.checking_status);
-                holder.iconStatus.setImageResource(R.drawable.yellow_circle);
                 break;
             case ServerStatus.ERROR:
                 holder.textStatus.setText(R.string.something_wrong);
-                holder.iconStatus.setImageResource(R.drawable.red_circle);
                 break;
         }
 
@@ -118,28 +126,37 @@ public class ServerAdapter extends RecyclerView.Adapter<ServerAdapter.ServerVH> 
         return mServers.size();
     }
 
-    public static class ServerVH extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class ServerVH extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
-        final ImageView iconStatus;
+        final StatusImageView iconStatus;
         final TextView textName;
         final TextView textInterval;
         final TextView textUrl;
         final TextView textStatus;
+        final ServerAdapter adapter;
 
-        public ServerVH(View itemView) {
+        public ServerVH(View itemView, ServerAdapter adapter) {
             super(itemView);
-            iconStatus = (ImageView) itemView.findViewById(R.id.iconStatus);
+            iconStatus = (StatusImageView) itemView.findViewById(R.id.iconStatus);
             textName = (TextView) itemView.findViewById(R.id.textName);
             textInterval = (TextView) itemView.findViewById(R.id.textInterval);
             textUrl = (TextView) itemView.findViewById(R.id.textUrl);
             textStatus = (TextView) itemView.findViewById(R.id.textStatus);
+            this.adapter = adapter;
 
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
-            Toast.makeText(view.getContext(), "Coming soon", Toast.LENGTH_SHORT).show();
+            adapter.performClick(getAdapterPosition(), false);
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            adapter.performClick(getAdapterPosition(), true);
+            return false;
         }
     }
 }

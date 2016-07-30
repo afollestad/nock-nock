@@ -3,9 +3,9 @@
     <string name="app_name" tools:ignore="Typos">Nock Nock</string>
 
     <string name="everything_checks_out">Everything checks out!</string>
-    <string name="something_wrong">Something\'s wrong!</string>
+    <string name="something_wrong">Something\'s wrong! Tap for details.</string>
     <string name="checking_status">Checking status…</string>
-    <string name="waiting">Waiting</string>
+    <string name="waiting">Waiting…</string>
 
     <string name="no_sites_added">No sites added!</string>
 
@@ -25,12 +25,26 @@
     <string name="check_interval">Check Interval</string>
     <string name="done">Done</string>
     <string name="never_refresh">Never Refresh</string>
+    <string name="please_enter_name">Please enter a name!</string>
+    <string name="please_enter_url">Please enter a URL.</string>
+    <string name="please_enter_valid_url">Please enter a valid URL.</string>
 
+    <string name="timeout">Request timed out! Your server is probably down.</string>
+    <string name="options">Options</string>
+    <string name="already_checking_sites">Already checking sites!</string>
+    <string name="remove_site">Remove Site</string>
+    <string name="remove_site_prompt"><![CDATA[Remove <b>%1$s</b> from your sites?]]></string>
+    <string name="remove">Remove</string>
     <string-array name="interval_options">
         <item>Minute(s)</item>
         <item>Hour(s)</item>
         <item>Day(s)</item>
         <item>Weeks(s)</item>
+    </string-array>
+
+    <string-array name="site_long_options">
+        <item>Refresh Status</item>
+        <item>Remove Site</item>
     </string-array>
 
 </resources>

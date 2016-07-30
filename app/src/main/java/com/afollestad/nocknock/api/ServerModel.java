@@ -19,9 +19,12 @@ public class ServerModel implements Serializable {
     @Column
     public String url;
     @Column
+    @ServerStatus.Enum
     public int status;
     @Column
     public long checkInterval;
     @Column
     public long lastCheck;
+    @Column
+    public String reason;
 }

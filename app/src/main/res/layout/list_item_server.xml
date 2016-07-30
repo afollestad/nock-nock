@@ -5,24 +5,23 @@
     android:layout_height="wrap_content"
     android:background="?selectableItemBackground"
     android:orientation="horizontal"
+    android:paddingBottom="@dimen/content_inset_less"
     android:paddingLeft="@dimen/content_inset"
-    android:paddingRight="@dimen/content_inset">
+    android:paddingRight="@dimen/content_inset"
+    android:paddingTop="@dimen/content_inset_less">
 
-    <ImageView
+    <com.afollestad.nocknock.views.StatusImageView
         android:id="@+id/iconStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_marginBottom="@dimen/content_inset"
         android:layout_marginEnd="@dimen/content_inset"
-        android:layout_marginTop="@dimen/content_inset_half"
-        android:src="@drawable/green_circle"
+        android:scaleType="centerInside"
         tools:ignore="ContentDescription" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/content_inset_half"
         android:orientation="vertical">
 
         <RelativeLayout
@@ -79,12 +78,6 @@
             android:textColor="?android:textColorSecondary"
             android:textSize="@dimen/body_font_size"
             tools:text="Everything checks out!" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:layout_marginTop="@dimen/content_inset_less"
-            android:background="@color/dividerColor" />
 
     </LinearLayout>
 
