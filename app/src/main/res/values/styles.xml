@@ -27,4 +27,9 @@
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
+    <style name="AccentButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:textColor">#fff</item>
+        <item name="android:colorButtonNormal">@color/colorAccent</item>
+    </style>
+
 </resources>

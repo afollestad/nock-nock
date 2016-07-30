@@ -52,6 +52,7 @@ public class AlarmUtil {
     }
 
     public static void setSiteChecks(Context context, ServerModel[] sites) {
+        if (sites == null || sites.length == 0) return;
         for (ServerModel site : sites)
             setSiteChecks(context, site);
     }

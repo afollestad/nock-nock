@@ -8,8 +8,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Path;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
@@ -94,6 +96,24 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         Inquiry.init(this, DB_NAME, 1);
     }
 
+    private void showRefreshTutorial() {
+        if (mAdapter.getItemCount() == 0) return;
+        final SharedPreferences pr = PreferenceManager.getDefaultSharedPreferences(this);
+        if (pr.getBoolean("shown_swipe_refresh_tutorial", false)) return;
+
+        final View tutorialView = findViewById(R.id.swipeRefreshTutorial);
+        tutorialView.setVisibility(View.VISIBLE);
+        tutorialView.setAlpha(0f);
+        tutorialView.animate().cancel();
+        tutorialView.animate().setDuration(300).alpha(1f).start();
+
+        findViewById(R.id.understoodBtn).setOnClickListener(view -> {
+            view.setOnClickListener(null);
+            findViewById(R.id.swipeRefreshTutorial).setVisibility(View.GONE);
+            pr.edit().putBoolean("shown_swipe_refresh_tutorial", true).commit();
+        });
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -135,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         mAdapter.set(models);
         mEmptyText.setVisibility(mAdapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
         AlarmUtil.setSiteChecks(this, models);
+        showRefreshTutorial();
     }
 
     @Override
@@ -204,7 +225,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                             AlarmUtil.setSiteChecks(MainActivity.this, model);
                             checkSite(MainActivity.this, model);
                         });
-            } else if(requestCode == VIEW_SITE_RQ) {
+            } else if (requestCode == VIEW_SITE_RQ) {
                 Inquiry.get()
                         .update(MainActivity.SITES_TABLE_NAME, ServerModel.class)
                         .where("_id = ?", model.id)

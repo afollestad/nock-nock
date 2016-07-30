@@ -42,6 +42,8 @@
     <string name="none">None</string>
 
     <string name="refresh_status">Refresh Status</string>
+    <string name="swipe_refresh_hint">Drag the list down to manually refresh site statuses! Otherwise, they will be updated automatically in the background on chosen intervals.</string>
+    <string name="understood">Understood!</string>
 
     <string-array name="interval_options">
         <item>Minute(s)</item>
