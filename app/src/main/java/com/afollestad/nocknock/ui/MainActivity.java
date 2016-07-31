@@ -280,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                         if (which == 0) {
                             checkSite(MainActivity.this, model);
                         } else {
-                            removeSite(MainActivity.this, model, null);
+                            removeSite(MainActivity.this, model, () -> mAdapter.remove(index));
                         }
                     }).show();
         } else {
