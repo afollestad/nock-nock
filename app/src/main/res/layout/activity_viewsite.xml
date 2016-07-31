@@ -85,6 +85,7 @@
                         android:fontFamily="sans-serif-light"
                         android:textColor="?android:textColorPrimary"
                         android:textSize="@dimen/caption_font_size"
+                        android:visibility="gone"
                         tools:text="Warning: this app checks for server availability with HTTP requests. It's recommended that you use an HTTP URL." />
 
                 </LinearLayout>
