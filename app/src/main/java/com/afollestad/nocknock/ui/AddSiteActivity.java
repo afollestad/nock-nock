@@ -3,6 +3,7 @@ package com.afollestad.nocknock.ui;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
@@ -17,6 +18,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.afollestad.nocknock.R;
 import com.afollestad.nocknock.api.ServerModel;
@@ -34,6 +36,8 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
     private EditText inputUrl;
     private EditText inputInterval;
     private Spinner spinnerInterval;
+    private TextView textUrlWarning;
+
     private boolean isClosing;
 
     @Override
@@ -44,13 +48,12 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
         rootLayout = findViewById(R.id.rootView);
         inputName = (EditText) findViewById(R.id.inputName);
         inputUrl = (EditText) findViewById(R.id.inputUrl);
+        textUrlWarning = (TextView) findViewById(R.id.textUrlWarning);
         inputInterval = (EditText) findViewById(R.id.checkIntervalInput);
         spinnerInterval = (Spinner) findViewById(R.id.checkIntervalSpinner);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setNavigationOnClickListener(view -> {
-            closeActivityWithReveal();
-        });
+        toolbar.setNavigationOnClickListener(view -> closeActivityWithReveal());
 
         if (savedInstanceState == null) {
             rootLayout.setVisibility(View.INVISIBLE);
@@ -69,6 +72,23 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
         ArrayAdapter<String> intervalOptionsAdapter = new ArrayAdapter<>(this, R.layout.list_item_spinner,
                 getResources().getStringArray(R.array.interval_options));
         spinnerInterval.setAdapter(intervalOptionsAdapter);
+
+        inputUrl.setOnFocusChangeListener((view, hasFocus) -> {
+            if (!hasFocus) {
+                final String inputStr = inputUrl.getText().toString().trim();
+                if (inputStr.isEmpty()) return;
+                final Uri uri = Uri.parse(inputStr);
+                if (uri.getScheme() == null) {
+                    inputUrl.setText("http://" + inputStr);
+                    textUrlWarning.setVisibility(View.GONE);
+                } else if (!"http".equals(uri.getScheme()) && !"https".equals(uri.getScheme())) {
+                    textUrlWarning.setVisibility(View.VISIBLE);
+                    textUrlWarning.setText(R.string.warning_http_url);
+                } else {
+                    textUrlWarning.setVisibility(View.GONE);
+                }
+            }
+        });
 
         findViewById(R.id.doneBtn).setOnClickListener(this);
     }
@@ -144,6 +164,10 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
                 urlTl.setError(getString(R.string.please_enter_valid_url));
                 isClosing = false;
                 return;
+            } else {
+                final Uri uri = Uri.parse(model.url);
+                if (uri.getScheme() == null)
+                    model.url = "http://" + model.url;
             }
         }
 

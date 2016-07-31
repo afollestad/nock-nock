@@ -70,6 +70,16 @@
             </android.support.design.widget.TextInputLayout>
 
             <TextView
+                android:id="@+id/textUrlWarning"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/list_text_spacing"
+                android:fontFamily="sans-serif-light"
+                android:textColor="?android:textColorPrimary"
+                android:textSize="@dimen/caption_font_size"
+                tools:text="Warning: this app checks for server availability with HTTP requests. It's recommended that you use an HTTP URL." />
+
+            <TextView
                 android:id="@+id/checkIntervalLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

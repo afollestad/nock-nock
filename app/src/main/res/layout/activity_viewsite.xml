@@ -75,6 +75,18 @@
                         android:textSize="@dimen/body_font_size"
                         android:transitionName="site_url" />
 
+                    <TextView
+                        android:id="@+id/textUrlWarning"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="@dimen/list_text_spacing"
+                        android:fontFamily="sans-serif-light"
+                        android:textColor="?android:textColorPrimary"
+                        android:textSize="@dimen/caption_font_size"
+                        tools:text="Warning: this app checks for server availability with HTTP requests. It's recommended that you use an HTTP URL." />
+
                 </LinearLayout>
 
             </LinearLayout>
@@ -140,7 +152,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/list_text_spacing"
                 android:fontFamily="sans-serif"
-                android:textColor="?android:textColorSecondary"
+                android:textColor="?android:textColorPrimary"
                 android:textSize="@dimen/medium_text_size"
                 tools:text="Everything checks out!" />
 
@@ -158,7 +170,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/list_text_spacing"
                 android:fontFamily="sans-serif"
-                android:textColor="?android:textColorSecondary"
+                android:textColor="?android:textColorPrimary"
                 android:textSize="@dimen/medium_text_size"
                 tools:text="In 2 hours" />
 

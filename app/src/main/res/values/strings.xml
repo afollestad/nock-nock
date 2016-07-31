@@ -46,6 +46,10 @@
     <string name="swipe_refresh_hint">Drag the list down to manually refresh site statuses! Otherwise, they will be updated automatically in the background on chosen intervals.</string>
     <string name="understood">Understood!</string>
 
+    <string name="warning_http_url">
+        Warning: this app checks for server availability with HTTP requests. It\'s recommended that you use an HTTP URL.
+    </string>
+
     <string-array name="interval_options">
         <item>Minute(s)</item>
         <item>Hour(s)</item>

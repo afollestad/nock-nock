@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -42,6 +43,7 @@ public class ViewSiteActivity extends AppCompatActivity implements View.OnClickL
     private Spinner checkIntervalSpinner;
     private TextView textLastCheckResult;
     private TextView textNextCheck;
+    private TextView textUrlWarning;
 
     private ServerModel mModel;
 
@@ -70,6 +72,7 @@ public class ViewSiteActivity extends AppCompatActivity implements View.OnClickL
         iconStatus = (StatusImageView) findViewById(R.id.iconStatus);
         inputName = (EditText) findViewById(R.id.inputName);
         inputUrl = (EditText) findViewById(R.id.inputUrl);
+        textUrlWarning = (TextView) findViewById(R.id.textUrlWarning);
         inputCheckInterval = (EditText) findViewById(R.id.checkIntervalInput);
         checkIntervalSpinner = (Spinner) findViewById(R.id.checkIntervalSpinner);
         textLastCheckResult = (TextView) findViewById(R.id.textLastCheckResult);
@@ -78,6 +81,23 @@ public class ViewSiteActivity extends AppCompatActivity implements View.OnClickL
         ArrayAdapter<String> intervalOptionsAdapter = new ArrayAdapter<>(this, R.layout.list_item_spinner,
                 getResources().getStringArray(R.array.interval_options));
         checkIntervalSpinner.setAdapter(intervalOptionsAdapter);
+
+        inputUrl.setOnFocusChangeListener((view, hasFocus) -> {
+            if (!hasFocus) {
+                final String inputStr = inputUrl.getText().toString().trim();
+                if (inputStr.isEmpty()) return;
+                final Uri uri = Uri.parse(inputStr);
+                if (uri.getScheme() == null) {
+                    inputUrl.setText("http://" + inputStr);
+                    textUrlWarning.setVisibility(View.GONE);
+                } else if (!"http".equals(uri.getScheme()) && !"https".equals(uri.getScheme())) {
+                    textUrlWarning.setVisibility(View.VISIBLE);
+                    textUrlWarning.setText(R.string.warning_http_url);
+                } else {
+                    textUrlWarning.setVisibility(View.GONE);
+                }
+            }
+        });
 
         mModel = (ServerModel) getIntent().getSerializableExtra("model");
         update();
@@ -197,6 +217,10 @@ public class ViewSiteActivity extends AppCompatActivity implements View.OnClickL
             if (!Patterns.WEB_URL.matcher(mModel.url).find()) {
                 inputUrl.setError(getString(R.string.please_enter_valid_url));
                 return;
+            } else {
+                final Uri uri = Uri.parse(mModel.url);
+                if (uri.getScheme() == null)
+                    mModel.url = "http://" + mModel.url;
             }
         }
 

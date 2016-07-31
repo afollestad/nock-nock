@@ -135,6 +135,7 @@ public class CheckService extends Service {
                 .setSmallIcon(R.drawable.ic_notification)
                 .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher))
                 .setPriority(Notification.PRIORITY_HIGH)
+                .setAutoCancel(true)
                 .setDefaults(Notification.DEFAULT_VIBRATE)
                 .build();
         nm.notify(site.url, NOTI_ID, noti);
@@ -150,6 +151,8 @@ public class CheckService extends Service {
 
         Inquiry.init(this, MainActivity.DB_NAME, 1);
         isRunning(true);
+        Bridge.config()
+                .defaultHeader("User-Agent", getString(R.string.app_name) + " (Android)");
 
         new Thread(() -> {
             final Query<ServerModel, Integer> query = Inquiry.get()
