@@ -150,7 +150,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
     private void refreshModels() {
-        mEmptyText.setVisibility(View.GONE);
+        mAdapter.clear();
+        mEmptyText.setVisibility(View.VISIBLE);
         Inquiry.get()
                 .selectFrom(SITES_TABLE_NAME, ServerModel.class)
                 .all(this::setModels);
@@ -280,7 +281,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                         if (which == 0) {
                             checkSite(MainActivity.this, model);
                         } else {
-                            removeSite(MainActivity.this, model, () -> mAdapter.remove(index));
+                            removeSite(MainActivity.this, model, () -> {
+                                mAdapter.remove(index);
+                                mEmptyText.setVisibility(mAdapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
+                            });
                         }
                     }).show();
         } else {

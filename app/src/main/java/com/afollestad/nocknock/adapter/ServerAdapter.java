@@ -86,6 +86,11 @@ public class ServerAdapter extends RecyclerView.Adapter<ServerAdapter.ServerVH> 
         notifyDataSetChanged();
     }
 
+    public void clear() {
+        mServers.clear();
+        notifyDataSetChanged();
+    }
+
     @Override
     public ServerAdapter.ServerVH onCreateViewHolder(ViewGroup parent, int viewType) {
         final View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_server, parent, false);
