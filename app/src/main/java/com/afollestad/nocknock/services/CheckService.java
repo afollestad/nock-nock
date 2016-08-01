@@ -24,6 +24,7 @@ import com.afollestad.nocknock.api.ServerModel;
 import com.afollestad.nocknock.api.ServerStatus;
 import com.afollestad.nocknock.ui.MainActivity;
 import com.afollestad.nocknock.ui.ViewSiteActivity;
+import com.afollestad.nocknock.util.NetworkUtil;
 
 import java.util.Locale;
 
@@ -35,6 +36,7 @@ public class CheckService extends Service {
     public static String ACTION_CHECK_UPDATE = BuildConfig.APPLICATION_ID + ".CHECK_UPDATE";
     public static String ACTION_RUNNING = BuildConfig.APPLICATION_ID + ".CHECK_RUNNING";
     public static String MODEL_ID = "model_id";
+    public static String ONLY_WAITING = "only_waiting";
     public static int NOTI_ID = 3456;
 
     private static void LOG(String msg, Object... format) {
@@ -157,8 +159,11 @@ public class CheckService extends Service {
         new Thread(() -> {
             final Query<ServerModel, Integer> query = Inquiry.get()
                     .selectFrom(MainActivity.SITES_TABLE_NAME, ServerModel.class);
-            if (intent != null && intent.hasExtra(MODEL_ID))
+            if (intent != null && intent.hasExtra(MODEL_ID)) {
                 query.where("_id = ?", intent.getLongExtra(MODEL_ID, -1));
+            } else if (intent != null && intent.getBooleanExtra(ONLY_WAITING, false)) {
+                query.where("status = ?", ServerStatus.WAITING);
+            }
             final ServerModel[] sites = query.all();
 
             if (sites == null || sites.length == 0) {
@@ -177,23 +182,27 @@ public class CheckService extends Service {
                 updateStatus(site);
             }
 
-            for (ServerModel site : sites) {
-                LOG("Checking %s (%s)...", site.name, site.url);
-                site.status = ServerStatus.CHECKING;
-                site.lastCheck = System.currentTimeMillis();
-                updateStatus(site);
+            if (NetworkUtil.hasInternet(this)) {
+                for (ServerModel site : sites) {
+                    LOG("Checking %s (%s)...", site.name, site.url);
+                    site.status = ServerStatus.CHECKING;
+                    site.lastCheck = System.currentTimeMillis();
+                    updateStatus(site);
 
-                try {
-                    Bridge.get(site.url)
-                            .throwIfNotSuccess()
-                            .cancellable(false)
-                            .request();
-                    site.reason = null;
-                    site.status = ServerStatus.OK;
-                } catch (BridgeException e) {
-                    processError(e, site);
+                    try {
+                        Bridge.get(site.url)
+                                .throwIfNotSuccess()
+                                .cancellable(false)
+                                .request();
+                        site.reason = null;
+                        site.status = ServerStatus.OK;
+                    } catch (BridgeException e) {
+                        processError(e, site);
+                    }
+                    updateStatus(site);
                 }
-                updateStatus(site);
+            } else {
+                LOG("No internet connection, waiting.");
             }
 
             isRunning(false);

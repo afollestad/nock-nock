@@ -1,4 +1,4 @@
-package com.afollestad.nocknock.services;
+package com.afollestad.nocknock.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
