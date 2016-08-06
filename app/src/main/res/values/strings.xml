@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="app_name" tools:ignore="Typos">Nock Nock</string>
+    <string name="app_name" tools:ignore="Typos">Nock Nock (BETA)</string>
 
     <string name="everything_checks_out">Everything checks out!</string>
     <string name="something_wrong">Something\'s wrong! Tap for details.</string>
@@ -17,7 +17,7 @@
         <a href=\'https://google.com/+AidanFollestad\'>Google+</a>&nbsp;&nbsp;
         <a href=\'https://github.com/afollestad\'>GitHub</a>&nbsp;&nbsp;
         <a href=\'https://www.linkedin.com/in/afollestad\'>LinkedIn</a>
-        <br/><i>Nock Nock is open source! Check out the <a href=\'https://github.com/afollestad/nock-nock\'>GitHub page</a>!</i>
+        <br/><br/><i>Nock Nock is open source! Check out the <a href=\'https://github.com/afollestad/nock-nock\'>GitHub page</a>!</i>
         <br/>Icon by <a href=\'https://plus.google.com/+KevinAguilarC\'>Kevin Aguilar</a> of <b>221 Pixels</b>.
     ]]></string>
     <string name="dismiss">Dismiss</string>

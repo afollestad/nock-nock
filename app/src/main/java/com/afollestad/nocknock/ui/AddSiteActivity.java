@@ -240,7 +240,7 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
                 break;
             case 2:
                 model.validationMode = ValidationMode.JAVASCRIPT;
-                model.validationContent = ((EditText) findViewById(R.id.responseValidationScriptInput)).getText().toString().trim().replace("\n", " ");
+                model.validationContent = ((EditText) findViewById(R.id.responseValidationScriptInput)).getText().toString().trim();
                 break;
         }
 

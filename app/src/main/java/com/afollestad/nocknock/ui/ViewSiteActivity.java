@@ -302,7 +302,7 @@ public class ViewSiteActivity extends AppCompatActivity implements View.OnClickL
                 break;
             case 2:
                 mModel.validationMode = ValidationMode.JAVASCRIPT;
-                mModel.validationContent = ((EditText) findViewById(R.id.responseValidationScriptInput)).getText().toString().trim().replace("\n", " ");
+                mModel.validationContent = ((EditText) findViewById(R.id.responseValidationScriptInput)).getText().toString().trim();
                 break;
         }
 
