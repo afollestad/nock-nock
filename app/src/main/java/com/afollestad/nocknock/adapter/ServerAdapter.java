@@ -116,7 +116,7 @@ public class ServerAdapter extends RecyclerView.Adapter<ServerAdapter.ServerVH> 
                 holder.textStatus.setText(R.string.checking_status);
                 break;
             case ServerStatus.ERROR:
-                holder.textStatus.setText(R.string.something_wrong);
+                holder.textStatus.setText(model.reason);
                 break;
         }
 

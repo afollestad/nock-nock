@@ -15,6 +15,7 @@ import android.view.ViewAnimationUtils;
 import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -23,6 +24,7 @@ import android.widget.TextView;
 import com.afollestad.nocknock.R;
 import com.afollestad.nocknock.api.ServerModel;
 import com.afollestad.nocknock.api.ServerStatus;
+import com.afollestad.nocknock.api.ValidationMode;
 
 /**
  * @author Aidan Follestad (afollestad)
@@ -37,6 +39,7 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
     private EditText inputInterval;
     private Spinner spinnerInterval;
     private TextView textUrlWarning;
+    private Spinner responseValidationSpinner;
 
     private boolean isClosing;
 
@@ -51,6 +54,7 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
         textUrlWarning = (TextView) findViewById(R.id.textUrlWarning);
         inputInterval = (EditText) findViewById(R.id.checkIntervalInput);
         spinnerInterval = (Spinner) findViewById(R.id.checkIntervalSpinner);
+        responseValidationSpinner = (Spinner) findViewById(R.id.responseValidationMode);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(view -> closeActivityWithReveal());
@@ -71,6 +75,7 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
 
         ArrayAdapter<String> intervalOptionsAdapter = new ArrayAdapter<>(this, R.layout.list_item_spinner,
                 getResources().getStringArray(R.array.interval_options));
+        intervalOptionsAdapter.setDropDownViewResource(R.layout.list_item_spinner_dropdown);
         spinnerInterval.setAdapter(intervalOptionsAdapter);
 
         inputUrl.setOnFocusChangeListener((view, hasFocus) -> {
@@ -87,6 +92,38 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
                 } else {
                     textUrlWarning.setVisibility(View.GONE);
                 }
+            }
+        });
+
+        ArrayAdapter<String> validationOptionsAdapter = new ArrayAdapter<>(this, R.layout.list_item_spinner,
+                getResources().getStringArray(R.array.response_validation_options));
+        validationOptionsAdapter.setDropDownViewResource(R.layout.list_item_spinner_dropdown);
+        responseValidationSpinner.setAdapter(validationOptionsAdapter);
+        responseValidationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                final View searchTerm = findViewById(R.id.responseValidationSearchTerm);
+                final View javascript = findViewById(R.id.responseValidationScript);
+                final TextView modeDesc = (TextView) findViewById(R.id.validationModeDescription);
+
+                searchTerm.setVisibility(i == 1 ? View.VISIBLE : View.GONE);
+                javascript.setVisibility(i == 2 ? View.VISIBLE : View.GONE);
+
+                switch (i) {
+                    case 0:
+                        modeDesc.setText(R.string.validation_mode_status_desc);
+                        break;
+                    case 1:
+                        modeDesc.setText(R.string.validation_mode_term_desc);
+                        break;
+                    case 2:
+                        modeDesc.setText(R.string.validation_mode_javascript_desc);
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
             }
         });
 
@@ -191,6 +228,21 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
         }
 
         model.lastCheck = System.currentTimeMillis() - model.checkInterval;
+
+        switch (responseValidationSpinner.getSelectedItemPosition()) {
+            case 0:
+                model.validationMode = ValidationMode.STATUS_CODE;
+                model.validationContent = null;
+                break;
+            case 1:
+                model.validationMode = ValidationMode.TERM_SEARCH;
+                model.validationContent = ((EditText) findViewById(R.id.responseValidationSearchTerm)).getText().toString().trim();
+                break;
+            case 2:
+                model.validationMode = ValidationMode.JAVASCRIPT;
+                model.validationContent = ((EditText) findViewById(R.id.responseValidationScriptInput)).getText().toString().trim().replace("\n", " ");
+                break;
+        }
 
         setResult(RESULT_OK, new Intent()
                 .putExtra("model", model));

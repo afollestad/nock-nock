@@ -16,14 +16,17 @@ import android.widget.Toast;
 
 import com.afollestad.bridge.Bridge;
 import com.afollestad.bridge.BridgeException;
+import com.afollestad.bridge.Response;
 import com.afollestad.inquiry.Inquiry;
 import com.afollestad.inquiry.Query;
 import com.afollestad.nocknock.BuildConfig;
 import com.afollestad.nocknock.R;
 import com.afollestad.nocknock.api.ServerModel;
 import com.afollestad.nocknock.api.ServerStatus;
+import com.afollestad.nocknock.api.ValidationMode;
 import com.afollestad.nocknock.ui.MainActivity;
 import com.afollestad.nocknock.ui.ViewSiteActivity;
+import com.afollestad.nocknock.util.JsUtil;
 import com.afollestad.nocknock.util.NetworkUtil;
 
 import java.util.Locale;
@@ -31,6 +34,7 @@ import java.util.Locale;
 /**
  * @author Aidan Follestad (afollestad)
  */
+@SuppressWarnings("CheckResult")
 public class CheckService extends Service {
 
     public static String ACTION_CHECK_UPDATE = BuildConfig.APPLICATION_ID + ".CHECK_UPDATE";
@@ -89,7 +93,7 @@ public class CheckService extends Service {
     }
 
     private void updateStatus(ServerModel site) {
-        Inquiry.get()
+        Inquiry.get(this)
                 .update(MainActivity.SITES_TABLE_NAME, ServerModel.class)
                 .where("_id = ?", site.id)
                 .values(site)
@@ -151,13 +155,13 @@ public class CheckService extends Service {
             return START_NOT_STICKY;
         }
 
-        Inquiry.init(this, MainActivity.DB_NAME, 1);
+        Inquiry.newInstance(this, MainActivity.DB_NAME).build();
         isRunning(true);
         Bridge.config()
                 .defaultHeader("User-Agent", getString(R.string.app_name) + " (Android)");
 
         new Thread(() -> {
-            final Query<ServerModel, Integer> query = Inquiry.get()
+            final Query<ServerModel, Integer> query = Inquiry.get(this)
                     .selectFrom(MainActivity.SITES_TABLE_NAME, ServerModel.class);
             if (intent != null && intent.hasExtra(MODEL_ID)) {
                 query.where("_id = ?", intent.getLongExtra(MODEL_ID, -1));
@@ -190,12 +194,27 @@ public class CheckService extends Service {
                     updateStatus(site);
 
                     try {
-                        Bridge.get(site.url)
+                        final Response response = Bridge.get(site.url)
                                 .throwIfNotSuccess()
                                 .cancellable(false)
-                                .request();
+                                .request()
+                                .response();
+
                         site.reason = null;
                         site.status = ServerStatus.OK;
+
+                        if (site.validationMode == ValidationMode.TERM_SEARCH) {
+                            final String body = response.asString();
+                            if (body == null || !body.contains(site.validationContent)) {
+                                site.status = ServerStatus.ERROR;
+                                site.reason = "Term \"" + site.validationContent + "\" not found in response body.";
+                            }
+                        } else if (site.validationMode == ValidationMode.JAVASCRIPT) {
+                            final String body = response.asString();
+                            site.reason = JsUtil.exec(site.validationContent, body);
+                            if (site.reason != null && !site.toString().isEmpty())
+                                site.status = ServerStatus.ERROR;
+                        }
                     } catch (BridgeException e) {
                         processError(e, site);
                     }
@@ -211,5 +230,11 @@ public class CheckService extends Service {
         }).start();
 
         return START_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        Inquiry.destroy(this);
+        super.onDestroy();
     }
 }

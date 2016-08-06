@@ -18,6 +18,7 @@
         <a href=\'https://github.com/afollestad\'>GitHub</a>&nbsp;&nbsp;
         <a href=\'https://www.linkedin.com/in/afollestad\'>LinkedIn</a>
         <br/><i>Nock Nock is open source! Check out the <a href=\'https://github.com/afollestad/nock-nock\'>GitHub page</a>!</i>
+        <br/>Icon by <a href=\'https://plus.google.com/+KevinAguilarC\'>Kevin Aguilar</a> of <b>221 Pixels</b>.
     ]]></string>
     <string name="dismiss">Dismiss</string>
     <string name="add_site">Add Site</string>
@@ -49,6 +50,15 @@
     <string name="warning_http_url">
         Warning: this app checks for server availability with HTTP requests. It\'s recommended that you use an HTTP URL.
     </string>
+    <string name="default_js">var responseObj = JSON.parse(response);\nreturn responseObj.success === true;</string>
+    <string name="function_declaration">function validate(response) {</string>
+    <string name="function_end">}</string>
+    <string name="response_validation_mode">Response Validation Mode</string>
+    <string name="search_term">Search term…</string>
+
+    <string name="validation_mode_status_desc">The HTTP status code is checked. If it\'s a successful status code, the site passes the check.</string>
+    <string name="validation_mode_term_desc">The status code check is done first. If it\'s successful, the response body is checked. If it contains your search term, the site passes the check.</string>
+    <string name="validation_mode_javascript_desc">The status code check is done first. If it\'s successful, the response body is passed to the JavaScript function above. If the function returns true, the site passes the check. Throw an exception to pass custom error messages to Nock Nock.</string>
 
     <string-array name="interval_options">
         <item>Minute(s)</item>
@@ -60,6 +70,12 @@
     <string-array name="site_long_options" translatable="false">
         <item>@string/refresh_status</item>
         <item>@string/remove_site</item>
+    </string-array>
+
+    <string-array name="response_validation_options">
+        <item>Status Code</item>
+        <item>Search Term</item>
+        <item>JavaScript Evaluation</item>
     </string-array>
 
 </resources>

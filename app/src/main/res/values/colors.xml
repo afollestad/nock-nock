@@ -11,4 +11,6 @@
     <color name="md_yellow">#FDD835</color>
     <color name="md_green">#43A047</color>
 
+    <color name="dividerColorDark">#37474F</color>
+
 </resources>

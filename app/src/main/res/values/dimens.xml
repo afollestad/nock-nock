@@ -18,5 +18,6 @@
     <dimen name="fab_elevation_pressed">8dp</dimen>
     <dimen name="button_height">52dp</dimen>
     <dimen name="tutorial_button_width">300dp</dimen>
+    <dimen name="code_font_size">14sp</dimen>
 
 </resources>

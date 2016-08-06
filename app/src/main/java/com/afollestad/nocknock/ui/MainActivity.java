@@ -3,6 +3,7 @@ package com.afollestad.nocknock.ui;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -33,6 +34,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.nocknock.R;
 import com.afollestad.nocknock.adapter.ServerAdapter;
 import com.afollestad.nocknock.api.ServerModel;
+import com.afollestad.nocknock.api.ValidationMode;
 import com.afollestad.nocknock.dialogs.AboutDialog;
 import com.afollestad.nocknock.services.CheckService;
 import com.afollestad.nocknock.util.AlarmUtil;
@@ -44,7 +46,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private final static int ADD_SITE_RQ = 6969;
     private final static int VIEW_SITE_RQ = 6923;
     public final static String DB_NAME = "nock_nock";
-    public final static String SITES_TABLE_NAME = "sites";
+    public final static String SITES_TABLE_NAME_OLD = "sites";
+    public final static String SITES_TABLE_NAME = "site_models";
 
     private FloatingActionButton mFab;
     private RecyclerView mList;
@@ -72,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         }
     };
 
+    @SuppressLint("CommitPrefEdits")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,9 +98,33 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         mFab = (FloatingActionButton) findViewById(R.id.fab);
         mFab.setOnClickListener(this);
 
-        Inquiry.init(this, DB_NAME, 1);
+        Inquiry.newInstance(this, DB_NAME).build();
         Bridge.config()
                 .defaultHeader("User-Agent", getString(R.string.app_name) + " (Android)");
+
+        final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        if (!sp.getBoolean("migrated_db", false)) {
+            final Inquiry mdb = Inquiry.newInstance(this, DB_NAME)
+                    .instanceName("migrate_db")
+                    .build(false);
+            final ServerModel[] models = Inquiry.get(this)
+                    .selectFrom(SITES_TABLE_NAME_OLD, ServerModel.class)
+                    .projection("_id", "name", "url", "status", "checkInterval", "lastCheck", "reason")
+                    .all();
+            if (models != null) {
+                Log.d("SiteMigration", "Migrating " + models.length + " sites to the new table.");
+                for (ServerModel model : models) {
+                    model.validationMode = ValidationMode.STATUS_CODE;
+                    model.validationContent = null;
+                }
+                //noinspection CheckResult
+                mdb.insertInto(SITES_TABLE_NAME, ServerModel.class)
+                        .values(models)
+                        .run();
+                mdb.dropTable(SITES_TABLE_NAME_OLD);
+            }
+            sp.edit().putBoolean("migrated_db", true).commit();
+        }
     }
 
     private void showRefreshTutorial() {
@@ -141,6 +169,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         super.onPause();
         CheckService.isAppOpen(this, false);
 
+        if (isFinishing()) {
+            Inquiry.destroy(this);
+        }
+
         NotificationManagerCompat.from(this).cancel(CheckService.NOTI_ID);
         try {
             unregisterReceiver(mReceiver);
@@ -152,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private void refreshModels() {
         mAdapter.clear();
         mEmptyText.setVisibility(View.VISIBLE);
-        Inquiry.get()
+        Inquiry.get(this)
                 .selectFrom(SITES_TABLE_NAME, ServerModel.class)
                 .all(this::setModels);
     }
@@ -225,28 +257,21 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             if (requestCode == ADD_SITE_RQ) {
                 mAdapter.add(model);
                 mEmptyText.setVisibility(View.GONE);
-                Inquiry.get().insertInto(SITES_TABLE_NAME, ServerModel.class)
+                Inquiry.get(this).insertInto(SITES_TABLE_NAME, ServerModel.class)
                         .values(model)
                         .run(inserted -> {
                             AlarmUtil.setSiteChecks(MainActivity.this, model);
                             checkSite(MainActivity.this, model);
                         });
             } else if (requestCode == VIEW_SITE_RQ) {
-                Inquiry.get()
-                        .update(MainActivity.SITES_TABLE_NAME, ServerModel.class)
-                        .where("_id = ?", model.id)
-                        .values(model)
-                        .run(changed -> {
-                            mAdapter.update(model);
-                            AlarmUtil.setSiteChecks(MainActivity.this, model);
-                            checkSite(MainActivity.this, model);
-                        });
+                mAdapter.update(model);
+                AlarmUtil.setSiteChecks(MainActivity.this, model);
+                checkSite(MainActivity.this, model);
             }
         }
     }
 
     public static void removeSite(final Context context, final ServerModel model, final Runnable onRemoved) {
-        Inquiry.init(context, DB_NAME, 1);
         new MaterialDialog.Builder(context)
                 .title(R.string.remove_site)
                 .content(Html.fromHtml(context.getString(R.string.remove_site_prompt, model.name)))
@@ -256,10 +281,15 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                     AlarmUtil.cancelSiteChecks(context, model);
                     final NotificationManagerCompat nm = NotificationManagerCompat.from(context);
                     nm.cancel(model.url, CheckService.NOTI_ID);
-                    Inquiry.get()
-                            .deleteFrom(SITES_TABLE_NAME, ServerModel.class)
+                    //noinspection CheckResult
+                    final Inquiry rinq = Inquiry.newInstance(context, DB_NAME)
+                            .instanceName("remove_site")
+                            .build(false);
+                    //noinspection CheckResult
+                    rinq.deleteFrom(SITES_TABLE_NAME, ServerModel.class)
                             .where("_id = ?", model.id)
                             .run();
+                    rinq.destroyInstance();
                     if (onRemoved != null)
                         onRemoved.run();
                 }).show();

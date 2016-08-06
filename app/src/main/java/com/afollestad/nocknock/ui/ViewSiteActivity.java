@@ -14,15 +14,18 @@ import android.util.Log;
 import android.util.Patterns;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.afollestad.bridge.Bridge;
+import com.afollestad.inquiry.Inquiry;
 import com.afollestad.nocknock.R;
 import com.afollestad.nocknock.api.ServerModel;
 import com.afollestad.nocknock.api.ServerStatus;
+import com.afollestad.nocknock.api.ValidationMode;
 import com.afollestad.nocknock.services.CheckService;
 import com.afollestad.nocknock.util.TimeUtil;
 import com.afollestad.nocknock.views.StatusImageView;
@@ -44,6 +47,7 @@ public class ViewSiteActivity extends AppCompatActivity implements View.OnClickL
     private TextView textLastCheckResult;
     private TextView textNextCheck;
     private TextView textUrlWarning;
+    private Spinner responseValidationSpinner;
 
     private ServerModel mModel;
 
@@ -77,9 +81,11 @@ public class ViewSiteActivity extends AppCompatActivity implements View.OnClickL
         checkIntervalSpinner = (Spinner) findViewById(R.id.checkIntervalSpinner);
         textLastCheckResult = (TextView) findViewById(R.id.textLastCheckResult);
         textNextCheck = (TextView) findViewById(R.id.textNextCheck);
+        responseValidationSpinner = (Spinner) findViewById(R.id.responseValidationMode);
 
         ArrayAdapter<String> intervalOptionsAdapter = new ArrayAdapter<>(this, R.layout.list_item_spinner,
                 getResources().getStringArray(R.array.interval_options));
+        intervalOptionsAdapter.setDropDownViewResource(R.layout.list_item_spinner_dropdown);
         checkIntervalSpinner.setAdapter(intervalOptionsAdapter);
 
         inputUrl.setOnFocusChangeListener((view, hasFocus) -> {
@@ -99,6 +105,38 @@ public class ViewSiteActivity extends AppCompatActivity implements View.OnClickL
             }
         });
 
+        ArrayAdapter<String> validationOptionsAdapter = new ArrayAdapter<>(this, R.layout.list_item_spinner,
+                getResources().getStringArray(R.array.response_validation_options));
+        validationOptionsAdapter.setDropDownViewResource(R.layout.list_item_spinner_dropdown);
+        responseValidationSpinner.setAdapter(validationOptionsAdapter);
+        responseValidationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                final View searchTerm = findViewById(R.id.responseValidationSearchTerm);
+                final View javascript = findViewById(R.id.responseValidationScript);
+                final TextView modeDesc = (TextView) findViewById(R.id.validationModeDescription);
+
+                searchTerm.setVisibility(i == 1 ? View.VISIBLE : View.GONE);
+                javascript.setVisibility(i == 2 ? View.VISIBLE : View.GONE);
+
+                switch (i) {
+                    case 0:
+                        modeDesc.setText(R.string.validation_mode_status_desc);
+                        break;
+                    case 1:
+                        modeDesc.setText(R.string.validation_mode_term_desc);
+                        break;
+                    case 2:
+                        modeDesc.setText(R.string.validation_mode_javascript_desc);
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
+
         mModel = (ServerModel) getIntent().getSerializableExtra("model");
         update();
 
@@ -115,7 +153,7 @@ public class ViewSiteActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint({"SetTextI18n", "SwitchIntDef"})
     private void update() {
         final SimpleDateFormat df = new SimpleDateFormat("MMMM dd, hh:mm:ss a", Locale.getDefault());
 
@@ -169,6 +207,16 @@ public class ViewSiteActivity extends AppCompatActivity implements View.OnClickL
             }
         }
 
+        responseValidationSpinner.setSelection(mModel.validationMode - 1);
+        switch (mModel.validationMode) {
+            case ValidationMode.TERM_SEARCH:
+                ((TextView) findViewById(R.id.responseValidationSearchTerm)).setText(mModel.validationContent);
+                break;
+            case ValidationMode.JAVASCRIPT:
+                ((TextView) findViewById(R.id.responseValidationScriptInput)).setText(mModel.validationContent);
+                break;
+        }
+
         findViewById(R.id.doneBtn).setOnClickListener(this);
     }
 
@@ -195,26 +243,24 @@ public class ViewSiteActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    // Save button
-    @Override
-    public void onClick(View view) {
+    private void performSave(boolean withValidation) {
         mModel.name = inputName.getText().toString().trim();
         mModel.url = inputUrl.getText().toString().trim();
         mModel.status = ServerStatus.WAITING;
 
-        if (mModel.name.isEmpty()) {
+        if (withValidation && mModel.name.isEmpty()) {
             inputName.setError(getString(R.string.please_enter_name));
             return;
         } else {
             inputName.setError(null);
         }
 
-        if (mModel.url.isEmpty()) {
+        if (withValidation && mModel.url.isEmpty()) {
             inputUrl.setError(getString(R.string.please_enter_url));
             return;
         } else {
             inputUrl.setError(null);
-            if (!Patterns.WEB_URL.matcher(mModel.url).find()) {
+            if (withValidation && !Patterns.WEB_URL.matcher(mModel.url).find()) {
                 inputUrl.setError(getString(R.string.please_enter_valid_url));
                 return;
             } else {
@@ -245,6 +291,35 @@ public class ViewSiteActivity extends AppCompatActivity implements View.OnClickL
 
         mModel.lastCheck = System.currentTimeMillis() - mModel.checkInterval;
 
+        switch (responseValidationSpinner.getSelectedItemPosition()) {
+            case 0:
+                mModel.validationMode = ValidationMode.STATUS_CODE;
+                mModel.validationContent = null;
+                break;
+            case 1:
+                mModel.validationMode = ValidationMode.TERM_SEARCH;
+                mModel.validationContent = ((EditText) findViewById(R.id.responseValidationSearchTerm)).getText().toString().trim();
+                break;
+            case 2:
+                mModel.validationMode = ValidationMode.JAVASCRIPT;
+                mModel.validationContent = ((EditText) findViewById(R.id.responseValidationScriptInput)).getText().toString().trim().replace("\n", " ");
+                break;
+        }
+
+        final Inquiry inq = Inquiry.newInstance(this, MainActivity.DB_NAME)
+                .build(false);
+        //noinspection CheckResult
+        inq.update(MainActivity.SITES_TABLE_NAME, ServerModel.class)
+                .where("_id = ?", mModel.id)
+                .values(mModel)
+                .run();
+        inq.destroyInstance();
+    }
+
+    // Save button
+    @Override
+    public void onClick(View view) {
+        performSave(true);
         setResult(RESULT_OK, new Intent().putExtra("model", mModel));
         finish();
     }
@@ -253,10 +328,11 @@ public class ViewSiteActivity extends AppCompatActivity implements View.OnClickL
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.refresh:
+                performSave(false);
                 MainActivity.checkSite(this, mModel);
                 return true;
             case R.id.remove:
-                MainActivity.removeSite(this, mModel, () -> finish());
+                MainActivity.removeSite(this, mModel, this::finish);
                 return true;
         }
         return false;

@@ -27,4 +27,10 @@ public class ServerModel implements Serializable {
     public long lastCheck;
     @Column
     public String reason;
+
+    @Column
+    @ValidationMode.Enum
+    public int validationMode;
+    @Column
+    public String validationContent;
 }

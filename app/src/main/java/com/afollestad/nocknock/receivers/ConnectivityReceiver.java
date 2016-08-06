@@ -17,8 +17,9 @@ public class ConnectivityReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         final boolean hasInternet = NetworkUtil.hasInternet(context);
         Log.v("ConnectivityReceiver", "Connectivity state changed... has internet? " + hasInternet);
-        if (hasInternet)
+        if (hasInternet) {
             context.startService(new Intent(context, CheckService.class)
                     .putExtra(CheckService.ONLY_WAITING, true));
+        }
     }
 }

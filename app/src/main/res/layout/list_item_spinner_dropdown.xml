@@ -4,5 +4,7 @@
     android:layout_height="@dimen/button_height"
     android:fontFamily="sans-serif-light"
     android:gravity="center_vertical|start"
+    android:paddingLeft="@dimen/content_inset"
+    android:paddingRight="@dimen/content_inset"
     android:textColor="?android:textColorPrimary"
     android:textSize="@dimen/body_font_size" />

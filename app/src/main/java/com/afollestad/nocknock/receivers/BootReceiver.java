@@ -17,11 +17,12 @@ public class BootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
-            Inquiry.init(context, MainActivity.DB_NAME, 1);
-            ServerModel[] models = Inquiry.get()
+            final Inquiry inq = Inquiry.newInstance(context, MainActivity.DB_NAME).build(false);
+            ServerModel[] models = inq
                     .selectFrom(MainActivity.SITES_TABLE_NAME, ServerModel.class)
                     .all();
             AlarmUtil.setSiteChecks(context, models);
+            inq.destroyInstance();
         }
     }
 }
