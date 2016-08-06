@@ -215,6 +215,9 @@ public class CheckService extends Service {
                             if (site.reason != null && !site.toString().isEmpty())
                                 site.status = ServerStatus.ERROR;
                         }
+
+                        if (site.status == ServerStatus.ERROR)
+                            showNotification(this, site);
                     } catch (BridgeException e) {
                         processError(e, site);
                     }
