@@ -11,6 +11,9 @@ android {
         versionCode 9
         versionName "0.1.2.0"
 
+        lintOptions {
+            abortOnError false
+        }
         jackOptions {
             enabled true
         }
