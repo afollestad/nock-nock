@@ -8,8 +8,8 @@ android {
         applicationId "com.afollestad.nocknock"
         minSdkVersion 21
         targetSdkVersion 24
-        versionCode 11
-        versionName "0.1.2.1"
+        versionCode 12
+        versionName "0.1.2.2"
 
         lintOptions {
             abortOnError false
@@ -34,10 +34,10 @@ android {
 
 dependencies {
     compile 'com.android.support:appcompat-v7:24.1.1'
-    compile 'com.afollestad.material-dialogs:core:0.8.6.2'
-    compile 'com.afollestad.material-dialogs:commons:0.8.6.2'
+    compile 'com.afollestad.material-dialogs:core:0.9.0.0'
+    compile 'com.afollestad.material-dialogs:commons:0.9.0.0'
     compile 'com.afollestad:bridge:3.2.5'
-    compile 'com.afollestad:inquiry:3.1.0'
+    compile 'com.afollestad:inquiry:3.2.1'
     compile 'com.android.support:design:24.1.1'
     compile files('libs/rhino-1.7.7.1.jar')
 }

@@ -237,7 +237,11 @@ public class CheckService extends Service {
 
     @Override
     public void onDestroy() {
-        Inquiry.destroy(this);
+        try {
+            Inquiry.destroy(this);
+        } catch (Throwable t2) {
+            t2.printStackTrace();
+        }
         super.onDestroy();
     }
 }
