@@ -34,7 +34,9 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
     private View rootLayout;
     private Toolbar toolbar;
 
+    private TextInputLayout nameTiLayout;
     private EditText inputName;
+    private TextInputLayout urlTiLayout;
     private EditText inputUrl;
     private EditText inputInterval;
     private Spinner spinnerInterval;
@@ -49,7 +51,9 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
         setContentView(R.layout.activity_addsite);
 
         rootLayout = findViewById(R.id.rootView);
+        nameTiLayout = (TextInputLayout) findViewById(R.id.nameTiLayout);
         inputName = (EditText) findViewById(R.id.inputName);
+        urlTiLayout = (TextInputLayout) findViewById(R.id.urlTiLayout);
         inputUrl = (EditText) findViewById(R.id.inputUrl);
         textUrlWarning = (TextView) findViewById(R.id.textUrlWarning);
         inputInterval = (EditText) findViewById(R.id.checkIntervalInput);
@@ -183,22 +187,21 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
         model.status = ServerStatus.WAITING;
 
         if (model.name.isEmpty()) {
-            ((TextInputLayout) inputName.getParent()).setError(getString(R.string.please_enter_name));
+            nameTiLayout.setError(getString(R.string.please_enter_name));
             isClosing = false;
             return;
         } else {
-            ((TextInputLayout) inputName.getParent()).setError(null);
+            nameTiLayout.setError(null);
         }
 
         if (model.url.isEmpty()) {
-            ((TextInputLayout) inputUrl.getParent()).setError(getString(R.string.please_enter_url));
+            urlTiLayout.setError(getString(R.string.please_enter_url));
             isClosing = false;
             return;
         } else {
-            final TextInputLayout urlTl = (TextInputLayout) inputUrl.getParent();
-            urlTl.setError(null);
+            urlTiLayout.setError(null);
             if (!Patterns.WEB_URL.matcher(model.url).find()) {
-                urlTl.setError(getString(R.string.please_enter_valid_url));
+                urlTiLayout.setError(getString(R.string.please_enter_valid_url));
                 isClosing = false;
                 return;
             } else {
