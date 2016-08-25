@@ -1,5 +1,6 @@
 package com.afollestad.nocknock.services;
 
+import android.app.IntentService;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -35,13 +36,17 @@ import java.util.Locale;
  * @author Aidan Follestad (afollestad)
  */
 @SuppressWarnings("CheckResult")
-public class CheckService extends Service {
+public class CheckService extends IntentService {
 
     public static String ACTION_CHECK_UPDATE = BuildConfig.APPLICATION_ID + ".CHECK_UPDATE";
     public static String ACTION_RUNNING = BuildConfig.APPLICATION_ID + ".CHECK_RUNNING";
     public static String MODEL_ID = "model_id";
     public static String ONLY_WAITING = "only_waiting";
     public static int NOTI_ID = 3456;
+
+    public CheckService() {
+        super("NockNockCheckService");
+    }
 
     private static void LOG(String msg, Object... format) {
         if (format != null)
@@ -53,6 +58,83 @@ public class CheckService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    @Override
+    protected void onHandleIntent(Intent intent) {
+        Inquiry.newInstance(this, MainActivity.DB_NAME).build();
+        isRunning(true);
+        Bridge.config()
+                .defaultHeader("User-Agent", getString(R.string.app_name) + " (Android)");
+
+        final Query<ServerModel, Integer> query = Inquiry.get(this)
+                .selectFrom(MainActivity.SITES_TABLE_NAME, ServerModel.class);
+        if (intent != null && intent.hasExtra(MODEL_ID)) {
+            query.where("_id = ?", intent.getLongExtra(MODEL_ID, -1));
+        } else if (intent != null && intent.getBooleanExtra(ONLY_WAITING, false)) {
+            query.where("status = ?", ServerStatus.WAITING);
+        }
+        final ServerModel[] sites = query.all();
+
+        if (sites == null || sites.length == 0) {
+            LOG("No sites added to check, service will terminate.");
+            isRunning(false);
+            stopSelf();
+            return;
+        }
+
+        LOG("Checking %d sites...", sites.length);
+        sendBroadcast(new Intent(ACTION_RUNNING));
+
+        for (ServerModel site : sites) {
+            LOG("Updating %s (%s) status to WAITING...", site.name, site.url);
+            site.status = ServerStatus.WAITING;
+            updateStatus(site);
+        }
+
+        if (NetworkUtil.hasInternet(this)) {
+            for (ServerModel site : sites) {
+                LOG("Checking %s (%s)...", site.name, site.url);
+                site.status = ServerStatus.CHECKING;
+                site.lastCheck = System.currentTimeMillis();
+                updateStatus(site);
+
+                try {
+                    final Response response = Bridge.get(site.url)
+                            .throwIfNotSuccess()
+                            .cancellable(false)
+                            .request()
+                            .response();
+
+                    site.reason = null;
+                    site.status = ServerStatus.OK;
+
+                    if (site.validationMode == ValidationMode.TERM_SEARCH) {
+                        final String body = response.asString();
+                        if (body == null || !body.contains(site.validationContent)) {
+                            site.status = ServerStatus.ERROR;
+                            site.reason = "Term \"" + site.validationContent + "\" not found in response body.";
+                        }
+                    } else if (site.validationMode == ValidationMode.JAVASCRIPT) {
+                        final String body = response.asString();
+                        site.reason = JsUtil.exec(site.validationContent, body);
+                        if (site.reason != null && !site.toString().isEmpty())
+                            site.status = ServerStatus.ERROR;
+                    }
+
+                    if (site.status == ServerStatus.ERROR)
+                        showNotification(this, site);
+                } catch (BridgeException e) {
+                    processError(e, site);
+                }
+                updateStatus(site);
+            }
+        } else {
+            LOG("No internet connection, waiting.");
+        }
+
+        isRunning(false);
+        LOG("Service is finished!");
     }
 
     private void processError(BridgeException e, ServerModel site) {
@@ -145,94 +227,6 @@ public class CheckService extends Service {
                 .setDefaults(Notification.DEFAULT_VIBRATE)
                 .build();
         nm.notify(site.url, NOTI_ID, noti);
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        if (isRunning(this)) {
-            Toast.makeText(this, R.string.already_checking_sites, Toast.LENGTH_SHORT).show();
-            stopSelf();
-            return START_NOT_STICKY;
-        }
-
-        Inquiry.newInstance(this, MainActivity.DB_NAME).build();
-        isRunning(true);
-        Bridge.config()
-                .defaultHeader("User-Agent", getString(R.string.app_name) + " (Android)");
-
-        new Thread(() -> {
-            final Query<ServerModel, Integer> query = Inquiry.get(this)
-                    .selectFrom(MainActivity.SITES_TABLE_NAME, ServerModel.class);
-            if (intent != null && intent.hasExtra(MODEL_ID)) {
-                query.where("_id = ?", intent.getLongExtra(MODEL_ID, -1));
-            } else if (intent != null && intent.getBooleanExtra(ONLY_WAITING, false)) {
-                query.where("status = ?", ServerStatus.WAITING);
-            }
-            final ServerModel[] sites = query.all();
-
-            if (sites == null || sites.length == 0) {
-                LOG("No sites added to check, service will terminate.");
-                isRunning(false);
-                stopSelf();
-                return;
-            }
-
-            LOG("Checking %d sites...", sites.length);
-            sendBroadcast(new Intent(ACTION_RUNNING));
-
-            for (ServerModel site : sites) {
-                LOG("Updating %s (%s) status to WAITING...", site.name, site.url);
-                site.status = ServerStatus.WAITING;
-                updateStatus(site);
-            }
-
-            if (NetworkUtil.hasInternet(this)) {
-                for (ServerModel site : sites) {
-                    LOG("Checking %s (%s)...", site.name, site.url);
-                    site.status = ServerStatus.CHECKING;
-                    site.lastCheck = System.currentTimeMillis();
-                    updateStatus(site);
-
-                    try {
-                        final Response response = Bridge.get(site.url)
-                                .throwIfNotSuccess()
-                                .cancellable(false)
-                                .request()
-                                .response();
-
-                        site.reason = null;
-                        site.status = ServerStatus.OK;
-
-                        if (site.validationMode == ValidationMode.TERM_SEARCH) {
-                            final String body = response.asString();
-                            if (body == null || !body.contains(site.validationContent)) {
-                                site.status = ServerStatus.ERROR;
-                                site.reason = "Term \"" + site.validationContent + "\" not found in response body.";
-                            }
-                        } else if (site.validationMode == ValidationMode.JAVASCRIPT) {
-                            final String body = response.asString();
-                            site.reason = JsUtil.exec(site.validationContent, body);
-                            if (site.reason != null && !site.toString().isEmpty())
-                                site.status = ServerStatus.ERROR;
-                        }
-
-                        if (site.status == ServerStatus.ERROR)
-                            showNotification(this, site);
-                    } catch (BridgeException e) {
-                        processError(e, site);
-                    }
-                    updateStatus(site);
-                }
-            } else {
-                LOG("No internet connection, waiting.");
-            }
-
-            isRunning(false);
-            LOG("Service is finished!");
-            stopSelf();
-        }).start();
-
-        return START_STICKY;
     }
 
     @Override
