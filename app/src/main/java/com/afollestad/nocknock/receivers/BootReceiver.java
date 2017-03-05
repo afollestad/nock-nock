@@ -16,7 +16,7 @@ public class BootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
+        if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
             final Inquiry inq = Inquiry.newInstance(context, MainActivity.DB_NAME).build(false);
             ServerModel[] models = inq
                     .selectFrom(MainActivity.SITES_TABLE_NAME, ServerModel.class)
