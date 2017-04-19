@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="app_name" tools:ignore="Typos">Nock Nock (BETA)</string>
+
+    <string name="everything_checks_out">一切正常！</string>
+    <string name="something_wrong">有一些错误，点击了解详情。</string>
+    <string name="checking_status">检查状态…</string>
+    <string name="waiting">请等待…</string>
+
+    <string name="no_sites_added">没有站点！</string>
+
+    <string name="about">关于</string>
+    <string name="about_body"><![CDATA[
+        <b>Nock Nock</b> 是一个简单的应用程序，由 <b>Aidan Follestad</b> 所设计。<br/>
+        <a href=\'https://aidanfollestad.com\'>Website</a>&nbsp;&nbsp;
+        <a href=\'https://twitter.com/afollestad\'>Twitter</a>&nbsp;&nbsp;
+        <a href=\'https://google.com/+AidanFollestad\'>Google+</a>&nbsp;&nbsp;
+        <a href=\'https://github.com/afollestad\'>GitHub</a>&nbsp;&nbsp;
+        <a href=\'https://www.linkedin.com/in/afollestad\'>LinkedIn</a>
+        <br/><br/><i>Nock Nock 是一款开源的软件，在 <a href=\'https://github.com/afollestad/nock-nock\'>GitHub page</a> 可获得源码！</i>
+        <br/>图标由 <b>221 Pixels</b> 的 <a href=\'https://plus.google.com/+KevinAguilarC\'>Kevin Aguilar</a> 设计。
+    ]]></string>
+    <string name="dismiss">确定</string>
+    <string name="add_site">添加站点</string>
+    <string name="site_name">站点名称</string>
+    <string name="site_url">站点 URL</string>
+    <string name="check_interval">检查间隔</string>
+    <string name="done">完成</string>
+    <string name="please_enter_name">请输入一个名称！</string>
+    <string name="please_enter_url">请输入一个 URL！</string>
+    <string name="please_enter_valid_url">请输入一个有效的 URL！</string>
+
+    <string name="timeout">请求超时！你的服务器可能已经关闭了。</string>
+    <string name="options">选项</string>
+    <string name="already_checking_sites">已检查网站！</string>
+    <string name="remove_site">移除站点</string>
+    <string name="remove_site_prompt"><![CDATA[真的要移除 <b>%1$s</b> 吗？]]></string>
+    <string name="remove">移除</string>
+    <string name="save">保存</string>
+    <string name="view_site">显示站点</string>
+    <string name="last_check_result">最后的检查结果</string>
+    <string name="next_check">下次检查</string>
+    <string name="none_turned_off">无 (关闭)</string>
+    <string name="none">无</string>
+
+    <string name="refresh_status">刷新状态</string>
+    <string name="swipe_refresh_hint">向下拖动列表手动刷新网站状态！否则它们将自动在所选择的时间间隔里后台更新。</string>
+    <string name="understood">了解！</string>
+
+    <string name="warning_http_url">
+        警告：这个应用程序检查服务器的可用性是使用HTTP请求，因此我们建议您使用HTTP URL。
+    </string>
+    <string name="default_js">var responseObj = JSON.parse(response);\nreturn responseObj.success === true;</string>
+    <string name="function_declaration">function validate(response) {</string>
+    <string name="function_end">}</string>
+    <string name="response_validation_mode">响应验证模式</string>
+    <string name="search_term">检索词…</string>
+
+    <string name="validation_mode_status_desc">使用 HTTP 状态码来检查。如果返回成功的状态码，则该网站通过检查。</string>
+    <string name="validation_mode_term_desc">在状态码第一次检查完成后，如果成功，则检查响应体。如果包含你的检索词，则该网站通过检查。</string>
+    <string name="validation_mode_javascript_desc">在状态码第一次检查完成后，如果成功，则检查 JavaScript 函数。如果函数返回 true，则该网站通过检查。通过自定义错误信息来传递抛出的一个异常。</string>
+
+    <string-array name="interval_options">
+        <item>分钟</item>
+        <item>小时</item>
+        <item>天</item>
+        <item>周</item>
+    </string-array>
+
+    <string-array name="site_long_options" translatable="false">
+        <item>@string/refresh_status</item>
+        <item>@string/remove_site</item>
+    </string-array>
+
+    <string-array name="response_validation_options">
+        <item>状态代码</item>
+        <item>检索词</item>
+        <item>JavaScript 函数</item>
+    </string-array>
+
+</resources>
