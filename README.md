@@ -1,6 +1,6 @@
 ## Nock Nock
 
-[![Build Status](https://travis-ci.org/afollestad/nock-nock.svg)](https://travis-ci.org/afollestad/nock-nock)
+[![Travis](https://img.shields.io/travis/afollestad/nock-nock.svg?style=flat-square)](https://travis-ci.org/afollestad/nock-nock)
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg?style=flat-square)](https://www.apache.org/licenses/LICENSE-2.0.html)
 
 ![Showcase](https://raw.githubusercontent.com/afollestad/nock-nock/master/art/showcasemain.png)
