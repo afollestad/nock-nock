@@ -2,6 +2,7 @@ package com.afollestad.nocknock.ui;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -42,22 +43,23 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
 
   private boolean isClosing;
 
+  @SuppressLint("SetTextI18n")
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_addsite);
 
     rootLayout = findViewById(R.id.rootView);
-    nameTiLayout = (TextInputLayout) findViewById(R.id.nameTiLayout);
-    inputName = (EditText) findViewById(R.id.inputName);
-    urlTiLayout = (TextInputLayout) findViewById(R.id.urlTiLayout);
-    inputUrl = (EditText) findViewById(R.id.inputUrl);
-    textUrlWarning = (TextView) findViewById(R.id.textUrlWarning);
-    inputInterval = (EditText) findViewById(R.id.checkIntervalInput);
-    spinnerInterval = (Spinner) findViewById(R.id.checkIntervalSpinner);
-    responseValidationSpinner = (Spinner) findViewById(R.id.responseValidationMode);
+    nameTiLayout = findViewById(R.id.nameTiLayout);
+    inputName = findViewById(R.id.inputName);
+    urlTiLayout = findViewById(R.id.urlTiLayout);
+    inputUrl = findViewById(R.id.inputUrl);
+    textUrlWarning = findViewById(R.id.textUrlWarning);
+    inputInterval = findViewById(R.id.checkIntervalInput);
+    spinnerInterval = findViewById(R.id.checkIntervalSpinner);
+    responseValidationSpinner = findViewById(R.id.responseValidationMode);
 
-    toolbar = (Toolbar) findViewById(R.id.toolbar);
+    toolbar = findViewById(R.id.toolbar);
     toolbar.setNavigationOnClickListener(view -> closeActivityWithReveal());
 
     if (savedInstanceState == null) {
@@ -114,7 +116,7 @@ public class AddSiteActivity extends AppCompatActivity implements View.OnClickLi
           public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
             final View searchTerm = findViewById(R.id.responseValidationSearchTerm);
             final View javascript = findViewById(R.id.responseValidationScript);
-            final TextView modeDesc = (TextView) findViewById(R.id.validationModeDescription);
+            final TextView modeDesc = findViewById(R.id.validationModeDescription);
 
             searchTerm.setVisibility(i == 1 ? View.VISIBLE : View.GONE);
             javascript.setVisibility(i == 2 ? View.VISIBLE : View.GONE);

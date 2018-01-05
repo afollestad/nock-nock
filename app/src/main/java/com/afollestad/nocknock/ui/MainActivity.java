@@ -33,13 +33,12 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.nocknock.R;
 import com.afollestad.nocknock.adapter.ServerAdapter;
 import com.afollestad.nocknock.api.ServerModel;
-import com.afollestad.nocknock.api.ValidationMode;
 import com.afollestad.nocknock.dialogs.AboutDialog;
 import com.afollestad.nocknock.services.CheckService;
 import com.afollestad.nocknock.util.AlarmUtil;
 import com.afollestad.nocknock.util.MathUtil;
-import com.afollestad.nocknock.views.DividerItemDecoration;
 
+@SuppressLint("VisibleForTests")
 public class MainActivity extends AppCompatActivity
     implements SwipeRefreshLayout.OnRefreshListener,
         View.OnClickListener,
@@ -48,7 +47,6 @@ public class MainActivity extends AppCompatActivity
   private static final int ADD_SITE_RQ = 6969;
   private static final int VIEW_SITE_RQ = 6923;
   public static final String DB_NAME = "nock_nock";
-  public static final String SITES_TABLE_NAME_OLD = "sites";
   public static final String SITES_TABLE_NAME = "site_models";
 
   private FloatingActionButton mFab;
@@ -84,47 +82,27 @@ public class MainActivity extends AppCompatActivity
     setContentView(R.layout.activity_main);
 
     mAdapter = new ServerAdapter(this);
-    mEmptyText = (TextView) findViewById(R.id.emptyText);
+    mEmptyText = findViewById(R.id.emptyText);
 
-    mList = (RecyclerView) findViewById(R.id.list);
+    mList = findViewById(R.id.list);
     mList.setLayoutManager(new LinearLayoutManager(this));
     mList.setAdapter(mAdapter);
-    mList.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
+    mList.addItemDecoration(
+        new android.support.v7.widget.DividerItemDecoration(
+            this, android.support.v7.widget.DividerItemDecoration.VERTICAL));
 
-    mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+    mRefreshLayout = findViewById(R.id.swipeRefreshLayout);
     mRefreshLayout.setOnRefreshListener(this);
     mRefreshLayout.setColorSchemeColors(
         ContextCompat.getColor(this, R.color.md_green),
         ContextCompat.getColor(this, R.color.md_yellow),
         ContextCompat.getColor(this, R.color.md_red));
 
-    mFab = (FloatingActionButton) findViewById(R.id.fab);
+    mFab = findViewById(R.id.fab);
     mFab.setOnClickListener(this);
 
     Inquiry.newInstance(this, DB_NAME).build();
     Bridge.config().defaultHeader("User-Agent", getString(R.string.app_name) + " (Android)");
-
-    final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-    if (!sp.getBoolean("migrated_db", false)) {
-      final Inquiry mdb =
-          Inquiry.newInstance(this, DB_NAME).instanceName("migrate_db").build(false);
-      final ServerModel[] models =
-          Inquiry.get(this)
-              .selectFrom(SITES_TABLE_NAME_OLD, ServerModel.class)
-              .projection("_id", "name", "url", "status", "checkInterval", "lastCheck", "reason")
-              .all();
-      if (models != null) {
-        Log.d("SiteMigration", "Migrating " + models.length + " sites to the new table.");
-        for (ServerModel model : models) {
-          model.validationMode = ValidationMode.STATUS_CODE;
-          model.validationContent = null;
-        }
-        //noinspection CheckResult
-        mdb.insertInto(SITES_TABLE_NAME, ServerModel.class).values(models).run();
-        mdb.dropTable(SITES_TABLE_NAME_OLD);
-      }
-      sp.edit().putBoolean("migrated_db", true).commit();
-    }
   }
 
   private void showRefreshTutorial() {
@@ -144,7 +122,7 @@ public class MainActivity extends AppCompatActivity
             view -> {
               view.setOnClickListener(null);
               findViewById(R.id.swipeRefreshTutorial).setVisibility(View.GONE);
-              pr.edit().putBoolean("shown_swipe_refresh_tutorial", true).commit();
+              pr.edit().putBoolean("shown_swipe_refresh_tutorial", true).apply();
               mFab.show();
             });
   }
@@ -263,7 +241,7 @@ public class MainActivity extends AppCompatActivity
         mEmptyText.setVisibility(View.GONE);
         Inquiry.get(this)
             .insertInto(SITES_TABLE_NAME, ServerModel.class)
-            .values(model)
+            .values(new ServerModel[] {model})
             .run(
                 inserted -> {
                   AlarmUtil.setSiteChecks(MainActivity.this, model);
@@ -293,9 +271,11 @@ public class MainActivity extends AppCompatActivity
               final Inquiry rinq =
                   Inquiry.newInstance(context, DB_NAME).instanceName("remove_site").build(false);
               //noinspection CheckResult
-              rinq.deleteFrom(SITES_TABLE_NAME, ServerModel.class).where("_id = ?", model.id).run();
+              rinq.delete(ServerModel.class).where("_id = ?", model.id).run();
               rinq.destroyInstance();
-              if (onRemoved != null) onRemoved.run();
+              if (onRemoved != null) {
+                onRemoved.run();
+              }
             })
         .show();
   }
@@ -305,6 +285,7 @@ public class MainActivity extends AppCompatActivity
         new Intent(context, CheckService.class).putExtra(CheckService.MODEL_ID, model.id));
   }
 
+  @SuppressLint("RestrictedApi")
   @Override
   public void onSiteSelected(final int index, final ServerModel model, boolean longClick) {
     if (longClick) {

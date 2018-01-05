@@ -1,9 +1,13 @@
 package com.afollestad.nocknock.api;
 
+import static com.afollestad.nocknock.ui.MainActivity.SITES_TABLE_NAME;
+
 import com.afollestad.inquiry.annotations.Column;
+import com.afollestad.inquiry.annotations.Table;
 import java.io.Serializable;
 
 /** @author Aidan Follestad (afollestad) */
+@Table(name = SITES_TABLE_NAME)
 public class ServerModel implements Serializable {
 
   public ServerModel() {}

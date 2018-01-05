@@ -1,5 +1,6 @@
 package com.afollestad.nocknock.services;
 
+import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -30,6 +31,7 @@ import java.util.Locale;
 
 /** @author Aidan Follestad (afollestad) */
 @SuppressWarnings("CheckResult")
+@SuppressLint("VisibleForTests")
 public class CheckService extends IntentService {
 
   public static String ACTION_CHECK_UPDATE = BuildConfig.APPLICATION_ID + ".CHECK_UPDATE";
@@ -43,7 +45,9 @@ public class CheckService extends IntentService {
   }
 
   private static void LOG(String msg, Object... format) {
-    if (format != null) msg = String.format(Locale.getDefault(), msg, format);
+    if (format != null) {
+      msg = String.format(Locale.getDefault(), msg, format);
+    }
     Log.v("NockNockService", msg);
   }
 
@@ -162,11 +166,7 @@ public class CheckService extends IntentService {
   }
 
   private void updateStatus(ServerModel site) {
-    Inquiry.get(this)
-        .update(MainActivity.SITES_TABLE_NAME, ServerModel.class)
-        .where("_id = ?", site.id)
-        .values(site)
-        .run();
+    Inquiry.get(this).update(ServerModel.class).values(new ServerModel[] {site}).run();
     sendBroadcast(new Intent(ACTION_CHECK_UPDATE).putExtra("model", site));
   }
 
@@ -174,7 +174,7 @@ public class CheckService extends IntentService {
     PreferenceManager.getDefaultSharedPreferences(this)
         .edit()
         .putBoolean("check_service_running", running)
-        .commit();
+        .apply();
   }
 
   public static boolean isRunning(Context context) {
@@ -186,7 +186,7 @@ public class CheckService extends IntentService {
     PreferenceManager.getDefaultSharedPreferences(context)
         .edit()
         .putBoolean("is_app_open", open)
-        .commit();
+        .apply();
   }
 
   public static boolean isAppOpen(Context context) {

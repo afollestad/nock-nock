@@ -24,7 +24,7 @@ public class ServerAdapter extends RecyclerView.Adapter<ServerAdapter.ServerVH> 
     void onSiteSelected(int index, ServerModel model, boolean longClick);
   }
 
-  public void performClick(int index, boolean longClick) {
+  void performClick(int index, boolean longClick) {
     if (mListener != null) {
       mListener.onSiteSelected(index, mServers.get(index), longClick);
     }
@@ -40,7 +40,7 @@ public class ServerAdapter extends RecyclerView.Adapter<ServerAdapter.ServerVH> 
     notifyItemInserted(mServers.size() - 1);
   }
 
-  public void update(int index, ServerModel model) {
+  private void update(int index, ServerModel model) {
     mServers.set(index, model);
     notifyItemChanged(index);
   }
@@ -142,13 +142,13 @@ public class ServerAdapter extends RecyclerView.Adapter<ServerAdapter.ServerVH> 
     final TextView textStatus;
     final ServerAdapter adapter;
 
-    public ServerVH(View itemView, ServerAdapter adapter) {
+    ServerVH(View itemView, ServerAdapter adapter) {
       super(itemView);
-      iconStatus = (StatusImageView) itemView.findViewById(R.id.iconStatus);
-      textName = (TextView) itemView.findViewById(R.id.textName);
-      textInterval = (TextView) itemView.findViewById(R.id.textInterval);
-      textUrl = (TextView) itemView.findViewById(R.id.textUrl);
-      textStatus = (TextView) itemView.findViewById(R.id.textStatus);
+      iconStatus = itemView.findViewById(R.id.iconStatus);
+      textName = itemView.findViewById(R.id.textName);
+      textInterval = itemView.findViewById(R.id.textInterval);
+      textUrl = itemView.findViewById(R.id.textUrl);
+      textStatus = itemView.findViewById(R.id.textStatus);
       this.adapter = adapter;
 
       itemView.setOnClickListener(this);

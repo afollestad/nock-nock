@@ -61,25 +61,26 @@ public class ViewSiteActivity extends AppCompatActivity
         }
       };
 
+  @SuppressLint("SetTextI18n")
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_viewsite);
 
-    final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    final Toolbar toolbar = findViewById(R.id.toolbar);
     toolbar.setNavigationOnClickListener(view -> finish());
     toolbar.inflateMenu(R.menu.menu_viewsite);
     toolbar.setOnMenuItemClickListener(this);
 
-    iconStatus = (StatusImageView) findViewById(R.id.iconStatus);
-    inputName = (EditText) findViewById(R.id.inputName);
-    inputUrl = (EditText) findViewById(R.id.inputUrl);
-    textUrlWarning = (TextView) findViewById(R.id.textUrlWarning);
-    inputCheckInterval = (EditText) findViewById(R.id.checkIntervalInput);
-    checkIntervalSpinner = (Spinner) findViewById(R.id.checkIntervalSpinner);
-    textLastCheckResult = (TextView) findViewById(R.id.textLastCheckResult);
-    textNextCheck = (TextView) findViewById(R.id.textNextCheck);
-    responseValidationSpinner = (Spinner) findViewById(R.id.responseValidationMode);
+    iconStatus = findViewById(R.id.iconStatus);
+    inputName = findViewById(R.id.inputName);
+    inputUrl = findViewById(R.id.inputUrl);
+    textUrlWarning = findViewById(R.id.textUrlWarning);
+    inputCheckInterval = findViewById(R.id.checkIntervalInput);
+    checkIntervalSpinner = findViewById(R.id.checkIntervalSpinner);
+    textLastCheckResult = findViewById(R.id.textLastCheckResult);
+    textNextCheck = findViewById(R.id.textNextCheck);
+    responseValidationSpinner = findViewById(R.id.responseValidationMode);
 
     ArrayAdapter<String> intervalOptionsAdapter =
         new ArrayAdapter<>(
@@ -120,7 +121,7 @@ public class ViewSiteActivity extends AppCompatActivity
           public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
             final View searchTerm = findViewById(R.id.responseValidationSearchTerm);
             final View javascript = findViewById(R.id.responseValidationScript);
-            final TextView modeDesc = (TextView) findViewById(R.id.validationModeDescription);
+            final TextView modeDesc = findViewById(R.id.validationModeDescription);
 
             searchTerm.setVisibility(i == 1 ? View.VISIBLE : View.GONE);
             javascript.setVisibility(i == 2 ? View.VISIBLE : View.GONE);
@@ -257,6 +258,7 @@ public class ViewSiteActivity extends AppCompatActivity
     }
   }
 
+  @SuppressLint("VisibleForTests")
   private void performSave(boolean withValidation) {
     mModel.name = inputName.getText().toString().trim();
     mModel.url = inputUrl.getText().toString().trim();
@@ -329,10 +331,7 @@ public class ViewSiteActivity extends AppCompatActivity
 
     final Inquiry inq = Inquiry.newInstance(this, MainActivity.DB_NAME).build(false);
     //noinspection CheckResult
-    inq.update(MainActivity.SITES_TABLE_NAME, ServerModel.class)
-        .where("_id = ?", mModel.id)
-        .values(mModel)
-        .run();
+    inq.update(ServerModel.class).values(new ServerModel[] {mModel}).run();
     inq.destroyInstance();
   }
 

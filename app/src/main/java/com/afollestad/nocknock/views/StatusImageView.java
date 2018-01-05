@@ -1,13 +1,13 @@
 package com.afollestad.nocknock.views;
 
 import android.content.Context;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
-import android.widget.ImageView;
 import com.afollestad.nocknock.R;
 import com.afollestad.nocknock.api.ServerStatus;
 
 /** @author Aidan Follestad (afollestad) */
-public class StatusImageView extends ImageView {
+public class StatusImageView extends AppCompatImageView {
 
   public StatusImageView(Context context) {
     super(context);

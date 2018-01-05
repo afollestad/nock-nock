@@ -1,5 +1,6 @@
 package com.afollestad.nocknock.receivers;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,11 +12,12 @@ import com.afollestad.nocknock.util.AlarmUtil;
 /** @author Aidan Follestad (afollestad) */
 public class BootReceiver extends BroadcastReceiver {
 
+  @SuppressLint("VisibleForTests")
   @Override
   public void onReceive(Context context, Intent intent) {
-    if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
+    if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
       final Inquiry inq = Inquiry.newInstance(context, MainActivity.DB_NAME).build(false);
-      ServerModel[] models = inq.selectFrom(MainActivity.SITES_TABLE_NAME, ServerModel.class).all();
+      ServerModel[] models = inq.select(ServerModel.class).all();
       AlarmUtil.setSiteChecks(context, models);
       inq.destroyInstance();
     }
