@@ -14,9 +14,6 @@ android {
         lintOptions {
             abortOnError false
         }
-        jackOptions {
-            enabled true
-        }
     }
 
     compileOptions {
