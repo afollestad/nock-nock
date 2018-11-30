@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/button_height"
     android:fontFamily="sans-serif-light"
@@ -7,4 +8,5 @@
     android:paddingLeft="@dimen/content_inset"
     android:paddingRight="@dimen/content_inset"
     android:textColor="?android:textColorPrimary"
-    android:textSize="@dimen/body_font_size" />
+    android:textSize="@dimen/body_font_size"
+    />

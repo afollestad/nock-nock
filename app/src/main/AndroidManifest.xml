@@ -3,60 +3,49 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.afollestad.nocknock">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+  <uses-permission android:name="android.permission.INTERNET"/>
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
-    <application
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+  <application
+      android:name=".App"
+      android:allowBackup="true"
+      android:icon="@mipmap/ic_launcher"
+      android:label="@string/app_name"
+      android:supportsRtl="true"
+      android:theme="@style/AppTheme"
+      android:usesCleartextTraffic="true"
+      tools:ignore="AllowBackup,GoogleAppIndexingWarning,UnusedAttribute">
 
-        <activity
-            android:name="com.afollestad.nocknock.ui.MainActivity"
-            android:launchMode="singleTop">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+    <activity
+        android:name="com.afollestad.nocknock.ui.MainActivity"
+        android:launchMode="singleTop">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <category android:name="android.intent.category.LAUNCHER"/>
+      </intent-filter>
+    </activity>
 
-        <activity
-            android:name="com.afollestad.nocknock.ui.AddSiteActivity"
-            android:label="@string/add_site"
-            android:launchMode="singleTop"
-            android:theme="@style/AppTheme.Transparent"
-            android:windowSoftInputMode="stateHidden" />
+    <activity
+        android:name="com.afollestad.nocknock.ui.AddSiteActivity"
+        android:label="@string/add_site"
+        android:launchMode="singleTop"
+        android:theme="@style/AppTheme.Transparent"
+        android:windowSoftInputMode="stateHidden"/>
 
-        <activity
-            android:name="com.afollestad.nocknock.ui.ViewSiteActivity"
-            android:label="@string/view_site"
-            android:launchMode="singleTop"
-            android:theme="@style/AppTheme.Ink"
-            android:windowSoftInputMode="stateHidden" />
+    <activity
+        android:name="com.afollestad.nocknock.ui.ViewSiteActivity"
+        android:label="@string/view_site"
+        android:launchMode="singleTop"
+        android:theme="@style/AppTheme.Ink"
+        android:windowSoftInputMode="stateHidden"/>
 
-        <service
-            android:name="com.afollestad.nocknock.services.CheckService"
-            android:enabled="true"
-            android:label="Site Check Service" />
+    <service
+        android:name=".engine.statuscheck.CheckStatusJob"
+        android:label="@string/check_service_name"
+        android:permission="android.permission.BIND_JOB_SERVICE"/>
 
-        <receiver android:name=".receivers.BootReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-
-        <receiver android:name=".receivers.ConnectivityReceiver">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
-            </intent-filter>
-        </receiver>
-
-    </application>
+  </application>
 
 </manifest>

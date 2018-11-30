@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <string name="channel_server_status_title">Server Statuses</string>
+  <string name="channel_server_status_description">
+    Notifications for server status changes, whether it\'s successful statuses or error statuses.
+  </string>
+
+  <string name="something_wrong">Something\'s wrong! Tap for details.</string>
+
+</resources>

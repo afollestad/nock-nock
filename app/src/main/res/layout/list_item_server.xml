@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -8,80 +9,88 @@
     android:paddingBottom="@dimen/content_inset_less"
     android:paddingLeft="@dimen/content_inset"
     android:paddingRight="@dimen/content_inset"
-    android:paddingTop="@dimen/content_inset_less">
+    android:paddingTop="@dimen/content_inset_less"
+    >
 
-    <com.afollestad.nocknock.views.StatusImageView
-        android:id="@+id/iconStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginEnd="@dimen/content_inset"
-        android:scaleType="centerInside"
-        android:transitionName="status_image_view"
-        tools:ignore="ContentDescription" />
+  <com.afollestad.nocknock.views.StatusImageView
+      android:id="@+id/iconStatus"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_vertical"
+      android:layout_marginEnd="@dimen/content_inset"
+      android:scaleType="centerInside"
+      android:transitionName="status_image_view"
+      tools:ignore="ContentDescription"
+      />
 
-    <LinearLayout
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      >
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="horizontal"
+        >
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+      <TextView
+          android:id="@+id/textName"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignParentStart="true"
+          android:layout_centerVertical="true"
+          android:layout_marginEnd="@dimen/content_inset_half"
+          android:layout_toStartOf="@+id/textInterval"
+          android:fontFamily="sans-serif-medium"
+          android:singleLine="true"
+          android:textColor="?android:textColorPrimary"
+          android:textSize="@dimen/title_font_size"
+          android:transitionName="site_name"
+          tools:text="Website Name"
+          />
 
-            <TextView
-                android:id="@+id/textName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="@dimen/content_inset_half"
-                android:layout_toStartOf="@+id/textInterval"
-                android:fontFamily="sans-serif-medium"
-                android:singleLine="true"
-                android:textColor="?android:textColorPrimary"
-                android:textSize="@dimen/title_font_size"
-                android:transitionName="site_name"
-                tools:text="Website Name" />
+      <TextView
+          android:id="@+id/textInterval"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignParentEnd="true"
+          android:layout_centerVertical="true"
+          android:fontFamily="sans-serif-light"
+          android:singleLine="true"
+          android:textColor="?android:textColorSecondary"
+          android:textSize="@dimen/caption_font_size"
+          tools:text="1h"
+          />
 
-            <TextView
-                android:id="@+id/textInterval"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:fontFamily="sans-serif-light"
-                android:singleLine="true"
-                android:textColor="?android:textColorSecondary"
-                android:textSize="@dimen/caption_font_size"
-                tools:text="1h" />
+    </RelativeLayout>
 
-        </RelativeLayout>
+    <TextView
+        android:id="@+id/textUrl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_text_spacing"
+        android:fontFamily="sans-serif"
+        android:singleLine="true"
+        android:textColor="?android:textColorSecondary"
+        android:textSize="@dimen/body_font_size"
+        android:transitionName="site_url"
+        tools:text="https://yourwebsitehere.com"
+        />
 
-        <TextView
-            android:id="@+id/textUrl"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/list_text_spacing"
-            android:fontFamily="sans-serif"
-            android:singleLine="true"
-            android:textColor="?android:textColorSecondary"
-            android:textSize="@dimen/body_font_size"
-            android:transitionName="site_url"
-            tools:text="https://yourwebsitehere.com" />
+    <TextView
+        android:id="@+id/textStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_text_spacing"
+        android:fontFamily="sans-serif"
+        android:singleLine="true"
+        android:textColor="?android:textColorSecondary"
+        android:textSize="@dimen/body_font_size"
+        tools:text="Everything checks out!"
+        />
 
-        <TextView
-            android:id="@+id/textStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/list_text_spacing"
-            android:fontFamily="sans-serif"
-            android:singleLine="true"
-            android:textColor="?android:textColorSecondary"
-            android:textSize="@dimen/body_font_size"
-            tools:text="Everything checks out!" />
-
-    </LinearLayout>
+  </LinearLayout>
 
 </LinearLayout>

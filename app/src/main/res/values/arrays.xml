@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <string-array name="interval_options">
+    <item>Minute(s)</item>
+    <item>Hour(s)</item>
+    <item>Day(s)</item>
+    <item>Week(s)</item>
+  </string-array>
+
+  <string-array name="site_long_options" translatable="false">
+    <item>@string/refresh_status</item>
+    <item>@string/remove_site</item>
+  </string-array>
+
+  <string-array name="response_validation_options">
+    <item>Status Code</item>
+    <item>Search Term</item>
+    <item>JavaScript Evaluation</item>
+  </string-array>
+
+</resources>

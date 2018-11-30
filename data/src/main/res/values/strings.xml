@@ -1,0 +1,7 @@
+<resources>
+
+  <string name="everything_checks_out">Everything checks out!</string>
+  <string name="checking_status">Checking status…</string>
+  <string name="waiting">Waiting…</string>
+
+</resources>

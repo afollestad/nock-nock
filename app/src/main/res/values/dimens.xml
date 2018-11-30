@@ -1,23 +1,21 @@
 <resources>
 
-    <dimen name="headline_font_size">24sp</dimen>
-    <dimen name="title_font_size">20sp</dimen>
-    <dimen name="medium_text_size">16sp</dimen>
-    <dimen name="body_font_size">14sp</dimen>
-    <dimen name="caption_font_size">12sp</dimen>
+  <dimen name="title_font_size">20sp</dimen>
+  <dimen name="medium_text_size">16sp</dimen>
+  <dimen name="body_font_size">14sp</dimen>
+  <dimen name="caption_font_size">12sp</dimen>
+  <dimen name="empty_text_size">26sp</dimen>
 
-    <dimen name="content_inset_half">8dp</dimen>
-    <dimen name="content_inset_less">12dp</dimen>
-    <dimen name="content_inset">16dp</dimen>
-    <dimen name="content_inset_more">24dp</dimen>
-    <dimen name="content_inset_double">32dp</dimen>
+  <dimen name="content_inset_half">8dp</dimen>
+  <dimen name="content_inset_less">12dp</dimen>
+  <dimen name="content_inset">16dp</dimen>
+  <dimen name="content_inset_more">24dp</dimen>
 
-    <dimen name="list_circle_size">42dp</dimen>
-    <dimen name="list_text_spacing">4dp</dimen>
-    <dimen name="fab_elevation">4dp</dimen>
-    <dimen name="fab_elevation_pressed">8dp</dimen>
-    <dimen name="button_height">52dp</dimen>
-    <dimen name="tutorial_button_width">300dp</dimen>
-    <dimen name="code_font_size">14sp</dimen>
+  <dimen name="list_circle_size">42dp</dimen>
+  <dimen name="list_text_spacing">4dp</dimen>
+  <dimen name="fab_elevation">4dp</dimen>
+  <dimen name="fab_elevation_pressed">8dp</dimen>
+  <dimen name="button_height">52dp</dimen>
+  <dimen name="code_font_size">14sp</dimen>
 
 </resources>

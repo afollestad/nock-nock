@@ -1,242 +1,270 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?colorPrimary"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    >
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
+  <androidx.appcompat.widget.Toolbar
+      android:id="@+id/toolbar"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      app:navigationIcon="@drawable/ic_action_close"
+      app:title="@string/add_site"
+      app:titleTextColor="?android:textColorPrimary"
+      />
+
+  <ScrollView
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      >
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:navigationIcon="@drawable/ic_action_close"
-        app:title="@string/add_site"
-        app:titleTextColor="?android:textColorPrimary" />
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/content_inset"
+        android:paddingLeft="@dimen/content_inset"
+        android:paddingRight="@dimen/content_inset"
+        >
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+      <com.google.android.material.textfield.TextInputLayout
+          android:id="@+id/nameTiLayout"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="-4dp"
+          android:layout_marginRight="-4dp"
+          android:layout_marginTop="@dimen/content_inset"
+          >
 
-        <LinearLayout
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:hint="@string/site_name"
+            android:inputType="textPersonName|textCapWords|textAutoCorrect"
+            android:textColor="?android:textColorPrimary"
+            android:textColorHint="?android:textColorSecondary"
+            android:textSize="@dimen/body_font_size"
+            />
+
+      </com.google.android.material.textfield.TextInputLayout>
+
+      <com.google.android.material.textfield.TextInputLayout
+          android:id="@+id/urlTiLayout"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="-4dp"
+          android:layout_marginRight="-4dp"
+          android:layout_marginTop="@dimen/content_inset_half"
+          >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputUrl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:hint="@string/site_url"
+            android:inputType="textUri"
+            android:textColor="?android:textColorPrimary"
+            android:textColorHint="?android:textColorSecondary"
+            android:textSize="@dimen/body_font_size"
+            />
+
+      </com.google.android.material.textfield.TextInputLayout>
+
+      <TextView
+          android:id="@+id/textUrlWarning"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/list_text_spacing"
+          android:fontFamily="sans-serif-light"
+          android:textColor="?android:textColorPrimary"
+          android:textSize="@dimen/caption_font_size"
+          android:visibility="gone"
+          tools:text="Warning: this app checks for server availability with HTTP requests. It's recommended that you use an HTTP URL."
+          />
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="1dp"
+          android:layout_marginTop="@dimen/content_inset"
+          android:background="@color/dividerColorDark"
+          />
+
+      <TextView
+          android:id="@+id/checkIntervalLabel"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/content_inset"
+          android:fontFamily="sans-serif"
+          android:text="@string/check_interval"
+          android:textColor="?colorAccent"
+          android:textSize="@dimen/caption_font_size"
+          />
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          android:weightSum="2"
+          >
+
+        <EditText
+            android:id="@+id/checkIntervalInput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginEnd="@dimen/content_inset_half"
+            android:layout_marginStart="-4dp"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-light"
+            android:hint="0"
+            android:inputType="number"
+            android:textSize="@dimen/body_font_size"
+            tools:ignore="HardcodedText,LabelFor"
+            />
+
+        <Spinner
+            android:id="@+id/checkIntervalSpinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="-4dp"
+            android:layout_weight="1"
+            />
+
+      </LinearLayout>
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="1dp"
+          android:layout_marginTop="@dimen/content_inset"
+          android:background="@color/dividerColorDark"
+          />
+
+      <TextView
+          android:id="@+id/responseValidation"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/content_inset"
+          android:fontFamily="sans-serif"
+          android:text="@string/response_validation_mode"
+          android:textColor="?colorAccent"
+          android:textSize="@dimen/caption_font_size"
+          />
+
+      <Spinner
+          android:id="@+id/responseValidationMode"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          />
+
+      <EditText
+          android:id="@+id/responseValidationSearchTerm"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="@dimen/content_inset_less"
+          android:layout_marginLeft="-4dp"
+          android:layout_marginRight="-4dp"
+          android:layout_marginTop="-4dp"
+          android:fontFamily="sans-serif-light"
+          android:hint="@string/search_term"
+          android:textSize="@dimen/body_font_size"
+          android:visibility="gone"
+          tools:ignore="Autofill"
+          />
+
+      <HorizontalScrollView
+          android:id="@+id/responseValidationScript"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="@dimen/content_inset"
+          android:layout_marginTop="@dimen/content_inset_half"
+          android:background="@color/colorPrimaryDark"
+          android:elevation="@dimen/fab_elevation"
+          android:padding="@dimen/content_inset_half"
+          android:scrollbars="none"
+          tools:ignore="UnusedAttribute"
+          >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="@dimen/content_inset"
-            android:paddingLeft="@dimen/content_inset"
-            android:paddingRight="@dimen/content_inset">
+            >
 
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/nameTiLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="-4dp"
-                android:layout_marginRight="-4dp"
-                android:layout_marginTop="@dimen/content_inset">
+          <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:fontFamily="serif-monospace"
+              android:lineSpacingMultiplier="1.4"
+              android:singleLine="true"
+              android:text="@string/function_declaration"
+              android:textSize="@dimen/code_font_size"
+              />
 
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/inputName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-light"
-                    android:hint="@string/site_name"
-                    android:inputType="textPersonName|textCapWords|textAutoCorrect"
-                    android:textColor="?android:textColorPrimary"
-                    android:textColorHint="?android:textColorSecondary"
-                    android:textSize="@dimen/body_font_size" />
+          <EditText
+              android:id="@+id/responseValidationScriptInput"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:background="@null"
+              android:fontFamily="serif-monospace"
+              android:gravity="top"
+              android:hint="@string/default_js"
+              android:inputType="textMultiLine"
+              android:lineSpacingMultiplier="1.4"
+              android:paddingBottom="@dimen/content_inset_less"
+              android:paddingEnd="@dimen/content_inset_more"
+              android:paddingStart="@dimen/content_inset_more"
+              android:paddingTop="@dimen/content_inset_less"
+              android:scrollHorizontally="true"
+              android:textSize="@dimen/code_font_size"
+              tools:ignore="Autofill,LabelFor,RtlSymmetry"
+              />
 
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/urlTiLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="-4dp"
-                android:layout_marginRight="-4dp"
-                android:layout_marginTop="@dimen/content_inset_half">
-
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/inputUrl"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-light"
-                    android:hint="@string/site_url"
-                    android:inputType="textUri"
-                    android:textColor="?android:textColorPrimary"
-                    android:textColorHint="?android:textColorSecondary"
-                    android:textSize="@dimen/body_font_size" />
-
-            </android.support.design.widget.TextInputLayout>
-
-            <TextView
-                android:id="@+id/textUrlWarning"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/list_text_spacing"
-                android:fontFamily="sans-serif-light"
-                android:textColor="?android:textColorPrimary"
-                android:textSize="@dimen/caption_font_size"
-                android:visibility="gone"
-                tools:text="Warning: this app checks for server availability with HTTP requests. It's recommended that you use an HTTP URL." />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/content_inset"
-                android:background="@color/dividerColorDark" />
-
-            <TextView
-                android:id="@+id/checkIntervalLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/content_inset"
-                android:fontFamily="sans-serif"
-                android:text="@string/check_interval"
-                android:textColor="?colorAccent"
-                android:textSize="@dimen/caption_font_size" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="2">
-
-                <EditText
-                    android:id="@+id/checkIntervalInput"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start|center_vertical"
-                    android:layout_marginEnd="@dimen/content_inset_half"
-                    android:layout_marginStart="-4dp"
-                    android:layout_weight="1"
-                    android:fontFamily="sans-serif-light"
-                    android:hint="0"
-                    android:inputType="number"
-                    android:textSize="@dimen/body_font_size"
-                    tools:ignore="HardcodedText,LabelFor" />
-
-                <Spinner
-                    android:id="@+id/checkIntervalSpinner"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end|center_vertical"
-                    android:layout_marginEnd="-4dp"
-                    android:layout_weight="1" />
-
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/content_inset"
-                android:background="@color/dividerColorDark" />
-
-            <TextView
-                android:id="@+id/responseValidation"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/content_inset"
-                android:fontFamily="sans-serif"
-                android:text="@string/response_validation_mode"
-                android:textColor="?colorAccent"
-                android:textSize="@dimen/caption_font_size" />
-
-            <Spinner
-                android:id="@+id/responseValidationMode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <EditText
-                android:id="@+id/responseValidationSearchTerm"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/content_inset_less"
-                android:layout_marginLeft="-4dp"
-                android:layout_marginRight="-4dp"
-                android:layout_marginTop="-4dp"
-                android:fontFamily="sans-serif-light"
-                android:hint="@string/search_term"
-                android:textSize="@dimen/body_font_size"
-                android:visibility="gone" />
-
-            <HorizontalScrollView
-                android:id="@+id/responseValidationScript"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/content_inset"
-                android:layout_marginTop="@dimen/content_inset_half"
-                android:background="@color/colorPrimaryDark"
-                android:elevation="@dimen/fab_elevation"
-                android:padding="@dimen/content_inset_half"
-                android:scrollbars="none">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="serif-monospace"
-                        android:lineSpacingMultiplier="1.4"
-                        android:singleLine="true"
-                        android:text="@string/function_declaration"
-                        android:textSize="@dimen/code_font_size" />
-
-                    <EditText
-                        android:id="@+id/responseValidationScriptInput"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@null"
-                        android:fontFamily="serif-monospace"
-                        android:gravity="top"
-                        android:hint="@string/default_js"
-                        android:inputType="textMultiLine"
-                        android:lineSpacingMultiplier="1.4"
-                        android:paddingBottom="@dimen/content_inset_less"
-                        android:paddingEnd="@dimen/content_inset_more"
-                        android:paddingStart="@dimen/content_inset_more"
-                        android:paddingTop="@dimen/content_inset_less"
-                        android:scrollHorizontally="true"
-                        android:textSize="@dimen/code_font_size"
-                        tools:ignore="LabelFor,RtlSymmetry" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="serif-monospace"
-                        android:text="@string/function_end"
-                        android:textSize="@dimen/code_font_size" />
-
-                </LinearLayout>
-
-            </HorizontalScrollView>
-
-            <TextView
-                android:id="@+id/validationModeDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/content_inset_half"
-                android:fontFamily="sans-serif-light"
-                android:lineSpacingMultiplier="1.2"
-                android:text="@string/validation_mode_status_desc"
-                android:textSize="@dimen/body_font_size" />
-
-            <Button
-                android:id="@+id/doneBtn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="-4dp"
-                android:layout_marginRight="-4dp"
-                android:layout_marginTop="@dimen/content_inset"
-                android:text="@string/done"
-                android:textColor="#fff" />
+          <TextView
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:fontFamily="serif-monospace"
+              android:text="@string/function_end"
+              android:textSize="@dimen/code_font_size"
+              />
 
         </LinearLayout>
 
-    </ScrollView>
+      </HorizontalScrollView>
+
+      <TextView
+          android:id="@+id/validationModeDescription"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="@dimen/content_inset_half"
+          android:fontFamily="sans-serif-light"
+          android:lineSpacingMultiplier="1.2"
+          android:text="@string/validation_mode_status_desc"
+          android:textSize="@dimen/body_font_size"
+          />
+
+      <Button
+          android:id="@+id/doneBtn"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="-4dp"
+          android:layout_marginRight="-4dp"
+          android:layout_marginTop="@dimen/content_inset"
+          android:text="@string/done"
+          android:textColor="#fff"
+          />
+
+    </LinearLayout>
+
+  </ScrollView>
 
 </LinearLayout>

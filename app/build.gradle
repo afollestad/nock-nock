@@ -1,40 +1,38 @@
+apply from: '../dependencies.gradle'
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion versions.compileSdk
-    buildToolsVersion versions.buildTools
+  compileSdkVersion versions.compileSdk
+  buildToolsVersion versions.buildTools
 
-    defaultConfig {
-        applicationId "com.afollestad.nocknock"
-        minSdkVersion versions.minSdk
-        targetSdkVersion versions.compileSdk
-        versionCode versions.publishVersionCode
-        versionName versions.publishVersion
-
-        lintOptions {
-            abortOnError false
-        }
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
+  defaultConfig {
+    applicationId "com.afollestad.nocknock"
+    minSdkVersion versions.minSdk
+    targetSdkVersion versions.compileSdk
+    versionCode versions.publishVersionCode
+    versionName versions.publishVersion
+  }
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:' + versions.supportLib
-    compile 'com.android.support:design:' + versions.supportLib
-    compile 'com.afollestad.material-dialogs:core:' + versions.materialDialogs
-    compile 'com.afollestad.material-dialogs:commons:' + versions.materialDialogs
-    compile 'com.afollestad:bridge:' + versions.bridge
-    compile 'com.afollestad:inquiry:' + versions.inquiry
-    compile files('libs/rhino-1.7.7.1.jar')
+  implementation project(':data')
+  implementation project(':utilities')
+  implementation project(':engine')
+  implementation project(':notifications')
+
+  implementation 'androidx.appcompat:appcompat:' + versions.androidx
+  implementation 'androidx.recyclerview:recyclerview:' + versions.androidx
+  implementation 'com.google.android.material:material:' + versions.androidx
+
+  implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:' + versions.kotlin
+
+  implementation 'com.google.dagger:dagger:' + versions.dagger
+  kapt 'com.google.dagger:dagger-compiler:' + versions.dagger
+
+  implementation 'com.afollestad.material-dialogs:core:' + versions.materialDialogs
 }
+
+apply from: '../spotless.gradle'

@@ -1,0 +1,5 @@
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.afollestad.nocknock.engine">
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+</manifest>

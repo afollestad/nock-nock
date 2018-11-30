@@ -6,290 +6,324 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?colorPrimary"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    >
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
+  <androidx.appcompat.widget.Toolbar
+      android:id="@+id/toolbar"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      app:navigationIcon="@drawable/ic_action_close"
+      app:title="@string/view_site"
+      app:titleTextColor="?android:textColorPrimary"
+      />
+
+  <ScrollView
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      >
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:navigationIcon="@drawable/ic_action_close"
-        app:title="@string/view_site"
-        app:titleTextColor="?android:textColorPrimary" />
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/content_inset"
+        android:paddingLeft="@dimen/content_inset"
+        android:paddingRight="@dimen/content_inset"
+        android:paddingTop="@dimen/content_inset_half"
+        >
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          >
+
+        <com.afollestad.nocknock.views.StatusImageView
+            android:id="@+id/iconStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="@dimen/content_inset"
+            android:scaleType="centerInside"
+            android:transitionName="status_image_view"
+            tools:ignore="ContentDescription,UnusedAttribute"
+            />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="@dimen/content_inset"
-            android:paddingLeft="@dimen/content_inset"
-            android:paddingRight="@dimen/content_inset"
-            android:paddingTop="@dimen/content_inset_half">
+            >
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+          <EditText
+              android:id="@+id/inputName"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:fontFamily="sans-serif-light"
+              android:hint="@string/site_name"
+              android:inputType="textPersonName|textCapWords|textAutoCorrect"
+              android:singleLine="true"
+              android:textColor="?android:textColorPrimary"
+              android:textColorHint="?android:textColorSecondary"
+              android:textSize="@dimen/body_font_size"
+              android:transitionName="site_name"
+              tools:ignore="UnusedAttribute"
+              />
 
-                <com.afollestad.nocknock.views.StatusImageView
-                    android:id="@+id/iconStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginEnd="@dimen/content_inset"
-                    android:scaleType="centerInside"
-                    android:transitionName="status_image_view"
-                    tools:ignore="ContentDescription" />
+          <EditText
+              android:id="@+id/inputUrl"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:fontFamily="sans-serif-light"
+              android:hint="@string/site_url"
+              android:inputType="textUri"
+              android:singleLine="true"
+              android:textColor="?android:textColorPrimary"
+              android:textColorHint="?android:textColorSecondary"
+              android:textSize="@dimen/body_font_size"
+              android:transitionName="site_url"
+              tools:ignore="UnusedAttribute"
+              />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <EditText
-                        android:id="@+id/inputName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-light"
-                        android:hint="@string/site_name"
-                        android:inputType="textPersonName|textCapWords|textAutoCorrect"
-                        android:singleLine="true"
-                        android:textColor="?android:textColorPrimary"
-                        android:textColorHint="?android:textColorSecondary"
-                        android:textSize="@dimen/body_font_size"
-                        android:transitionName="site_name" />
-
-                    <EditText
-                        android:id="@+id/inputUrl"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-light"
-                        android:hint="@string/site_url"
-                        android:inputType="textUri"
-                        android:singleLine="true"
-                        android:textColor="?android:textColorPrimary"
-                        android:textColorHint="?android:textColorSecondary"
-                        android:textSize="@dimen/body_font_size"
-                        android:transitionName="site_url" />
-
-                    <TextView
-                        android:id="@+id/textUrlWarning"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="4dp"
-                        android:layout_marginStart="4dp"
-                        android:layout_marginTop="@dimen/list_text_spacing"
-                        android:fontFamily="sans-serif-light"
-                        android:textColor="?android:textColorPrimary"
-                        android:textSize="@dimen/caption_font_size"
-                        android:visibility="gone"
-                        tools:text="Warning: this app checks for server availability with HTTP requests. It's recommended that you use an HTTP URL." />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/content_inset_less"
-                android:background="@color/dividerColorDark" />
-
-            <TextView
-                android:id="@+id/checkIntervalLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/content_inset"
-                android:fontFamily="sans-serif"
-                android:text="@string/check_interval"
-                android:textColor="?colorAccent"
-                android:textSize="@dimen/caption_font_size" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="2">
-
-                <EditText
-                    android:id="@+id/checkIntervalInput"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start|center_vertical"
-                    android:layout_marginEnd="@dimen/content_inset_half"
-                    android:layout_marginStart="-4dp"
-                    android:layout_weight="1"
-                    android:fontFamily="sans-serif-light"
-                    android:hint="0"
-                    android:inputType="number"
-                    android:textSize="@dimen/body_font_size"
-                    tools:ignore="HardcodedText,LabelFor" />
-
-                <Spinner
-                    android:id="@+id/checkIntervalSpinner"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end|center_vertical"
-                    android:layout_marginEnd="-4dp"
-                    android:layout_weight="1" />
-
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/content_inset_less"
-                android:background="@color/dividerColorDark" />
-
-            <TextView
-                android:id="@+id/responseValidation"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/content_inset"
-                android:fontFamily="sans-serif"
-                android:text="@string/response_validation_mode"
-                android:textColor="?colorAccent"
-                android:textSize="@dimen/caption_font_size" />
-
-            <Spinner
-                android:id="@+id/responseValidationMode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <EditText
-                android:id="@+id/responseValidationSearchTerm"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/content_inset_less"
-                android:layout_marginLeft="-4dp"
-                android:layout_marginRight="-4dp"
-                android:layout_marginTop="-4dp"
-                android:fontFamily="sans-serif-light"
-                android:hint="@string/search_term"
-                android:textSize="@dimen/body_font_size"
-                android:visibility="gone" />
-
-            <HorizontalScrollView
-                android:id="@+id/responseValidationScript"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/content_inset"
-                android:layout_marginTop="@dimen/content_inset_half"
-                android:background="@color/colorPrimaryDark"
-                android:elevation="@dimen/fab_elevation"
-                android:padding="@dimen/content_inset_half"
-                android:scrollbars="none">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="serif-monospace"
-                        android:lineSpacingMultiplier="1.4"
-                        android:singleLine="true"
-                        android:text="@string/function_declaration"
-                        android:textSize="@dimen/code_font_size" />
-
-                    <EditText
-                        android:id="@+id/responseValidationScriptInput"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@null"
-                        android:fontFamily="serif-monospace"
-                        android:gravity="top"
-                        android:hint="@string/default_js"
-                        android:inputType="textMultiLine"
-                        android:lineSpacingMultiplier="1.4"
-                        android:paddingBottom="@dimen/content_inset_less"
-                        android:paddingEnd="@dimen/content_inset_more"
-                        android:paddingStart="@dimen/content_inset_more"
-                        android:paddingTop="@dimen/content_inset_less"
-                        android:scrollHorizontally="true"
-                        android:textSize="@dimen/code_font_size"
-                        tools:ignore="LabelFor,RtlSymmetry" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="serif-monospace"
-                        android:text="@string/function_end"
-                        android:textSize="@dimen/code_font_size" />
-
-                </LinearLayout>
-
-            </HorizontalScrollView>
-
-            <TextView
-                android:id="@+id/validationModeDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/content_inset_half"
-                android:fontFamily="sans-serif-light"
-                android:lineSpacingMultiplier="1.2"
-                android:text="@string/validation_mode_status_desc"
-                android:textSize="@dimen/body_font_size" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/content_inset"
-                android:background="@color/dividerColorDark" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/content_inset"
-                android:text="@string/last_check_result"
-                android:textColor="?colorAccent"
-                android:textSize="@dimen/caption_font_size" />
-
-            <TextView
-                android:id="@+id/textLastCheckResult"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/list_text_spacing"
-                android:fontFamily="sans-serif"
-                android:textColor="?android:textColorPrimary"
-                android:textSize="@dimen/medium_text_size"
-                tools:text="Everything checks out!" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/content_inset"
-                android:text="@string/next_check"
-                android:textColor="?colorAccent"
-                android:textSize="@dimen/caption_font_size" />
-
-            <TextView
-                android:id="@+id/textNextCheck"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/list_text_spacing"
-                android:fontFamily="sans-serif"
-                android:textColor="?android:textColorPrimary"
-                android:textSize="@dimen/medium_text_size"
-                tools:text="In 2 hours" />
-
-            <Button
-                android:id="@+id/doneBtn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="-4dp"
-                android:layout_marginRight="-4dp"
-                android:layout_marginTop="@dimen/content_inset_more"
-                android:text="@string/save"
-                android:textColor="#fff" />
+          <TextView
+              android:id="@+id/textUrlWarning"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginEnd="4dp"
+              android:layout_marginStart="4dp"
+              android:layout_marginTop="@dimen/list_text_spacing"
+              android:fontFamily="sans-serif-light"
+              android:textColor="?android:textColorPrimary"
+              android:textSize="@dimen/caption_font_size"
+              android:visibility="gone"
+              tools:text="Warning: this app checks for server availability with HTTP requests. It's recommended that you use an HTTP URL."
+              />
 
         </LinearLayout>
 
-    </ScrollView>
+      </LinearLayout>
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="1dp"
+          android:layout_marginTop="@dimen/content_inset_less"
+          android:background="@color/dividerColorDark"
+          />
+
+      <TextView
+          android:id="@+id/checkIntervalLabel"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/content_inset"
+          android:fontFamily="sans-serif"
+          android:text="@string/check_interval"
+          android:textColor="?colorAccent"
+          android:textSize="@dimen/caption_font_size"
+          />
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          android:weightSum="2"
+          >
+
+        <EditText
+            android:id="@+id/checkIntervalInput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginEnd="@dimen/content_inset_half"
+            android:layout_marginStart="-4dp"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-light"
+            android:hint="0"
+            android:inputType="number"
+            android:textSize="@dimen/body_font_size"
+            tools:ignore="HardcodedText,LabelFor"
+            />
+
+        <Spinner
+            android:id="@+id/checkIntervalSpinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="-4dp"
+            android:layout_weight="1"
+            />
+
+      </LinearLayout>
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="1dp"
+          android:layout_marginTop="@dimen/content_inset_less"
+          android:background="@color/dividerColorDark"
+          />
+
+      <TextView
+          android:id="@+id/responseValidation"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/content_inset"
+          android:fontFamily="sans-serif"
+          android:text="@string/response_validation_mode"
+          android:textColor="?colorAccent"
+          android:textSize="@dimen/caption_font_size"
+          />
+
+      <Spinner
+          android:id="@+id/responseValidationMode"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          />
+
+      <EditText
+          android:id="@+id/responseValidationSearchTerm"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="@dimen/content_inset_less"
+          android:layout_marginLeft="-4dp"
+          android:layout_marginRight="-4dp"
+          android:layout_marginTop="-4dp"
+          android:fontFamily="sans-serif-light"
+          android:hint="@string/search_term"
+          android:textSize="@dimen/body_font_size"
+          android:visibility="gone"
+          />
+
+      <HorizontalScrollView
+          android:id="@+id/responseValidationScript"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="@dimen/content_inset"
+          android:layout_marginTop="@dimen/content_inset_half"
+          android:background="@color/colorPrimaryDark"
+          android:elevation="@dimen/fab_elevation"
+          android:padding="@dimen/content_inset_half"
+          android:scrollbars="none"
+          tools:ignore="UnusedAttribute"
+          >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+          <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:fontFamily="serif-monospace"
+              android:lineSpacingMultiplier="1.4"
+              android:singleLine="true"
+              android:text="@string/function_declaration"
+              android:textSize="@dimen/code_font_size"
+              />
+
+          <EditText
+              android:id="@+id/responseValidationScriptInput"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:background="@null"
+              android:fontFamily="serif-monospace"
+              android:gravity="top"
+              android:hint="@string/default_js"
+              android:inputType="textMultiLine"
+              android:lineSpacingMultiplier="1.4"
+              android:paddingBottom="@dimen/content_inset_less"
+              android:paddingEnd="@dimen/content_inset_more"
+              android:paddingStart="@dimen/content_inset_more"
+              android:paddingTop="@dimen/content_inset_less"
+              android:scrollHorizontally="true"
+              android:textSize="@dimen/code_font_size"
+              tools:ignore="Autofill,LabelFor,RtlSymmetry"
+              />
+
+          <TextView
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:fontFamily="serif-monospace"
+              android:text="@string/function_end"
+              android:textSize="@dimen/code_font_size"
+              />
+
+        </LinearLayout>
+
+      </HorizontalScrollView>
+
+      <TextView
+          android:id="@+id/validationModeDescription"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="@dimen/content_inset_half"
+          android:fontFamily="sans-serif-light"
+          android:lineSpacingMultiplier="1.2"
+          android:text="@string/validation_mode_status_desc"
+          android:textSize="@dimen/body_font_size"
+          />
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="1dp"
+          android:layout_marginTop="@dimen/content_inset"
+          android:background="@color/dividerColorDark"
+          />
+
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/content_inset"
+          android:text="@string/last_check_result"
+          android:textColor="?colorAccent"
+          android:textSize="@dimen/caption_font_size"
+          />
+
+      <TextView
+          android:id="@+id/textLastCheckResult"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/list_text_spacing"
+          android:fontFamily="sans-serif"
+          android:textColor="?android:textColorPrimary"
+          android:textSize="@dimen/medium_text_size"
+          tools:text="Everything checks out!"
+          />
+
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/content_inset"
+          android:text="@string/next_check"
+          android:textColor="?colorAccent"
+          android:textSize="@dimen/caption_font_size"
+          />
+
+      <TextView
+          android:id="@+id/textNextCheck"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/list_text_spacing"
+          android:fontFamily="sans-serif"
+          android:textColor="?android:textColorPrimary"
+          android:textSize="@dimen/medium_text_size"
+          tools:text="In 2 hours"
+          />
+
+      <Button
+          android:id="@+id/doneBtn"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="-4dp"
+          android:layout_marginRight="-4dp"
+          android:layout_marginTop="@dimen/content_inset_more"
+          android:text="@string/save"
+          android:textColor="#fff"
+          />
+
+    </LinearLayout>
+
+  </ScrollView>
 
 </LinearLayout>

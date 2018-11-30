@@ -2,104 +2,44 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.MainActivity">
+    tools:context=".ui.MainActivity"
+    >
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefreshLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+  <androidx.recyclerview.widget.RecyclerView
+      android:id="@+id/list"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:scrollbars="vertical"
+      />
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbars="vertical" />
+  <TextView
+      android:id="@+id/emptyText"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_gravity="center"
+      android:layout_marginBottom="@dimen/content_inset"
+      android:fontFamily="sans-serif-medium"
+      android:gravity="center"
+      android:text="@string/no_sites_added"
+      android:textSize="@dimen/empty_text_size"
+      android:textStyle="italic"
+      />
 
-    </android.support.v4.widget.SwipeRefreshLayout>
-
-    <TextView
-        android:id="@+id/emptyText"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:layout_marginBottom="@dimen/content_inset"
-        android:fontFamily="sans-serif-light"
-        android:gravity="center"
-        android:text="@string/no_sites_added"
-        android:textSize="@dimen/title_font_size"
-        android:textStyle="italic" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:src="@drawable/ic_add"
-        app:backgroundTint="?colorAccent"
-        app:elevation="@dimen/fab_elevation"
-        app:fabSize="normal"
-        app:pressedTranslationZ="@dimen/fab_elevation_pressed"
-        app:rippleColor="#40ffffff"
-        app:useCompatPadding="true" />
-
-    <LinearLayout
-        android:id="@+id/swipeRefreshTutorial"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#BF000000"
-        android:orientation="vertical"
-        android:padding="@dimen/content_inset"
-        android:visibility="gone">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="2">
-
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:scaleType="center"
-                android:src="@drawable/ic_down_arrow"
-                android:tint="#fff"
-                tools:ignore="ContentDescription" />
-
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:scaleType="center"
-                android:src="@drawable/ic_down_arrow"
-                android:tint="#fff"
-                tools:ignore="ContentDescription" />
-
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/content_inset_more"
-            android:fontFamily="sans-serif-medium"
-            android:gravity="center"
-            android:lineSpacingMultiplier="1.6"
-            android:text="@string/swipe_refresh_hint"
-            android:textColor="#fff"
-            android:textSize="@dimen/medium_text_size" />
-
-        <Button
-            android:id="@+id/understoodBtn"
-            android:layout_width="@dimen/tutorial_button_width"
-            android:layout_height="@dimen/button_height"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/content_inset_double"
-            android:text="@string/understood"
-            android:theme="@style/AccentButton" />
-
-    </LinearLayout>
+  <com.google.android.material.floatingactionbutton.FloatingActionButton
+      android:id="@+id/fab"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="end|bottom"
+      android:src="@drawable/ic_add"
+      app:backgroundTint="?colorAccent"
+      app:elevation="@dimen/fab_elevation"
+      app:fabSize="normal"
+      app:pressedTranslationZ="@dimen/fab_elevation_pressed"
+      app:rippleColor="#40ffffff"
+      app:useCompatPadding="true"
+      />
 
 </FrameLayout>
