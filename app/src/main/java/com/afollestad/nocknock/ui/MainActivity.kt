@@ -112,7 +112,17 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     list.addItemDecoration(DividerItemDecoration(this, VERTICAL))
 
     fab.setOnClickListener(this)
+
     notificationManager.createChannels()
+    ensureCheckJobs()
+  }
+
+  private fun ensureCheckJobs() {
+    rootView.scopeWhileAttached(IO) {
+      launch(coroutineContext) {
+        checkStatusManager.ensureScheduledChecks()
+      }
+    }
   }
 
   override fun onResume() {

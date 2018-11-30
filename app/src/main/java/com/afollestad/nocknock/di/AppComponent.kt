@@ -9,6 +9,7 @@ import android.app.Application
 import android.app.NotificationManager
 import android.app.job.JobScheduler
 import com.afollestad.nocknock.engine.EngineModule
+import com.afollestad.nocknock.engine.statuscheck.BootReceiver
 import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob
 import com.afollestad.nocknock.notifications.NotificationsModule
 import com.afollestad.nocknock.ui.AddSiteActivity
@@ -39,6 +40,8 @@ interface AppComponent {
   fun inject(activity: AddSiteActivity)
 
   fun inject(job: CheckStatusJob)
+
+  fun inject(bootReceiver: BootReceiver)
 
   @Component.Builder
   interface Builder {

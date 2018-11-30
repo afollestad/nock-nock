@@ -15,6 +15,7 @@ import com.afollestad.nocknock.data.ServerModel
 import com.afollestad.nocknock.data.ServerStatus.ERROR
 import com.afollestad.nocknock.data.ServerStatus.OK
 import com.afollestad.nocknock.engine.R
+import com.afollestad.nocknock.engine.db.ServerModelStore
 import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob.Companion.KEY_SITE_ID
 import com.afollestad.nocknock.utilities.BuildConfig
 import com.afollestad.nocknock.utilities.providers.StringProvider
@@ -33,6 +34,8 @@ data class CheckResult(
 /** @author Aidan Follestad (afollestad) */
 interface CheckStatusManager {
 
+  suspend fun ensureScheduledChecks()
+
   fun scheduleCheck(
     site: ServerModel,
     rightNow: Boolean = false
@@ -47,7 +50,8 @@ class RealCheckStatusManager @Inject constructor(
   private val app: Application,
   private val jobScheduler: JobScheduler,
   private val okHttpClient: OkHttpClient,
-  private val stringProvider: StringProvider
+  private val stringProvider: StringProvider,
+  private val siteStore: ServerModelStore
 ) : CheckStatusManager {
 
   companion object {
@@ -55,6 +59,25 @@ class RealCheckStatusManager @Inject constructor(
     private fun log(message: String) {
       if (BuildConfig.DEBUG) {
         Log.d("CheckStatusManager", message)
+      }
+    }
+  }
+
+  override suspend fun ensureScheduledChecks() {
+    val sites = siteStore.get()
+    if (sites.isEmpty()) {
+      return
+    }
+    log("Ensuring sites have scheduled checks.")
+
+    sites.forEach { site ->
+      val existingJob = jobScheduler.allPendingJobs
+          .firstOrNull { job -> job.id == site.id }
+      if (existingJob == null) {
+        log("Site ${site.id} does NOT have a scheduled job, running one now.")
+        scheduleCheck(site, rightNow = true)
+      } else {
+        log("Site ${site.id} already has a scheduled job. Nothing to do.")
       }
     }
   }
