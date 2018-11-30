@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.data.ServerModel
 import com.afollestad.nocknock.data.textRes
+import com.afollestad.nocknock.utilities.ui.onDebouncedClick
 import kotlinx.android.synthetic.main.list_item_server.view.iconStatus
 import kotlinx.android.synthetic.main.list_item_server.view.textInterval
 import kotlinx.android.synthetic.main.list_item_server.view.textName
@@ -24,10 +25,12 @@ typealias Listener = (model: ServerModel, longClick: Boolean) -> Unit
 class ServerVH constructor(
   itemView: View,
   private val adapter: ServerAdapter
-) : RecyclerView.ViewHolder(itemView), View.OnClickListener, View.OnLongClickListener {
+) : RecyclerView.ViewHolder(itemView), View.OnLongClickListener {
 
   init {
-    itemView.setOnClickListener(this)
+    itemView.onDebouncedClick {
+      adapter.performClick(adapterPosition, false)
+    }
     itemView.setOnLongClickListener(this)
   }
 
@@ -44,10 +47,6 @@ class ServerVH constructor(
     }
 
     itemView.textInterval.text = model.intervalText()
-  }
-
-  override fun onClick(view: View) {
-    adapter.performClick(adapterPosition, false)
   }
 
   override fun onLongClick(view: View): Boolean {
