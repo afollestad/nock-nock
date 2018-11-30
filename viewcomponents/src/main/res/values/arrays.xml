@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <string-array name="interval_options">
+    <item>Minute(s)</item>
+    <item>Hour(s)</item>
+    <item>Day(s)</item>
+    <item>Week(s)</item>
+  </string-array>
+
+</resources>

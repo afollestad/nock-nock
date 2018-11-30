@@ -6,4 +6,5 @@
     android:fontFamily="sans-serif-light"
     android:gravity="center_vertical|start"
     android:textColor="?android:textColorPrimary"
-    android:textSize="@dimen/body_font_size" />
+    android:textSize="@dimen/body_font_size"
+    />

@@ -25,33 +25,30 @@ import com.afollestad.nocknock.data.ValidationMode.STATUS_CODE
 import com.afollestad.nocknock.data.ValidationMode.TERM_SEARCH
 import com.afollestad.nocknock.engine.db.ServerModelStore
 import com.afollestad.nocknock.engine.statuscheck.CheckStatusManager
-import com.afollestad.nocknock.utilities.ext.conceal
-import com.afollestad.nocknock.utilities.ext.hide
 import com.afollestad.nocknock.utilities.ext.injector
 import com.afollestad.nocknock.utilities.ext.onEnd
-import com.afollestad.nocknock.utilities.ext.onItemSelected
-import com.afollestad.nocknock.utilities.ext.onLayout
 import com.afollestad.nocknock.utilities.ext.scopeWhileAttached
-import com.afollestad.nocknock.utilities.ext.show
-import com.afollestad.nocknock.utilities.ext.showOrHide
-import com.afollestad.nocknock.utilities.ext.textAsLong
-import com.afollestad.nocknock.utilities.ext.trimmedText
-import kotlinx.android.synthetic.main.activity_addsite.checkIntervalInput
-import kotlinx.android.synthetic.main.activity_addsite.checkIntervalSpinner
-import kotlinx.android.synthetic.main.activity_addsite.content_loading_progress
+import com.afollestad.nocknock.viewcomponents.ext.conceal
+import com.afollestad.nocknock.viewcomponents.ext.hide
+import com.afollestad.nocknock.viewcomponents.ext.onItemSelected
+import com.afollestad.nocknock.viewcomponents.ext.onLayout
+import com.afollestad.nocknock.viewcomponents.ext.show
+import com.afollestad.nocknock.viewcomponents.ext.showOrHide
+import com.afollestad.nocknock.viewcomponents.ext.trimmedText
+import kotlinx.android.synthetic.main.activity_addsite.checkIntervalLayout
 import kotlinx.android.synthetic.main.activity_addsite.doneBtn
 import kotlinx.android.synthetic.main.activity_addsite.inputName
 import kotlinx.android.synthetic.main.activity_addsite.inputUrl
+import kotlinx.android.synthetic.main.activity_addsite.loadingProgress
 import kotlinx.android.synthetic.main.activity_addsite.nameTiLayout
 import kotlinx.android.synthetic.main.activity_addsite.responseValidationMode
 import kotlinx.android.synthetic.main.activity_addsite.responseValidationSearchTerm
 import kotlinx.android.synthetic.main.activity_addsite.rootView
+import kotlinx.android.synthetic.main.activity_addsite.scriptInputLayout
 import kotlinx.android.synthetic.main.activity_addsite.textUrlWarning
 import kotlinx.android.synthetic.main.activity_addsite.toolbar
 import kotlinx.android.synthetic.main.activity_addsite.urlTiLayout
 import kotlinx.android.synthetic.main.activity_addsite.validationModeDescription
-import kotlinx.android.synthetic.main.include_script_input.responseValidationScript
-import kotlinx.android.synthetic.main.include_script_input.responseValidationScriptInput
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.async
@@ -97,14 +94,6 @@ class AddSiteActivity : AppCompatActivity(), View.OnClickListener {
       rootView.onLayout { circularRevealActivity() }
     }
 
-    val intervalOptionsAdapter = ArrayAdapter(
-        this,
-        R.layout.list_item_spinner,
-        resources.getStringArray(R.array.interval_options)
-    )
-    intervalOptionsAdapter.setDropDownViewResource(R.layout.list_item_spinner_dropdown)
-    checkIntervalSpinner.adapter = intervalOptionsAdapter
-
     inputUrl.setOnFocusChangeListener { _, hasFocus ->
       if (!hasFocus) {
         val inputStr = inputUrl.text
@@ -137,7 +126,7 @@ class AddSiteActivity : AppCompatActivity(), View.OnClickListener {
     responseValidationMode.adapter = validationOptionsAdapter
     responseValidationMode.onItemSelected { pos ->
       responseValidationSearchTerm.showOrHide(pos == 1)
-      responseValidationScript.showOrHide(pos == 2)
+      scriptInputLayout.showOrHide(pos == 2)
 
       validationModeDescription.setText(
           when (pos) {
@@ -200,14 +189,14 @@ class AddSiteActivity : AppCompatActivity(), View.OnClickListener {
   // Done button
   override fun onClick(view: View) {
     isClosing = true
-    var model = ServerModel(
+    var newModel = ServerModel(
         name = inputName.trimmedText(),
         url = inputUrl.trimmedText(),
         status = WAITING,
         validationMode = STATUS_CODE
     )
 
-    if (model.name.isEmpty()) {
+    if (newModel.name.isEmpty()) {
       nameTiLayout.error = getString(R.string.please_enter_name)
       isClosing = false
       return
@@ -215,42 +204,42 @@ class AddSiteActivity : AppCompatActivity(), View.OnClickListener {
       nameTiLayout.error = null
     }
 
-    if (model.url.isEmpty()) {
+    if (newModel.url.isEmpty()) {
       urlTiLayout.error = getString(R.string.please_enter_url)
       isClosing = false
       return
     } else {
       urlTiLayout.error = null
-      if (!WEB_URL.matcher(model.url).find()) {
+      if (!WEB_URL.matcher(newModel.url).find()) {
         urlTiLayout.error = getString(R.string.please_enter_valid_url)
         isClosing = false
         return
       } else {
-        val uri = Uri.parse(model.url)
+        val uri = Uri.parse(newModel.url)
         if (uri.scheme == null) {
-          model = model.copy(url = "http://${model.url}")
+          newModel = newModel.copy(url = "http://${newModel.url}")
         }
       }
     }
 
-    val parsedCheckInterval = getParsedCheckInterval()
+    val selectedCheckInterval = checkIntervalLayout.getSelectedCheckInterval()
     val selectedValidationMode = getSelectedValidationMode()
     val selectedValidationContent = getSelectedValidationContent()
 
-    model = model.copy(
-        checkInterval = parsedCheckInterval,
-        lastCheck = currentTimeMillis() - parsedCheckInterval,
+    newModel = newModel.copy(
+        checkInterval = selectedCheckInterval,
+        lastCheck = currentTimeMillis() - selectedCheckInterval,
         validationMode = selectedValidationMode,
         validationContent = selectedValidationContent
     )
 
     rootView.scopeWhileAttached(Main) {
       launch(coroutineContext) {
-        content_loading_progress.show()
-        val storedModel = async(IO) { serverModelStore.put(model) }.await()
+        loadingProgress.setLoading()
+        val storedModel = async(IO) { serverModelStore.put(newModel) }.await()
         checkStatusManager.cancelCheck(storedModel)
         checkStatusManager.scheduleCheck(storedModel, rightNow = true)
-        content_loading_progress.hide()
+        loadingProgress.setDone()
 
         setResult(RESULT_OK)
         finish()
@@ -260,16 +249,6 @@ class AddSiteActivity : AppCompatActivity(), View.OnClickListener {
   }
 
   override fun onBackPressed() = closeActivityWithReveal()
-
-  private fun getParsedCheckInterval(): Long {
-    val intervalInput = checkIntervalInput.textAsLong()
-    return when (checkIntervalSpinner.selectedItemPosition) {
-      0 -> intervalInput * (60 * 1000)
-      1 -> intervalInput * (60 * 60 * 1000)
-      2 -> intervalInput * (60 * 60 * 24 * 1000)
-      else -> intervalInput * (60 * 60 * 24 * 7 * 1000)
-    }
-  }
 
   private fun getSelectedValidationMode() = when (responseValidationMode.selectedItemPosition) {
     0 -> STATUS_CODE
@@ -285,7 +264,7 @@ class AddSiteActivity : AppCompatActivity(), View.OnClickListener {
   private fun getSelectedValidationContent() = when (responseValidationMode.selectedItemPosition) {
     0 -> null
     1 -> responseValidationSearchTerm.trimmedText()
-    2 -> responseValidationScriptInput.trimmedText()
+    2 -> scriptInputLayout.getCode()
     else -> {
       throw IllegalStateException(
           "Unexpected validation mode index: ${responseValidationMode.selectedItemPosition}"

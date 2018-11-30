@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <string name="default_js">var responseObj = JSON.parse(response);\nreturn responseObj.success === true;</string>
+  <string name="function_declaration">function validate(response) {</string>
+  <string name="function_end">}</string>
+
+  <string name="check_interval">Check Interval</string>
+
+</resources>

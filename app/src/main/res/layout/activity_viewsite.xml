@@ -45,7 +45,7 @@
             android:orientation="horizontal"
             >
 
-          <com.afollestad.nocknock.views.StatusImageView
+          <com.afollestad.nocknock.viewcomponents.StatusImageView
               android:id="@+id/iconStatus"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
@@ -110,56 +110,19 @@
 
         </LinearLayout>
 
-        <View
+        <include
+            layout="@layout/include_divider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="@dimen/content_inset_less"
-            android:background="@color/dividerColorDark"
             />
 
-        <TextView
-            android:id="@+id/checkIntervalLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/content_inset"
-            android:fontFamily="sans-serif"
-            android:text="@string/check_interval"
-            android:textColor="?colorAccent"
-            android:textSize="@dimen/caption_font_size"
-            />
-
-        <LinearLayout
+        <com.afollestad.nocknock.viewcomponents.CheckIntervalLayout
+            android:id="@+id/checkIntervalLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="2"
-            >
-
-          <EditText
-              android:id="@+id/checkIntervalInput"
-              android:layout_width="0dp"
-              android:layout_height="wrap_content"
-              android:layout_gravity="start|center_vertical"
-              android:layout_marginEnd="@dimen/content_inset_half"
-              android:layout_marginStart="-4dp"
-              android:layout_weight="1"
-              android:fontFamily="sans-serif-light"
-              android:hint="0"
-              android:inputType="number"
-              android:textSize="@dimen/body_font_size"
-              tools:ignore="HardcodedText,LabelFor"
-              />
-
-          <Spinner
-              android:id="@+id/checkIntervalSpinner"
-              android:layout_width="0dp"
-              android:layout_height="wrap_content"
-              android:layout_gravity="end|center_vertical"
-              android:layout_marginEnd="-4dp"
-              android:layout_weight="1"
-              />
-
-        </LinearLayout>
+            android:layout_marginTop="@dimen/content_inset"
+            />
 
         <View
             android:layout_width="match_parent"
@@ -197,9 +160,17 @@
             android:hint="@string/search_term"
             android:textSize="@dimen/body_font_size"
             android:visibility="gone"
+            tools:ignore="Autofill,TextFields"
             />
 
-        <include layout="@layout/include_script_input"/>
+        <com.afollestad.nocknock.viewcomponents.JavaScriptInputLayout
+            android:id="@+id/scriptInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/content_inset"
+            android:layout_marginTop="@dimen/content_inset_half"
+            android:background="@color/colorPrimaryDark"
+            />
 
         <TextView
             android:id="@+id/validationModeDescription"
@@ -212,12 +183,7 @@
             android:textSize="@dimen/body_font_size"
             />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="@dimen/content_inset"
-            android:background="@color/dividerColorDark"
-            />
+        <include layout="@layout/include_divider"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -259,15 +225,13 @@
             tools:text="In 2 hours"
             />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/doneBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="-4dp"
-            android:layout_marginRight="-4dp"
             android:layout_marginTop="@dimen/content_inset_more"
             android:text="@string/save"
-            android:textColor="#fff"
+            style="@style/AccentButton"
             />
 
       </LinearLayout>
@@ -276,21 +240,10 @@
 
   </LinearLayout>
 
-  <FrameLayout
-      android:id="@+id/content_loading_progress"
+  <com.afollestad.nocknock.viewcomponents.LoadingIndicatorFrame
+      android:id="@+id/loadingProgress"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:background="#40000000"
-      android:visibility="gone"
-      >
-
-    <ProgressBar
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        style="?android:progressBarStyleLarge"
-        />
-
-  </FrameLayout>
+      />
 
 </FrameLayout>

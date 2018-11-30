@@ -44,8 +44,8 @@ import com.afollestad.nocknock.utilities.ext.onEnd
 import com.afollestad.nocknock.utilities.ext.safeRegisterReceiver
 import com.afollestad.nocknock.utilities.ext.safeUnregisterReceiver
 import com.afollestad.nocknock.utilities.ext.scopeWhileAttached
-import com.afollestad.nocknock.utilities.ext.show
-import com.afollestad.nocknock.utilities.ext.showOrHide
+import com.afollestad.nocknock.viewcomponents.ext.show
+import com.afollestad.nocknock.viewcomponents.ext.showOrHide
 import com.afollestad.nocknock.utilities.util.MathUtil.bezierCurve
 import kotlinx.android.synthetic.main.activity_main.emptyText
 import kotlinx.android.synthetic.main.activity_main.fab

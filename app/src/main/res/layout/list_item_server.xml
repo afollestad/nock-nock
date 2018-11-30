@@ -12,7 +12,7 @@
     android:paddingTop="@dimen/content_inset_less"
     >
 
-  <com.afollestad.nocknock.views.StatusImageView
+  <com.afollestad.nocknock.viewcomponents.StatusImageView
       android:id="@+id/iconStatus"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"

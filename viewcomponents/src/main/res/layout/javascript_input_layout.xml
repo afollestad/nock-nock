@@ -1,19 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HorizontalScrollView
+<merge
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/responseValidationScript"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/content_inset"
-    android:layout_marginTop="@dimen/content_inset_half"
-    android:background="@color/colorPrimaryDark"
-    android:elevation="@dimen/fab_elevation"
-    android:paddingBottom="@dimen/content_inset"
-    android:paddingLeft="@dimen/content_inset_half"
-    android:paddingRight="@dimen/content_inset_half"
-    android:paddingTop="@dimen/content_inset"
-    android:scrollbars="none"
     tools:ignore="UnusedAttribute"
     >
 
@@ -34,7 +24,7 @@
         />
 
     <EditText
-        android:id="@+id/responseValidationScriptInput"
+        android:id="@+id/userInput"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@null"
@@ -62,4 +52,4 @@
 
   </LinearLayout>
 
-</HorizontalScrollView>
+</merge>

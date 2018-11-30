@@ -1,15 +1,12 @@
 apply from: '../dependencies.gradle'
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 
 android {
   compileSdkVersion versions.compileSdk
-  buildToolsVersion versions.buildTools
 
   defaultConfig {
-    applicationId "com.afollestad.nocknock"
     minSdkVersion versions.minSdk
     targetSdkVersion versions.compileSdk
     versionCode versions.publishVersionCode
@@ -18,22 +15,15 @@ android {
 }
 
 dependencies {
-  implementation project(':data')
   implementation project(':utilities')
-  implementation project(':engine')
-  implementation project(':notifications')
-  implementation project(':viewcomponents')
+  implementation project(':data')
 
   implementation 'androidx.appcompat:appcompat:' + versions.androidx
-  implementation 'androidx.recyclerview:recyclerview:' + versions.androidx
-  implementation 'com.google.android.material:material:' + versions.androidx
 
-  implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:' + versions.kotlin
+  api 'com.squareup.okhttp3:okhttp:' + versions.okHttp
 
   implementation 'com.google.dagger:dagger:' + versions.dagger
   kapt 'com.google.dagger:dagger-compiler:' + versions.dagger
-
-  implementation 'com.afollestad.material-dialogs:core:' + versions.materialDialogs
 }
 
 apply from: '../spotless.gradle'

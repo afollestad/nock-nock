@@ -3,12 +3,11 @@
  *
  * Designed and developed by Aidan Follestad (@afollestad)
  */
-package com.afollestad.nocknock.views
+package com.afollestad.nocknock.viewcomponents
 
 import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatImageView
-import com.afollestad.nocknock.R
 import com.afollestad.nocknock.data.ServerStatus
 import com.afollestad.nocknock.data.ServerStatus.CHECKING
 import com.afollestad.nocknock.data.ServerStatus.ERROR

@@ -3,7 +3,7 @@
  *
  * Designed and developed by Aidan Follestad (@afollestad)
  */
-package com.afollestad.nocknock.utilities.ext
+package com.afollestad.nocknock.viewcomponents.ext
 
 import android.view.View
 import android.view.View.GONE
@@ -13,6 +13,7 @@ import android.view.ViewTreeObserver
 import android.widget.AdapterView
 import android.widget.Spinner
 import android.widget.TextView
+import androidx.annotation.DimenRes
 
 fun View.show() {
   visibility = VISIBLE
@@ -59,3 +60,7 @@ fun View.onLayout(cb: () -> Unit) {
         })
   }
 }
+
+fun View.dimenFloat(@DimenRes res: Int) = resources.getDimension(res)
+
+fun View.dimenInt(@DimenRes res: Int) = resources.getDimensionPixelSize(res)
