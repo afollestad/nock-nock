@@ -127,8 +127,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
   override fun onResume() {
     super.onResume()
-    notificationManager.setIsAppOpen(true)
-
     val filter = IntentFilter().apply {
       addAction(ACTION_STATUS_UPDATE)
     }
@@ -139,7 +137,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
   override fun onPause() {
     super.onPause()
-    notificationManager.setIsAppOpen(false)
     safeUnregisterReceiver(intentReceiver)
   }
 

@@ -8,6 +8,7 @@ package com.afollestad.nocknock.di
 import android.app.Application
 import android.app.NotificationManager
 import android.app.job.JobScheduler
+import com.afollestad.nocknock.NockNockApp
 import com.afollestad.nocknock.engine.EngineModule
 import com.afollestad.nocknock.engine.statuscheck.BootReceiver
 import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob
@@ -32,6 +33,8 @@ import javax.inject.Singleton
     ]
 )
 interface AppComponent {
+
+  fun inject(app: NockNockApp)
 
   fun inject(activity: MainActivity)
 

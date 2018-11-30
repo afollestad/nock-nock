@@ -6,23 +6,35 @@
 package com.afollestad.nocknock
 
 import android.app.Application
-import android.app.NotificationManager
-import android.app.job.JobScheduler
-import android.content.Context
+import android.util.Log
 import com.afollestad.nocknock.di.AppComponent
 import com.afollestad.nocknock.di.DaggerAppComponent
 import com.afollestad.nocknock.engine.statuscheck.BootReceiver
 import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob
+import com.afollestad.nocknock.notifications.NockNotificationManager
 import com.afollestad.nocknock.ui.AddSiteActivity
 import com.afollestad.nocknock.ui.MainActivity
 import com.afollestad.nocknock.ui.ViewSiteActivity
 import com.afollestad.nocknock.utilities.Injector
+import com.afollestad.nocknock.utilities.ext.systemService
 import okhttp3.OkHttpClient
+import javax.inject.Inject
 
 /** @author Aidan Follestad (afollestad) */
-class App : Application(), Injector {
+class NockNockApp : Application(), Injector {
 
-  lateinit var appComponent: AppComponent
+  companion object {
+    private fun log(message: String) {
+      if (BuildConfig.DEBUG) {
+        Log.d("NockNockApp", message)
+      }
+    }
+  }
+
+  private lateinit var appComponent: AppComponent
+  @Inject lateinit var nockNotificationManager: NockNotificationManager
+
+  private var resumedActivities: Int = 0
 
   override fun onCreate() {
     super.onCreate()
@@ -36,15 +48,26 @@ class App : Application(), Injector {
           chain.proceed(request)
         }
         .build()
-    val jobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-    val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
     appComponent = DaggerAppComponent.builder()
         .application(this)
         .okHttpClient(okHttpClient)
-        .jobScheduler(jobScheduler)
-        .notificationManager(notificationManager)
+        .jobScheduler(systemService(JOB_SCHEDULER_SERVICE))
+        .notificationManager(systemService(NOTIFICATION_SERVICE))
         .build()
+    appComponent.inject(this)
+
+    onActivityLifeChange { activity, resumed ->
+      if (resumed) {
+        resumedActivities++
+        log("Activity resumed: $activity, resumedActivities = $resumedActivities")
+      } else {
+        resumedActivities--
+        log("Activity paused: $activity, resumedActivities = $resumedActivities")
+      }
+      check(resumedActivities >= 0) { "resumedActivities can't go below 0." }
+      nockNotificationManager.setIsAppOpen(resumedActivities > 0)
+    }
   }
 
   override fun injectInto(target: Any) = when (target) {
