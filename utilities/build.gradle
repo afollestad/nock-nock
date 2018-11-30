@@ -11,6 +11,11 @@ android {
     versionCode versions.publishVersionCode
     versionName versions.publishVersion
   }
+
+  // For Mozilla Rhino
+  lintOptions {
+    abortOnError false
+  }
 }
 
 dependencies {

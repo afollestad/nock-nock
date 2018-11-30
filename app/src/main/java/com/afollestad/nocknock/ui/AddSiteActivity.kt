@@ -44,14 +44,14 @@ import kotlinx.android.synthetic.main.activity_addsite.inputName
 import kotlinx.android.synthetic.main.activity_addsite.inputUrl
 import kotlinx.android.synthetic.main.activity_addsite.nameTiLayout
 import kotlinx.android.synthetic.main.activity_addsite.responseValidationMode
-import kotlinx.android.synthetic.main.activity_addsite.responseValidationScript
-import kotlinx.android.synthetic.main.activity_addsite.responseValidationScriptInput
 import kotlinx.android.synthetic.main.activity_addsite.responseValidationSearchTerm
 import kotlinx.android.synthetic.main.activity_addsite.rootView
 import kotlinx.android.synthetic.main.activity_addsite.textUrlWarning
 import kotlinx.android.synthetic.main.activity_addsite.toolbar
 import kotlinx.android.synthetic.main.activity_addsite.urlTiLayout
 import kotlinx.android.synthetic.main.activity_addsite.validationModeDescription
+import kotlinx.android.synthetic.main.include_script_input.responseValidationScript
+import kotlinx.android.synthetic.main.include_script_input.responseValidationScriptInput
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.async
@@ -233,38 +233,16 @@ class AddSiteActivity : AppCompatActivity(), View.OnClickListener {
       }
     }
 
-    val intervalValue = checkIntervalInput.textAsLong()
+    val parsedCheckInterval = getParsedCheckInterval()
+    val selectedValidationMode = getSelectedValidationMode()
+    val selectedValidationContent = getSelectedValidationContent()
 
-    model = when (checkIntervalSpinner.selectedItemPosition) {
-      0 -> model.copy(checkInterval = intervalValue * (60 * 1000))
-      1 -> model.copy(checkInterval = intervalValue * (60 * 60 * 1000))
-      2 -> model.copy(checkInterval = intervalValue * (60 * 60 * 24 * 1000))
-      else -> model.copy(checkInterval = intervalValue * (60 * 60 * 24 * 7 * 1000))
-    }
-    model = model.copy(lastCheck = currentTimeMillis() - model.checkInterval)
-
-    when (responseValidationMode.selectedItemPosition) {
-      0 -> {
-        model = model.copy(validationMode = STATUS_CODE, validationContent = null)
-      }
-      1 -> {
-        model = model.copy(
-            validationMode = TERM_SEARCH,
-            validationContent = responseValidationSearchTerm.trimmedText()
-        )
-      }
-      2 -> {
-        model = model.copy(
-            validationMode = JAVASCRIPT,
-            validationContent = responseValidationScriptInput.trimmedText()
-        )
-      }
-      else -> {
-        throw IllegalStateException(
-            "Unexpected validation mode index: ${responseValidationMode.selectedItemPosition}"
-        )
-      }
-    }
+    model = model.copy(
+        checkInterval = parsedCheckInterval,
+        lastCheck = currentTimeMillis() - parsedCheckInterval,
+        validationMode = selectedValidationMode,
+        validationContent = selectedValidationContent
+    )
 
     rootView.scopeWhileAttached(Main) {
       launch(coroutineContext) {
@@ -282,4 +260,36 @@ class AddSiteActivity : AppCompatActivity(), View.OnClickListener {
   }
 
   override fun onBackPressed() = closeActivityWithReveal()
+
+  private fun getParsedCheckInterval(): Long {
+    val intervalInput = checkIntervalInput.textAsLong()
+    return when (checkIntervalSpinner.selectedItemPosition) {
+      0 -> intervalInput * (60 * 1000)
+      1 -> intervalInput * (60 * 60 * 1000)
+      2 -> intervalInput * (60 * 60 * 24 * 1000)
+      else -> intervalInput * (60 * 60 * 24 * 7 * 1000)
+    }
+  }
+
+  private fun getSelectedValidationMode() = when (responseValidationMode.selectedItemPosition) {
+    0 -> STATUS_CODE
+    1 -> TERM_SEARCH
+    2 -> JAVASCRIPT
+    else -> {
+      throw IllegalStateException(
+          "Unexpected validation mode index: ${responseValidationMode.selectedItemPosition}"
+      )
+    }
+  }
+
+  private fun getSelectedValidationContent() = when (responseValidationMode.selectedItemPosition) {
+    0 -> null
+    1 -> responseValidationSearchTerm.trimmedText()
+    2 -> responseValidationScriptInput.trimmedText()
+    else -> {
+      throw IllegalStateException(
+          "Unexpected validation mode index: ${responseValidationMode.selectedItemPosition}"
+      )
+    }
+  }
 }

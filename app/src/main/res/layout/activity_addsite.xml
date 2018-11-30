@@ -186,65 +186,7 @@
             tools:ignore="Autofill"
             />
 
-        <HorizontalScrollView
-            android:id="@+id/responseValidationScript"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/content_inset"
-            android:layout_marginTop="@dimen/content_inset_half"
-            android:background="@color/colorPrimaryDark"
-            android:elevation="@dimen/fab_elevation"
-            android:padding="@dimen/content_inset_half"
-            android:scrollbars="none"
-            tools:ignore="UnusedAttribute"
-            >
-
-          <LinearLayout
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:orientation="vertical"
-              >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="serif-monospace"
-                android:lineSpacingMultiplier="1.4"
-                android:singleLine="true"
-                android:text="@string/function_declaration"
-                android:textSize="@dimen/code_font_size"
-                />
-
-            <EditText
-                android:id="@+id/responseValidationScriptInput"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:fontFamily="serif-monospace"
-                android:gravity="top"
-                android:hint="@string/default_js"
-                android:inputType="textMultiLine"
-                android:lineSpacingMultiplier="1.4"
-                android:paddingBottom="@dimen/content_inset_less"
-                android:paddingEnd="@dimen/content_inset_more"
-                android:paddingStart="@dimen/content_inset_more"
-                android:paddingTop="@dimen/content_inset_less"
-                android:scrollHorizontally="true"
-                android:textSize="@dimen/code_font_size"
-                tools:ignore="Autofill,LabelFor,RtlSymmetry"
-                />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="serif-monospace"
-                android:text="@string/function_end"
-                android:textSize="@dimen/code_font_size"
-                />
-
-          </LinearLayout>
-
-        </HorizontalScrollView>
+        <include layout="@layout/include_script_input"/>
 
         <TextView
             android:id="@+id/validationModeDescription"

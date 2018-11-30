@@ -58,8 +58,6 @@ import kotlinx.android.synthetic.main.activity_viewsite.iconStatus
 import kotlinx.android.synthetic.main.activity_viewsite.inputName
 import kotlinx.android.synthetic.main.activity_viewsite.inputUrl
 import kotlinx.android.synthetic.main.activity_viewsite.responseValidationMode
-import kotlinx.android.synthetic.main.activity_viewsite.responseValidationScript
-import kotlinx.android.synthetic.main.activity_viewsite.responseValidationScriptInput
 import kotlinx.android.synthetic.main.activity_viewsite.responseValidationSearchTerm
 import kotlinx.android.synthetic.main.activity_viewsite.rootView
 import kotlinx.android.synthetic.main.activity_viewsite.textLastCheckResult
@@ -67,6 +65,8 @@ import kotlinx.android.synthetic.main.activity_viewsite.textNextCheck
 import kotlinx.android.synthetic.main.activity_viewsite.textUrlWarning
 import kotlinx.android.synthetic.main.activity_viewsite.toolbar
 import kotlinx.android.synthetic.main.activity_viewsite.validationModeDescription
+import kotlinx.android.synthetic.main.include_script_input.responseValidationScript
+import kotlinx.android.synthetic.main.include_script_input.responseValidationScriptInput
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.async
@@ -257,7 +257,11 @@ class ViewSiteActivity : AppCompatActivity(),
 
     when (this.validationMode) {
       TERM_SEARCH -> responseValidationSearchTerm.setText(this.validationContent ?: "")
-      JAVASCRIPT -> responseValidationScriptInput.setText(this.validationContent ?: "")
+      JAVASCRIPT -> {
+        responseValidationScriptInput.setText(
+            this.validationContent ?: getString(R.string.default_js)
+        )
+      }
       else -> {
         responseValidationSearchTerm.setText("")
         responseValidationScriptInput.setText("")
@@ -311,44 +315,16 @@ class ViewSiteActivity : AppCompatActivity(),
       }
     }
 
-    val intervalValue = checkIntervalInput.textAsLong()
-
-    currentModel = when (checkIntervalSpinner.selectedItemPosition) {
-      0 -> currentModel.copy(checkInterval = intervalValue * (60 * 1000))
-      1 -> currentModel.copy(checkInterval = intervalValue * (60 * 60 * 1000))
-      2 -> currentModel.copy(checkInterval = intervalValue * (60 * 60 * 24 * 1000))
-      else -> currentModel.copy(checkInterval = intervalValue * (60 * 60 * 24 * 7 * 1000))
-    }
+    val parsedCheckInterval = getParsedCheckInterval()
+    val selectedValidationMode = getSelectedValidationMode()
+    val selectedValidationContent = getSelectedValidationContent()
 
     currentModel = currentModel.copy(
-        lastCheck = currentTimeMillis() - currentModel.checkInterval
+        checkInterval = parsedCheckInterval,
+        lastCheck = currentTimeMillis() - parsedCheckInterval,
+        validationMode = selectedValidationMode,
+        validationContent = selectedValidationContent
     )
-
-    when (responseValidationMode.selectedItemPosition) {
-      0 -> {
-        currentModel = currentModel.copy(
-            validationMode = STATUS_CODE,
-            validationContent = null
-        )
-      }
-      1 -> {
-        currentModel = currentModel.copy(
-            validationMode = TERM_SEARCH,
-            validationContent = responseValidationSearchTerm.trimmedText()
-        )
-      }
-      2 -> {
-        currentModel = currentModel.copy(
-            validationMode = JAVASCRIPT,
-            validationContent = responseValidationScriptInput.trimmedText()
-        )
-      }
-      else -> {
-        throw IllegalStateException(
-            "Unexpected response validation mode index: ${responseValidationMode.selectedItemPosition}"
-        )
-      }
-    }
   }
 
   // Save button
@@ -428,5 +404,37 @@ class ViewSiteActivity : AppCompatActivity(),
   private fun invalidateMenuForStatus() {
     val item = toolbar.menu.findItem(R.id.refresh)
     item.isEnabled = currentModel.status != CHECKING && currentModel.status != WAITING
+  }
+
+  private fun getParsedCheckInterval(): Long {
+    val intervalInput = checkIntervalInput.textAsLong()
+    return when (checkIntervalSpinner.selectedItemPosition) {
+      0 -> intervalInput * (60 * 1000)
+      1 -> intervalInput * (60 * 60 * 1000)
+      2 -> intervalInput * (60 * 60 * 24 * 1000)
+      else -> intervalInput * (60 * 60 * 24 * 7 * 1000)
+    }
+  }
+
+  private fun getSelectedValidationMode() = when (responseValidationMode.selectedItemPosition) {
+    0 -> STATUS_CODE
+    1 -> TERM_SEARCH
+    2 -> JAVASCRIPT
+    else -> {
+      throw IllegalStateException(
+          "Unexpected validation mode index: ${responseValidationMode.selectedItemPosition}"
+      )
+    }
+  }
+
+  private fun getSelectedValidationContent() = when (responseValidationMode.selectedItemPosition) {
+    0 -> null
+    1 -> responseValidationSearchTerm.trimmedText()
+    2 -> responseValidationScriptInput.trimmedText()
+    else -> {
+      throw IllegalStateException(
+          "Unexpected validation mode index: ${responseValidationMode.selectedItemPosition}"
+      )
+    }
   }
 }
