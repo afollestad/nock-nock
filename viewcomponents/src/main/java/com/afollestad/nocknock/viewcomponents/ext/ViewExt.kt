@@ -10,9 +10,6 @@ import android.view.View.GONE
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.ViewTreeObserver
-import android.widget.AdapterView
-import android.widget.Spinner
-import android.widget.TextView
 import androidx.annotation.DimenRes
 
 fun View.show() {
@@ -28,26 +25,6 @@ fun View.hide() {
 }
 
 fun View.showOrHide(show: Boolean) = if (show) show() else hide()
-
-fun TextView.trimmedText() = text.toString().trim()
-
-fun TextView.textAsLong(): Long {
-  val text = trimmedText()
-  return if (text.isEmpty()) 0L else text.toLong()
-}
-
-fun Spinner.onItemSelected(cb: (Int) -> Unit) {
-  onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-    override fun onNothingSelected(parent: AdapterView<*>?) = Unit
-
-    override fun onItemSelected(
-      parent: AdapterView<*>?,
-      view: View?,
-      position: Int,
-      id: Long
-    ) = cb(position)
-  }
-}
 
 fun View.onLayout(cb: () -> Unit) {
   if (this.viewTreeObserver.isAlive) {

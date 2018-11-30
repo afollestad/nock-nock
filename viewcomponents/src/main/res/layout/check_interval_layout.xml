@@ -35,6 +35,7 @@
         android:fontFamily="sans-serif-light"
         android:hint="0"
         android:inputType="number"
+        android:maxLength="6"
         android:textSize="@dimen/body_font_size"
         tools:ignore="Autofill,HardcodedText,LabelFor"
         />
