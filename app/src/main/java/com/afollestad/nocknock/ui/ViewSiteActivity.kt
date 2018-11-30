@@ -17,6 +17,7 @@ import android.util.Patterns.WEB_URL
 import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
+import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.text.HtmlCompat
@@ -285,7 +286,7 @@ class ViewSiteActivity : AppCompatActivity(),
     safeUnregisterReceiver(intentReceiver)
   }
 
-  private fun updateModelFromInput(withValidation: Boolean) {
+  @CheckResult private fun updateModelFromInput(withValidation: Boolean): Boolean {
     currentModel = currentModel.copy(
         name = inputName.trimmedText(),
         url = inputUrl.trimmedText(),
@@ -294,19 +295,19 @@ class ViewSiteActivity : AppCompatActivity(),
 
     if (withValidation && currentModel.name.isEmpty()) {
       inputName.error = getString(R.string.please_enter_name)
-      return
+      return false
     } else {
       inputName.error = null
     }
 
     if (withValidation && currentModel.url.isEmpty()) {
       inputUrl.error = getString(R.string.please_enter_url)
-      return
+      return false
     } else {
       inputUrl.error = null
       if (withValidation && !WEB_URL.matcher(currentModel.url).find()) {
         inputUrl.error = getString(R.string.please_enter_valid_url)
-        return
+        return false
       } else {
         val uri = Uri.parse(currentModel.url)
         if (uri.scheme == null) {
@@ -325,6 +326,8 @@ class ViewSiteActivity : AppCompatActivity(),
         validationMode = selectedValidationMode,
         validationContent = selectedValidationContent
     )
+
+    return true
   }
 
   // Save button
@@ -332,7 +335,11 @@ class ViewSiteActivity : AppCompatActivity(),
     rootView.scopeWhileAttached(Main) {
       launch(coroutineContext) {
         content_loading_progress.show()
-        updateModelFromInput(true)
+        if (!updateModelFromInput(true)) {
+          // Validation didn't pass
+          content_loading_progress.hide()
+          return@launch
+        }
 
         async(IO) { serverModelStore.update(currentModel) }.await()
         checkStatusManager.cancelCheck(currentModel)
