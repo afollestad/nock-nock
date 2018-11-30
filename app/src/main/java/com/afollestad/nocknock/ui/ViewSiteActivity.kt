@@ -24,6 +24,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.nocknock.BuildConfig
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.data.ServerModel
+import com.afollestad.nocknock.data.ServerStatus.CHECKING
 import com.afollestad.nocknock.data.ServerStatus.WAITING
 import com.afollestad.nocknock.data.ValidationMode.JAVASCRIPT
 import com.afollestad.nocknock.data.ValidationMode.STATUS_CODE
@@ -42,6 +43,8 @@ import com.afollestad.nocknock.utilities.ext.hide
 import com.afollestad.nocknock.utilities.ext.injector
 import com.afollestad.nocknock.utilities.ext.isHttpOrHttps
 import com.afollestad.nocknock.utilities.ext.onItemSelected
+import com.afollestad.nocknock.utilities.ext.safeRegisterReceiver
+import com.afollestad.nocknock.utilities.ext.safeUnregisterReceiver
 import com.afollestad.nocknock.utilities.ext.scopeWhileAttached
 import com.afollestad.nocknock.utilities.ext.show
 import com.afollestad.nocknock.utilities.ext.showOrHide
@@ -49,6 +52,7 @@ import com.afollestad.nocknock.utilities.ext.textAsLong
 import com.afollestad.nocknock.utilities.ext.trimmedText
 import kotlinx.android.synthetic.main.activity_viewsite.checkIntervalInput
 import kotlinx.android.synthetic.main.activity_viewsite.checkIntervalSpinner
+import kotlinx.android.synthetic.main.activity_viewsite.content_loading_progress
 import kotlinx.android.synthetic.main.activity_viewsite.doneBtn
 import kotlinx.android.synthetic.main.activity_viewsite.iconStatus
 import kotlinx.android.synthetic.main.activity_viewsite.inputName
@@ -106,7 +110,8 @@ class ViewSiteActivity : AppCompatActivity(),
       val model = intent.getSerializableExtra(KEY_VIEW_MODEL) as? ServerModel
       if (model != null) {
         this@ViewSiteActivity.currentModel = model
-        update()
+        log("Received model update: $currentModel")
+        displayCurrentModel()
       }
     }
   }
@@ -177,19 +182,19 @@ class ViewSiteActivity : AppCompatActivity(),
     }
 
     currentModel = intent.getSerializableExtra(KEY_VIEW_MODEL) as ServerModel
-    update()
+    displayCurrentModel()
   }
 
   override fun onNewIntent(intent: Intent?) {
     super.onNewIntent(intent)
     if (intent != null && intent.hasExtra(KEY_VIEW_MODEL)) {
       currentModel = intent.getSerializableExtra(KEY_VIEW_MODEL) as ServerModel
-      update()
+      displayCurrentModel()
     }
   }
 
   @SuppressLint("SetTextI18n")
-  private fun update() = with(currentModel) {
+  private fun displayCurrentModel() = with(currentModel) {
     iconStatus.setStatus(this.status)
     inputName.setText(this.name)
     inputUrl.setText(this.url)
@@ -260,27 +265,20 @@ class ViewSiteActivity : AppCompatActivity(),
     }
 
     doneBtn.setOnClickListener(this@ViewSiteActivity)
+    invalidateMenuForStatus()
   }
 
   override fun onResume() {
     super.onResume()
-    try {
-      val filter = IntentFilter()
-      filter.addAction(ACTION_STATUS_UPDATE)
-      // filter.addAction(CheckService.ACTION_JOB_RUNNING);
-      registerReceiver(intentReceiver, filter)
-    } catch (t: Throwable) {
-      t.printStackTrace()
+    val filter = IntentFilter().apply {
+      addAction(ACTION_STATUS_UPDATE)
     }
+    safeRegisterReceiver(intentReceiver, filter)
   }
 
   override fun onPause() {
     super.onPause()
-    try {
-      unregisterReceiver(intentReceiver)
-    } catch (t: Throwable) {
-      t.printStackTrace()
-    }
+    safeUnregisterReceiver(intentReceiver)
   }
 
   private fun updateModelFromInput(withValidation: Boolean) {
@@ -345,6 +343,11 @@ class ViewSiteActivity : AppCompatActivity(),
             validationContent = responseValidationScriptInput.trimmedText()
         )
       }
+      else -> {
+        throw IllegalStateException(
+            "Unexpected response validation mode index: ${responseValidationMode.selectedItemPosition}"
+        )
+      }
     }
   }
 
@@ -352,8 +355,14 @@ class ViewSiteActivity : AppCompatActivity(),
   override fun onClick(view: View) {
     rootView.scopeWhileAttached(Main) {
       launch(coroutineContext) {
+        content_loading_progress.show()
         updateModelFromInput(true)
+
         async(IO) { serverModelStore.update(currentModel) }.await()
+        checkStatusManager.cancelCheck(currentModel)
+        checkStatusManager.scheduleCheck(currentModel, rightNow = true)
+
+        content_loading_progress.hide()
         setResult(RESULT_OK)
         finish()
       }
@@ -365,26 +374,29 @@ class ViewSiteActivity : AppCompatActivity(),
       R.id.refresh -> {
         rootView.scopeWhileAttached(Main) {
           launch(coroutineContext) {
+            content_loading_progress.show()
             updateModelFromInput(false)
+            currentModel = currentModel.copy(status = WAITING)
+            displayCurrentModel()
+
             async(IO) { serverModelStore.update(currentModel) }.await()
+
             checkStatusManager.cancelCheck(currentModel)
             checkStatusManager.scheduleCheck(currentModel, rightNow = true)
+            content_loading_progress.hide()
           }
         }
         return true
       }
       R.id.remove -> {
-        maybeRemoveSite(currentModel) { finish() }
+        maybeRemoveSite(currentModel)
         return true
       }
     }
     return false
   }
 
-  private fun maybeRemoveSite(
-    model: ServerModel,
-    onRemoved: (() -> Unit)?
-  ) {
+  private fun maybeRemoveSite(model: ServerModel) {
     MaterialDialog(this).show {
       title(R.string.remove_site)
       message(
@@ -396,21 +408,25 @@ class ViewSiteActivity : AppCompatActivity(),
       positiveButton(R.string.remove) {
         checkStatusManager.cancelCheck(model)
         notificationManager.cancelStatusNotifications()
-        performRemoveSite(model, onRemoved)
+        performRemoveSite(model)
       }
       negativeButton(android.R.string.cancel)
     }
   }
 
-  private fun performRemoveSite(
-    model: ServerModel,
-    onRemoved: (() -> Unit)?
-  ) {
+  private fun performRemoveSite(model: ServerModel) {
     rootView.scopeWhileAttached(Main) {
       launch(coroutineContext) {
+        content_loading_progress.show()
         async(IO) { serverModelStore.delete(model) }.await()
-        onRemoved?.invoke()
+        content_loading_progress.hide()
+        finish()
       }
     }
+  }
+
+  private fun invalidateMenuForStatus() {
+    val item = toolbar.menu.findItem(R.id.refresh)
+    item.isEnabled = currentModel.status != CHECKING && currentModel.status != WAITING
   }
 }

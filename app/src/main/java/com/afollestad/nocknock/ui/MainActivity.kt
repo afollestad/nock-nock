@@ -85,6 +85,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
       when (intent.action) {
         ACTION_STATUS_UPDATE -> {
           val model = intent.getSerializableExtra(KEY_UPDATE_MODEL) as? ServerModel ?: return
+          log("Received model update: $model")
           list.post { adapter.update(model) }
         }
         else -> throw IllegalStateException("Unexpected intent: ${intent.action}")

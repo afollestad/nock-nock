@@ -160,7 +160,7 @@ class CheckStatusJob : JobService() {
     modelStore.update(newSiteModel)
 
     withContext(Main) {
-      sendBroadcast(Intent(ACTION_STATUS_UPDATE).apply { putExtra(KEY_UPDATE_MODEL, site) })
+      sendBroadcast(Intent(ACTION_STATUS_UPDATE).apply { putExtra(KEY_UPDATE_MODEL, newSiteModel) })
     }
     return newSiteModel
   }

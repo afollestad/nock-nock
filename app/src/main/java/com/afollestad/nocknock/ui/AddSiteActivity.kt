@@ -38,6 +38,7 @@ import com.afollestad.nocknock.utilities.ext.textAsLong
 import com.afollestad.nocknock.utilities.ext.trimmedText
 import kotlinx.android.synthetic.main.activity_addsite.checkIntervalInput
 import kotlinx.android.synthetic.main.activity_addsite.checkIntervalSpinner
+import kotlinx.android.synthetic.main.activity_addsite.content_loading_progress
 import kotlinx.android.synthetic.main.activity_addsite.doneBtn
 import kotlinx.android.synthetic.main.activity_addsite.inputName
 import kotlinx.android.synthetic.main.activity_addsite.inputUrl
@@ -199,7 +200,6 @@ class AddSiteActivity : AppCompatActivity(), View.OnClickListener {
   // Done button
   override fun onClick(view: View) {
     isClosing = true
-
     var model = ServerModel(
         name = inputName.trimmedText(),
         url = inputUrl.trimmedText(),
@@ -259,13 +259,20 @@ class AddSiteActivity : AppCompatActivity(), View.OnClickListener {
             validationContent = responseValidationScriptInput.trimmedText()
         )
       }
+      else -> {
+        throw IllegalStateException(
+            "Unexpected validation mode index: ${responseValidationMode.selectedItemPosition}"
+        )
+      }
     }
 
     rootView.scopeWhileAttached(Main) {
       launch(coroutineContext) {
+        content_loading_progress.show()
         val storedModel = async(IO) { serverModelStore.put(model) }.await()
         checkStatusManager.cancelCheck(storedModel)
         checkStatusManager.scheduleCheck(storedModel, rightNow = true)
+        content_loading_progress.hide()
 
         setResult(RESULT_OK)
         finish()
