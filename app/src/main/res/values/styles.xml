@@ -10,6 +10,11 @@
 
     <item name="android:textColorPrimary">#212121</item>
     <item name="android:textColorSecondary">#727272</item>
+
+    <item name="md_corner_radius">16dp</item>
+    <item name="md_font_title">@font/lato_black</item>
+    <item name="md_font_body">@font/lato</item>
+    <item name="md_font_button">@font/lato_bold</item>
   </style>
 
   <style name="AppTheme.Ink" parent="Theme.MaterialComponents.NoActionBar">
@@ -19,6 +24,11 @@
     <item name="colorButtonNormal">@color/colorPrimaryDark</item>
 
     <item name="android:listDivider">@drawable/divider</item>
+
+    <item name="md_corner_radius">16dp</item>
+    <item name="md_font_title">@font/lato_black</item>
+    <item name="md_font_body">@font/lato</item>
+    <item name="md_font_button">@font/lato_bold</item>
   </style>
 
   <style name="AppTheme.Transparent" parent="AppTheme.Ink">
