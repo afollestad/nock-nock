@@ -34,6 +34,11 @@ dependencies {
   kapt 'com.google.dagger:dagger-compiler:' + versions.dagger
 
   implementation 'com.afollestad.material-dialogs:core:' + versions.materialDialogs
+
+  testImplementation 'junit:junit:' + versions.junit
+  testImplementation 'org.mockito:mockito-core:' + versions.mockito
+  testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:' + versions.mockitoKotlin
+  testImplementation 'com.google.truth:truth:' + versions.truth
 }
 
 apply from: '../spotless.gradle'

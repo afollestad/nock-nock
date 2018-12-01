@@ -10,9 +10,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlin.coroutines.CoroutineContext
 
+typealias ScopeReceiver = CoroutineScope.() -> Unit
+
 fun View.scopeWhileAttached(
   context: CoroutineContext,
-  exec: CoroutineScope.() -> Unit
+  exec: ScopeReceiver
 ) {
   val job = Job(context[Job])
 

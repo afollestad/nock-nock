@@ -27,6 +27,7 @@ import javax.inject.Singleton
 @Component(
     modules = [
       MainModule::class,
+      MainBindModule::class,
       EngineModule::class,
       NotificationsModule::class,
       UtilitiesModule::class
