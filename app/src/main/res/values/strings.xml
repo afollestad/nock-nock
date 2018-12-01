@@ -30,12 +30,21 @@
   <string name="remove_site_prompt"><![CDATA[Remove <b>%1$s</b> from your sites?]]></string>
   <string name="remove">Remove</string>
   <string name="save_changes">Save Changes</string>
-  <string name="disable_automatic_checks">Disable Automatic Checks</string>
   <string name="view_site">View Site</string>
   <string name="last_check_result">Last Check Result</string>
   <string name="next_check">Next Check</string>
+  <string name="next_check_x">Next Check: %1$s</string>
   <string name="none_turned_off">None (turned off)</string>
   <string name="none">None</string>
+
+  <string name="disable_automatic_checks">Disable Automatic Checks</string>
+  <string name="disable_automatic_checks_prompt"><![CDATA[
+      Disable automatic checks for <b>%1$s</b>? The site will not be validated in the background
+      until you re-enable checks for it. You can still manually perform checks by tapping the
+      Refresh icon at the top of this page.
+  ]]></string>
+  <string name="disable">Disable</string>
+  <string name="renable_and_save_changes">Enable Checks &amp; Save Changes</string>
 
   <string name="refresh_status">Refresh Status</string>
 

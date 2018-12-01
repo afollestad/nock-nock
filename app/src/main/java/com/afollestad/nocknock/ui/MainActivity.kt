@@ -131,6 +131,7 @@ class MainActivity : AppCompatActivity() {
     }
     safeRegisterReceiver(intentReceiver, filter)
 
+    notificationManager.cancelStatusNotifications()
     refreshModels()
   }
 
@@ -171,10 +172,7 @@ class MainActivity : AppCompatActivity() {
         title(R.string.options)
         listItems(R.array.site_long_options) { _, i, _ ->
           when (i) {
-            0 -> {
-              checkStatusManager.cancelCheck(model)
-              checkStatusManager.scheduleCheck(model)
-            }
+            0 -> checkStatusManager.scheduleCheck(site = model, cancelPrevious = true)
             1 -> maybeRemoveSite(model) {
               adapter.remove(i)
               emptyText.showOrHide(adapter.itemCount == 0)
@@ -207,7 +205,7 @@ class MainActivity : AppCompatActivity() {
       )
       positiveButton(R.string.remove) {
         checkStatusManager.cancelCheck(model)
-        notificationManager.cancelStatusNotifications()
+        notificationManager.cancelStatusNotification(model)
         performRemoveSite(model, onRemoved)
       }
       negativeButton(android.R.string.cancel)

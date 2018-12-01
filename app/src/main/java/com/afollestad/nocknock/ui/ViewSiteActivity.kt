@@ -21,6 +21,7 @@ import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.text.HtmlCompat
+import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.nocknock.BuildConfig
 import com.afollestad.nocknock.R
@@ -74,7 +75,6 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import java.lang.System.currentTimeMillis
 import javax.inject.Inject
 
 private const val KEY_VIEW_MODEL = "site_model"
@@ -228,7 +228,15 @@ class ViewSiteActivity : AppCompatActivity(),
       }
     }
 
+    disableChecksButton.setOnClickListener(this@ViewSiteActivity)
+    disableChecksButton.showOrHide(!this.disabled)
+
     doneBtn.setOnClickListener(this@ViewSiteActivity)
+    doneBtn.setText(
+        if (this.disabled) R.string.renable_and_save_changes
+        else R.string.save_changes
+    )
+
     invalidateMenuForStatus()
   }
 
@@ -245,11 +253,139 @@ class ViewSiteActivity : AppCompatActivity(),
     safeUnregisterReceiver(intentReceiver)
   }
 
+  override fun onClick(view: View) = when (view.id) {
+    R.id.doneBtn -> performSaveChangesAndFinish()
+    R.id.disableChecksButton -> maybeDisableChecks()
+    else -> Unit
+  }
+
+  override fun onMenuItemClick(item: MenuItem): Boolean {
+    when (item.itemId) {
+      R.id.refresh -> performCheckNow()
+      R.id.remove -> maybeRemoveSite()
+    }
+    return true
+  }
+
+  private fun performCheckNow() {
+    rootView.scopeWhileAttached(Main) {
+      launch(coroutineContext) {
+        disableChecksButton.disable()
+        loadingProgress.setLoading()
+        updateModelFromInput(false)
+        currentModel = currentModel.copy(status = WAITING)
+        displayCurrentModel()
+
+        async(IO) { serverModelStore.update(currentModel) }.await()
+
+        checkStatusManager.scheduleCheck(
+            site = currentModel,
+            rightNow = true,
+            cancelPrevious = true
+        )
+        loadingProgress.setDone()
+        disableChecksButton.enable()
+      }
+    }
+  }
+
+  private fun maybeRemoveSite() {
+    MaterialDialog(this).show {
+      title(R.string.remove_site)
+      message(
+          text = HtmlCompat.fromHtml(
+              context.getString(R.string.remove_site_prompt, currentModel.name),
+              FROM_HTML_MODE_LEGACY
+          )
+      )
+      positiveButton(R.string.remove) {
+        checkStatusManager.cancelCheck(currentModel)
+        notificationManager.cancelStatusNotification(currentModel)
+        performRemoveSite()
+      }
+      negativeButton(android.R.string.cancel)
+    }
+  }
+
+  private fun performRemoveSite() {
+    rootView.scopeWhileAttached(Main) {
+      launch(coroutineContext) {
+        loadingProgress.setLoading()
+        async(IO) { serverModelStore.delete(currentModel) }.await()
+        loadingProgress.setDone()
+        finish()
+      }
+    }
+  }
+
+  private fun maybeDisableChecks() {
+    MaterialDialog(this).show {
+      title(R.string.disable_automatic_checks)
+      message(
+          text = HtmlCompat.fromHtml(
+              context.getString(R.string.disable_automatic_checks_prompt, currentModel.name),
+              FROM_HTML_MODE_LEGACY
+          )
+      )
+      positiveButton(R.string.disable) {
+        checkStatusManager.cancelCheck(currentModel)
+        notificationManager.cancelStatusNotification(currentModel)
+        performDisableChecks()
+      }
+      negativeButton(android.R.string.cancel)
+    }
+  }
+
+  private fun performDisableChecks() {
+    rootView.scopeWhileAttached(Main) {
+      launch(coroutineContext) {
+        loadingProgress.setLoading()
+        currentModel = currentModel.copy(
+            disabled = true,
+            lastCheck = LAST_CHECK_NONE
+        )
+        async(IO) { serverModelStore.update(currentModel) }.await()
+        loadingProgress.setDone()
+        displayCurrentModel() // invalidate UI to reflect disabled state
+      }
+    }
+  }
+
+  private fun performSaveChangesAndFinish() {
+    rootView.scopeWhileAttached(Main) {
+      launch(coroutineContext) {
+        loadingProgress.setLoading()
+        if (!updateModelFromInput(true)) {
+          // Validation didn't pass
+          loadingProgress.setDone()
+          return@launch
+        }
+
+        async(IO) { serverModelStore.update(currentModel) }.await()
+        checkStatusManager.scheduleCheck(
+            site = currentModel,
+            rightNow = true,
+            cancelPrevious = true
+        )
+
+        loadingProgress.setDone()
+        setResult(RESULT_OK)
+        finish()
+      }
+    }
+  }
+
+  private fun invalidateMenuForStatus() {
+    val item = toolbar.menu.findItem(R.id.refresh)
+    item.isEnabled = currentModel.status != CHECKING && currentModel.status != WAITING
+  }
+
   @CheckResult private fun updateModelFromInput(withValidation: Boolean): Boolean {
     currentModel = currentModel.copy(
         name = inputName.trimmedText(),
         url = inputUrl.trimmedText(),
-        status = WAITING
+        status = WAITING,
+        disabled = false
     )
 
     if (withValidation && currentModel.name.isEmpty()) {
@@ -281,97 +417,11 @@ class ViewSiteActivity : AppCompatActivity(),
 
     currentModel = currentModel.copy(
         checkInterval = selectedCheckInterval,
-        lastCheck = currentTimeMillis() - selectedCheckInterval,
         validationMode = selectedValidationMode,
         validationContent = selectedValidationMode.validationContent()
     )
 
     return true
-  }
-
-  // Save button
-  override fun onClick(view: View) {
-    rootView.scopeWhileAttached(Main) {
-      launch(coroutineContext) {
-        loadingProgress.setLoading()
-        if (!updateModelFromInput(true)) {
-          // Validation didn't pass
-          loadingProgress.setDone()
-          return@launch
-        }
-
-        async(IO) { serverModelStore.update(currentModel) }.await()
-        checkStatusManager.cancelCheck(currentModel)
-        checkStatusManager.scheduleCheck(currentModel, rightNow = true)
-
-        loadingProgress.setDone()
-        setResult(RESULT_OK)
-        finish()
-      }
-    }
-  }
-
-  override fun onMenuItemClick(item: MenuItem): Boolean {
-    when (item.itemId) {
-      R.id.refresh -> {
-        rootView.scopeWhileAttached(Main) {
-          launch(coroutineContext) {
-            disableChecksButton.disable()
-            loadingProgress.setLoading()
-            updateModelFromInput(false)
-            currentModel = currentModel.copy(status = WAITING)
-            displayCurrentModel()
-
-            async(IO) { serverModelStore.update(currentModel) }.await()
-
-            checkStatusManager.cancelCheck(currentModel)
-            checkStatusManager.scheduleCheck(currentModel, rightNow = true)
-            loadingProgress.setDone()
-            disableChecksButton.enable()
-          }
-        }
-        return true
-      }
-      R.id.remove -> {
-        maybeRemoveSite(currentModel)
-        return true
-      }
-    }
-    return false
-  }
-
-  private fun maybeRemoveSite(model: ServerModel) {
-    MaterialDialog(this).show {
-      title(R.string.remove_site)
-      message(
-          text = HtmlCompat.fromHtml(
-              context.getString(R.string.remove_site_prompt, model.name),
-              HtmlCompat.FROM_HTML_MODE_LEGACY
-          )
-      )
-      positiveButton(R.string.remove) {
-        checkStatusManager.cancelCheck(model)
-        notificationManager.cancelStatusNotifications()
-        performRemoveSite(model)
-      }
-      negativeButton(android.R.string.cancel)
-    }
-  }
-
-  private fun performRemoveSite(model: ServerModel) {
-    rootView.scopeWhileAttached(Main) {
-      launch(coroutineContext) {
-        loadingProgress.setLoading()
-        async(IO) { serverModelStore.delete(model) }.await()
-        loadingProgress.setDone()
-        finish()
-      }
-    }
-  }
-
-  private fun invalidateMenuForStatus() {
-    val item = toolbar.menu.findItem(R.id.refresh)
-    item.isEnabled = currentModel.status != CHECKING && currentModel.status != WAITING
   }
 
   private fun ValidationMode.validationContent() = when (this) {

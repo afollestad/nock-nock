@@ -36,3 +36,5 @@ fun ServerStatus.textRes() = when (this) {
 }
 
 fun Int.toServerStatus() = ServerStatus.fromValue(this)
+
+fun ServerStatus.isPending() = this == WAITING || this == CHECKING

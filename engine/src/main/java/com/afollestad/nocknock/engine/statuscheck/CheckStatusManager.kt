@@ -38,7 +38,9 @@ interface CheckStatusManager {
 
   fun scheduleCheck(
     site: ServerModel,
-    rightNow: Boolean = false
+    rightNow: Boolean = false,
+    cancelPrevious: Boolean = false,
+    fromFinishingJob: Boolean = false
   )
 
   fun cancelCheck(site: ServerModel)
@@ -55,7 +57,6 @@ class RealCheckStatusManager @Inject constructor(
 ) : CheckStatusManager {
 
   companion object {
-
     private fun log(message: String) {
       if (BuildConfig.DEBUG) {
         Log.d("CheckStatusManager", message)
@@ -68,34 +69,43 @@ class RealCheckStatusManager @Inject constructor(
     if (sites.isEmpty()) {
       return
     }
-    log("Ensuring sites have scheduled checks.")
-
-    sites.forEach { site ->
-      val existingJob = jobScheduler.allPendingJobs
-          .firstOrNull { job -> job.id == site.id }
-      if (existingJob == null) {
-        log("Site ${site.id} does NOT have a scheduled job, running one now.")
-        scheduleCheck(site, rightNow = true)
-      } else {
-        log("Site ${site.id} already has a scheduled job. Nothing to do.")
-      }
-    }
+    log("Ensuring enabled sites have scheduled checks.")
+    sites.filter { !it.disabled }
+        .forEach { site ->
+          val existingJob = jobForSite(site)
+          if (existingJob == null) {
+            log("Site ${site.id} does NOT have a scheduled job, running one now.")
+            scheduleCheck(site = site, rightNow = true)
+          } else {
+            log("Site ${site.id} already has a scheduled job. Nothing to do.")
+          }
+        }
   }
 
   override fun scheduleCheck(
     site: ServerModel,
-    rightNow: Boolean
+    rightNow: Boolean,
+    cancelPrevious: Boolean,
+    fromFinishingJob: Boolean
   ) {
     check(site.id != 0) { "Cannot schedule checks for jobs with no ID." }
-    log("Requesting a check job for site to be scheduled: $site")
+    if (cancelPrevious) {
+      cancelCheck(site)
+    } else if (!fromFinishingJob) {
+      val existingJob = jobForSite(site)
+      check(existingJob == null) {
+        "Site ${site.id} already has a scheduled job, and cancelPrevious = false."
+      }
+    }
 
+    log("Requesting a check job for site to be scheduled: $site")
     val extras = PersistableBundle().apply {
       putInt(KEY_SITE_ID, site.id)
     }
 
-    // Note that we don't use the periodic feature of JobScheduler because it requires a
+    // Note: we don't use the periodic feature of JobScheduler because it requires a
     // minimum of 15 minutes between each execution which may not be what's requested by the
-    // user of this app.
+    // user of the app.
     val jobInfo = jobInfo(app, site.id, CheckStatusJob::class.java) {
       setRequiredNetworkType(NETWORK_TYPE_ANY)
       if (rightNow) {
@@ -163,4 +173,8 @@ class RealCheckStatusManager @Inject constructor(
       CheckResult(model = site.copy(status = ERROR, reason = ex.message))
     }
   }
+
+  private fun jobForSite(site: ServerModel) =
+    jobScheduler.allPendingJobs
+        .firstOrNull { job -> job.id == site.id }
 }

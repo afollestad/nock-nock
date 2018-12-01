@@ -55,7 +55,6 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import java.lang.System.currentTimeMillis
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.properties.Delegates.notNull
@@ -233,7 +232,6 @@ class AddSiteActivity : AppCompatActivity(), View.OnClickListener {
 
     newModel = newModel.copy(
         checkInterval = selectedCheckInterval,
-        lastCheck = currentTimeMillis() - selectedCheckInterval,
         validationMode = selectedValidationMode,
         validationContent = selectedValidationMode.validationContent()
     )
@@ -242,8 +240,12 @@ class AddSiteActivity : AppCompatActivity(), View.OnClickListener {
       launch(coroutineContext) {
         loadingProgress.setLoading()
         val storedModel = async(IO) { serverModelStore.put(newModel) }.await()
-        checkStatusManager.cancelCheck(storedModel)
-        checkStatusManager.scheduleCheck(storedModel, rightNow = true)
+
+        checkStatusManager.scheduleCheck(
+            site = storedModel,
+            rightNow = true,
+            cancelPrevious = true
+        )
         loadingProgress.setDone()
 
         setResult(RESULT_OK)

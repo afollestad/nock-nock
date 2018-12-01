@@ -17,6 +17,7 @@ import com.afollestad.nocknock.data.ServerStatus.OK
 import com.afollestad.nocknock.data.ValidationMode.JAVASCRIPT
 import com.afollestad.nocknock.data.ValidationMode.STATUS_CODE
 import com.afollestad.nocknock.data.ValidationMode.TERM_SEARCH
+import com.afollestad.nocknock.data.isPending
 import com.afollestad.nocknock.engine.BuildConfig.APPLICATION_ID
 import com.afollestad.nocknock.engine.db.ServerModelStore
 import com.afollestad.nocknock.notifications.NockNotificationManager
@@ -127,7 +128,10 @@ class CheckStatusJob : JobService() {
         notificationManager.postStatusNotification(result)
       }
 
-      checkStatusManager.scheduleCheck(result)
+      checkStatusManager.scheduleCheck(
+          site = result,
+          fromFinishingJob = true
+      )
     }
 
     return true
@@ -146,8 +150,8 @@ class CheckStatusJob : JobService() {
     log("Updating ${site.name} (${site.url}) status to $status...")
 
     val lastCheckTime =
-      if (status == CHECKING) currentTimeMillis()
-      else site.lastCheck
+      if (status.isPending()) site.lastCheck
+      else currentTimeMillis()
     val reason =
       if (status == OK) null
       else site.reason

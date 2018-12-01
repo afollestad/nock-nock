@@ -46,7 +46,14 @@ class ServerVH constructor(
       itemView.textStatus.setText(statusText)
     }
 
-    itemView.textInterval.text = model.intervalText()
+    if (model.disabled) {
+      itemView.textInterval.setText(R.string.checks_disabled)
+    } else {
+      itemView.textInterval.text = itemView.resources.getString(
+          R.string.next_check_x,
+          model.intervalText()
+      )
+    }
   }
 
   override fun onLongClick(view: View): Boolean {

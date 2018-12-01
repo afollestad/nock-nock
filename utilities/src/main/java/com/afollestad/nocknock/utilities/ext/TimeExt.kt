@@ -15,7 +15,7 @@ const val WEEK = DAY * 7
 const val MONTH = WEEK * 4
 
 fun Long.timeString() = when {
-  this <= 0 -> ""
+  this <= 0 -> "??"
   this >= MONTH ->
     "${ceil((this.toFloat() / MONTH.toFloat()).toDouble()).toInt()}mo"
   this >= WEEK ->

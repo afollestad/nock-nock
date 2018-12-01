@@ -11,6 +11,7 @@ import com.afollestad.nocknock.data.ServerStatus.OK
 import com.afollestad.nocknock.utilities.ext.timeString
 import java.io.Serializable
 import java.lang.System.currentTimeMillis
+import kotlin.math.max
 
 const val CHECK_INTERVAL_UNSET = -1L
 const val LAST_CHECK_NONE = -1L
@@ -62,12 +63,10 @@ data class ServerModel(
     }
   }
 
-  fun intervalText() = if (checkInterval <= 0) {
-    ""
-  } else {
+  fun intervalText(): String {
     val now = currentTimeMillis()
-    val nextCheck = lastCheck + checkInterval
-    (nextCheck - now).timeString()
+    val nextCheck = max(lastCheck, 0) + checkInterval
+    return (nextCheck - now).timeString()
   }
 
   fun toContentValues() = ContentValues().apply {
