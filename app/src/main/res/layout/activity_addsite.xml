@@ -52,12 +52,10 @@
               android:id="@+id/inputName"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:fontFamily="@font/lato"
               android:hint="@string/site_name"
               android:inputType="textPersonName|textCapWords|textAutoCorrect"
-              android:textColor="?android:textColorPrimary"
-              android:textColorHint="?android:textColorSecondary"
-              android:textSize="@dimen/body_font_size"
+              android:textColor="#FFFFFF"
+              style="@style/NockText.Body"
               />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -75,12 +73,10 @@
               android:id="@+id/inputUrl"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:fontFamily="@font/lato"
               android:hint="@string/site_url"
               android:inputType="textUri"
-              android:textColor="?android:textColorPrimary"
-              android:textColorHint="?android:textColorSecondary"
-              android:textSize="@dimen/body_font_size"
+              android:textColor="#FFFFFF"
+              style="@style/NockText.Body"
               />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -90,11 +86,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/list_text_spacing"
-            android:fontFamily="@font/lato_light"
-            android:textColor="?android:textColorPrimary"
-            android:textSize="@dimen/caption_font_size"
             android:visibility="gone"
             tools:text="Warning: this app checks for server availability with HTTP requests. It's recommended that you use an HTTP URL."
+            style="@style/NockText.Footnote"
             />
 
         <include layout="@layout/include_divider"/>
@@ -111,10 +105,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/content_inset"
-            android:fontFamily="@font/lato"
             android:text="@string/response_validation_mode"
-            android:textColor="?colorAccent"
-            android:textSize="@dimen/caption_font_size"
+            style="@style/NockText.SectionHeader"
             />
 
         <Spinner
@@ -131,11 +123,10 @@
             android:layout_marginLeft="-4dp"
             android:layout_marginRight="-4dp"
             android:layout_marginTop="-4dp"
-            android:fontFamily="@font/lato_light"
             android:hint="@string/search_term"
-            android:textSize="@dimen/body_font_size"
             android:visibility="gone"
             tools:ignore="Autofill,TextFields"
+            style="@style/NockText.Body.Light"
             />
 
         <com.afollestad.nocknock.viewcomponents.JavaScriptInputLayout
@@ -152,10 +143,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/content_inset_half"
-            android:fontFamily="@font/lato_light"
             android:lineSpacingMultiplier="1.2"
             android:text="@string/validation_mode_status_desc"
-            android:textSize="@dimen/body_font_size"
+            style="@style/NockText.Body.Light"
             />
 
         <com.google.android.material.button.MaterialButton

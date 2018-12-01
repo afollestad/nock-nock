@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <style name="NockText"/>
+
+  <style name="NockText.SectionHeader">
+    <item name="android:textSize">@dimen/caption_font_size</item>
+    <item name="android:fontFamily">@font/lato_bold</item>
+    <item name="android:textColor">?colorAccent</item>
+  </style>
+
+  <style name="NockText.Title">
+    <item name="android:textSize">@dimen/title_font_size</item>
+    <item name="android:fontFamily">@font/lato</item>
+    <item name="android:textColor">?android:textColorPrimary</item>
+  </style>
+
+  <style name="NockText.Body">
+    <item name="android:textSize">@dimen/body_font_size</item>
+    <item name="android:fontFamily">@font/lato</item>
+    <item name="android:textColor">?android:textColorSecondary</item>
+  </style>
+
+  <style name="NockText.Body.Light" parent="NockText.Body">
+    <item name="android:fontFamily">@font/lato_light</item>
+  </style>
+
+  <style name="NockText.Caption">
+    <item name="android:textSize">@dimen/caption_font_size</item>
+    <item name="android:fontFamily">@font/lato_black</item>
+    <item name="android:textColor">?android:textColorSecondary</item>
+    <item name="android:singleLine">true</item>
+  </style>
+
+  <style name="NockText.Footnote">
+    <item name="android:textSize">@dimen/caption_font_size</item>
+    <item name="android:fontFamily">@font/lato_light</item>
+    <item name="android:textColor">?android:textColorPrimary</item>
+    <item name="android:textColorHint">?android:textColorSecondary</item>
+  </style>
+
+</resources>

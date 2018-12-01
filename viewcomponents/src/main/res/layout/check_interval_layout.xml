@@ -12,10 +12,8 @@
       android:id="@+id/label"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:fontFamily="@font/lato"
       android:text="@string/check_interval"
-      android:textColor="?colorAccent"
-      android:textSize="@dimen/caption_font_size"
+      style="@style/NockText.SectionHeader"
       />
 
   <LinearLayout
@@ -33,12 +31,12 @@
         android:layout_marginEnd="@dimen/content_inset_half"
         android:layout_marginStart="-4dp"
         android:layout_weight="1"
-        android:fontFamily="@font/lato_light"
         android:hint="0"
         android:inputType="number"
         android:maxLength="6"
-        android:textSize="@dimen/body_font_size"
+        android:textColor="#FFFFFF"
         tools:ignore="Autofill,HardcodedText,LabelFor"
+        style="@style/NockText.Body.Light"
         />
 
     <Spinner

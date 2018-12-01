@@ -40,15 +40,12 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_alignParentStart="true"
-          android:layout_centerVertical="true"
           android:layout_marginEnd="@dimen/content_inset_half"
           android:layout_toStartOf="@+id/textInterval"
-          android:fontFamily="@font/lato"
           android:singleLine="true"
-          android:textColor="?android:textColorPrimary"
-          android:textSize="@dimen/title_font_size"
           android:transitionName="site_name"
           tools:text="Website Name"
+          style="@style/NockText.Title"
           />
 
       <TextView
@@ -57,11 +54,8 @@
           android:layout_height="wrap_content"
           android:layout_alignParentEnd="true"
           android:layout_centerVertical="true"
-          android:fontFamily="@font/lato_black"
-          android:singleLine="true"
-          android:textColor="?android:textColorSecondary"
-          android:textSize="@dimen/caption_font_size"
           tools:text="1h"
+          style="@style/NockText.Caption"
           />
 
     </RelativeLayout>
@@ -71,12 +65,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/list_text_spacing"
-        android:fontFamily="@font/lato_light"
         android:singleLine="true"
-        android:textColor="?android:textColorSecondary"
-        android:textSize="@dimen/body_font_size"
         android:transitionName="site_url"
         tools:text="https://yourwebsitehere.com"
+        style="@style/NockText.Body.Light"
         />
 
     <TextView
@@ -84,11 +76,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/list_text_spacing"
-        android:fontFamily="@font/lato"
         android:singleLine="true"
-        android:textColor="?android:textColorSecondary"
-        android:textSize="@dimen/body_font_size"
         tools:text="Everything checks out!"
+        style="@style/NockText.Body"
         />
 
   </LinearLayout>

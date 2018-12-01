@@ -70,30 +70,26 @@
                 android:id="@+id/inputName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/lato"
                 android:hint="@string/site_name"
                 android:inputType="textPersonName|textCapWords|textAutoCorrect"
                 android:singleLine="true"
-                android:textColor="?android:textColorPrimary"
-                android:textColorHint="?android:textColorSecondary"
-                android:textSize="@dimen/body_font_size"
+                android:textColor="#FFFFFF"
                 android:transitionName="site_name"
                 tools:ignore="Autofill,UnusedAttribute"
+                style="@style/NockText.Body"
                 />
 
             <EditText
                 android:id="@+id/inputUrl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/lato"
                 android:hint="@string/site_url"
                 android:inputType="textUri"
                 android:singleLine="true"
-                android:textColor="?android:textColorPrimary"
-                android:textColorHint="?android:textColorSecondary"
-                android:textSize="@dimen/body_font_size"
+                android:textColor="#FFFFFF"
                 android:transitionName="site_url"
                 tools:ignore="Autofill,UnusedAttribute"
+                style="@style/NockText.Body"
                 />
 
             <TextView
@@ -103,11 +99,9 @@
                 android:layout_marginEnd="4dp"
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="@dimen/list_text_spacing"
-                android:fontFamily="@font/lato_light"
-                android:textColor="?android:textColorPrimary"
-                android:textSize="@dimen/caption_font_size"
                 android:visibility="gone"
                 tools:text="Warning: this app checks for server availability with HTTP requests. It's recommended that you use an HTTP URL."
+                style="@style/NockText.Footnote"
                 />
 
           </LinearLayout>
@@ -140,10 +134,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/content_inset"
-            android:fontFamily="@font/lato"
             android:text="@string/response_validation_mode"
-            android:textColor="?colorAccent"
-            android:textSize="@dimen/caption_font_size"
+            style="@style/NockText.SectionHeader"
             />
 
         <Spinner
@@ -160,11 +152,11 @@
             android:layout_marginLeft="-4dp"
             android:layout_marginRight="-4dp"
             android:layout_marginTop="-4dp"
-            android:fontFamily="@font/lato_light"
             android:hint="@string/search_term"
-            android:textSize="@dimen/body_font_size"
+            android:textColor="#FFFFFF"
             android:visibility="gone"
             tools:ignore="Autofill,TextFields"
+            style="@style/NockText.Body.Light"
             />
 
         <com.afollestad.nocknock.viewcomponents.JavaScriptInputLayout
@@ -181,10 +173,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/content_inset_half"
-            android:fontFamily="@font/lato"
             android:lineSpacingMultiplier="1.2"
             android:text="@string/validation_mode_status_desc"
-            android:textSize="@dimen/body_font_size"
+            style="@style/NockText.Body.Light"
             />
 
         <include layout="@layout/include_divider"/>
@@ -194,8 +185,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/content_inset"
             android:text="@string/last_check_result"
-            android:textColor="?colorAccent"
-            android:textSize="@dimen/caption_font_size"
+            style="@style/NockText.SectionHeader"
             />
 
         <TextView
@@ -203,10 +193,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/list_text_spacing"
-            android:fontFamily="@font/lato"
-            android:textColor="?android:textColorPrimary"
-            android:textSize="@dimen/medium_text_size"
             tools:text="Everything checks out!"
+            style="@style/NockText.Body"
             />
 
         <TextView
@@ -214,8 +202,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/content_inset"
             android:text="@string/next_check"
-            android:textColor="?colorAccent"
-            android:textSize="@dimen/caption_font_size"
+            style="@style/NockText.SectionHeader"
             />
 
         <TextView
@@ -223,10 +210,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/list_text_spacing"
-            android:fontFamily="@font/lato"
-            android:textColor="?android:textColorPrimary"
-            android:textSize="@dimen/medium_text_size"
             tools:text="In 2 hours"
+            style="@style/NockText.Body"
             />
 
         <com.google.android.material.button.MaterialButton
