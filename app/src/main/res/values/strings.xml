@@ -1,6 +1,6 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
-  <string name="app_name" tools:ignore="Typos">Nock Nock (BETA)</string>
+  <string name="app_name">Nock Nock</string>
 
   <string name="no_sites_added">No sites added!</string>
 
@@ -29,7 +29,8 @@
   <string name="remove_site">Remove Site</string>
   <string name="remove_site_prompt"><![CDATA[Remove <b>%1$s</b> from your sites?]]></string>
   <string name="remove">Remove</string>
-  <string name="save">Save</string>
+  <string name="save_changes">Save Changes</string>
+  <string name="disable_automatic_checks">Disable Automatic Checks</string>
   <string name="view_site">View Site</string>
   <string name="last_check_result">Last Check Result</string>
   <string name="next_check">Next Check</string>
@@ -39,13 +40,23 @@
   <string name="refresh_status">Refresh Status</string>
 
   <string name="warning_http_url">
-        Warning: this app checks for server availability with HTTP requests. It\'s recommended that you use an HTTP URL.
-    </string>
+    Warning: this app checks for server availability with HTTP requests. It\'s recommended that you
+    use an HTTP URL.
+  </string>
   <string name="response_validation_mode">Response Validation Mode</string>
   <string name="search_term">Search term…</string>
 
-  <string name="validation_mode_status_desc">The HTTP status code is checked. If it\'s a successful status code, the site passes the check.</string>
-  <string name="validation_mode_term_desc">The status code check is done first. If it\'s successful, the response body is checked. If it contains your search term, the site passes the check.</string>
-  <string name="validation_mode_javascript_desc">The status code check is done first. If it\'s successful, the response body is passed to the JavaScript function above. If the function returns true, the site passes the check. Throw an exception to pass custom error messages to Nock Nock.</string>
+  <string name="validation_mode_status_desc">
+    The HTTP status code is checked. If it\'s a successful status code, the site passes the check.
+  </string>
+  <string name="validation_mode_term_desc">
+    The status code check is done first. If it\'s successful, the response body is checked.
+    If it contains your search term, the site passes the check.
+  </string>
+  <string name="validation_mode_javascript_desc">
+    The status code check is done first. If it\'s successful, the response body is passed to the
+    JavaScript function above. If the function returns true, the site passes the check. Throw an
+    exception to pass custom error messages to Nock Nock.
+  </string>
 
 </resources>

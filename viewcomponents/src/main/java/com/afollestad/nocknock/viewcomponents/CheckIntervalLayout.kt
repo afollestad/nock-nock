@@ -74,11 +74,6 @@ class CheckIntervalLayout(
     }
   }
 
-  fun clear() {
-    input.setText("")
-    spinner.setSelection(0)
-  }
-
   @CheckResult fun getSelectedCheckInterval(): Long {
     val intervalInput = input.textAsLong()
     val spinnerPos = spinner.selectedItemPosition

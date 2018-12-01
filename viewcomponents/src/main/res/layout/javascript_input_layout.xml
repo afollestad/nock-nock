@@ -16,7 +16,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="serif-monospace"
+        android:fontFamily="@font/fira_mono"
         android:lineSpacingMultiplier="1.4"
         android:singleLine="true"
         android:text="@string/function_declaration"
@@ -28,7 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@null"
-        android:fontFamily="serif-monospace"
+        android:fontFamily="@font/fira_mono"
         android:gravity="top"
         android:inputType="textMultiLine"
         android:lineSpacingMultiplier="1.6"
@@ -45,7 +45,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="serif-monospace"
+        android:fontFamily="@font/fira_mono"
         android:text="@string/function_end"
         android:textSize="@dimen/code_font_size"
         />

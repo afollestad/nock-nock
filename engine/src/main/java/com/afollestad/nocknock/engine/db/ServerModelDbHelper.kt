@@ -20,7 +20,8 @@ private const val SQL_CREATE_ENTRIES =
       "${ServerModel.COLUMN_LAST_CHECK} INTEGER," +
       "${ServerModel.COLUMN_REASON} TEXT," +
       "${ServerModel.COLUMN_VALIDATION_MODE} INTEGER," +
-      "${ServerModel.COLUMN_VALIDATION_CONTENT} TEXT)"
+      "${ServerModel.COLUMN_VALIDATION_CONTENT} TEXT," +
+      "${ServerModel.COLUMN_DISABLED} INTEGER)"
 
 private const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${ServerModel.TABLE_NAME}"
 
@@ -29,7 +30,7 @@ class ServerModelDbHelper(context: Context) : SQLiteOpenHelper(
     context, DATABASE_NAME, null, DATABASE_VERSION
 ) {
   companion object {
-    const val DATABASE_VERSION = 1
+    const val DATABASE_VERSION = 2
     const val DATABASE_NAME = "ServerModels.db"
   }
 

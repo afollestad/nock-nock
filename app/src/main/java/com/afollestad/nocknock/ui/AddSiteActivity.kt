@@ -20,9 +20,11 @@ import androidx.appcompat.app.AppCompatActivity
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.data.ServerModel
 import com.afollestad.nocknock.data.ServerStatus.WAITING
+import com.afollestad.nocknock.data.ValidationMode
 import com.afollestad.nocknock.data.ValidationMode.JAVASCRIPT
 import com.afollestad.nocknock.data.ValidationMode.STATUS_CODE
 import com.afollestad.nocknock.data.ValidationMode.TERM_SEARCH
+import com.afollestad.nocknock.data.indexToValidationMode
 import com.afollestad.nocknock.engine.db.ServerModelStore
 import com.afollestad.nocknock.engine.statuscheck.CheckStatusManager
 import com.afollestad.nocknock.utilities.ext.injector
@@ -56,6 +58,7 @@ import kotlinx.coroutines.launch
 import java.lang.System.currentTimeMillis
 import javax.inject.Inject
 import kotlin.math.max
+import kotlin.properties.Delegates.notNull
 
 private const val KEY_FAB_X = "fab_x"
 private const val KEY_FAB_Y = "fab_y"
@@ -76,10 +79,18 @@ fun MainActivity.intentToAdd(
 /** @author Aidan Follestad (afollestad) */
 class AddSiteActivity : AppCompatActivity(), View.OnClickListener {
 
+  companion object {
+    private const val REVEAL_DURATION = 300L
+  }
+
   private var isClosing: Boolean = false
 
   @Inject lateinit var serverModelStore: ServerModelStore
   @Inject lateinit var checkStatusManager: CheckStatusManager
+
+  private var revealCx by notNull<Int>()
+  private var revealCy by notNull<Int>()
+  private var revealRadius by notNull<Float>()
 
   @SuppressLint("SetTextI18n")
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,7 +102,19 @@ class AddSiteActivity : AppCompatActivity(), View.OnClickListener {
 
     if (savedInstanceState == null) {
       rootView.conceal()
-      rootView.onLayout { circularRevealActivity() }
+      rootView.onLayout {
+        val fabSize = intent.getIntExtra(KEY_FAB_SIZE, 0)
+        val fabX = intent.getFloatExtra(KEY_FAB_X, 0f)
+            .toInt()
+        val fabY = intent.getFloatExtra(KEY_FAB_Y, 0f)
+            .toInt()
+
+        revealCx = fabX + fabSize / 2
+        revealCy = (fabY + toolbar.measuredHeight + fabSize / 2)
+        revealRadius = max(revealCx, revealCy).toFloat()
+
+        circularRevealActivity()
+      }
     }
 
     inputUrl.setOnFocusChangeListener { _, hasFocus ->
@@ -141,27 +164,23 @@ class AddSiteActivity : AppCompatActivity(), View.OnClickListener {
     doneBtn.setOnClickListener(this)
   }
 
+  private fun circularRevealActivity() {
+    val circularReveal =
+      createCircularReveal(rootView, revealCx, revealCy, 0f, revealRadius)
+          .apply {
+            duration = REVEAL_DURATION
+            interpolator = DecelerateInterpolator()
+          }
+    rootView.show()
+    circularReveal.start()
+  }
+
   private fun closeActivityWithReveal() {
-    if (isClosing) {
-      return
-    }
-
+    if (isClosing) return
     isClosing = true
-    val fabSize = intent.getIntExtra(KEY_FAB_SIZE, toolbar!!.measuredHeight)
-
-    val defaultCx = rootView.measuredWidth / 2f
-    val cx =
-      intent.getFloatExtra(KEY_FAB_X, defaultCx).toInt() + fabSize / 2
-
-    val defaultCy = rootView.measuredHeight / 2f
-    val cy = (intent.getFloatExtra(KEY_FAB_Y, defaultCy).toInt() +
-        toolbar!!.measuredHeight +
-        fabSize / 2)
-
-    val initialRadius = max(cx, cy).toFloat()
-    createCircularReveal(rootView, cx, cy, initialRadius, 0f)
+    createCircularReveal(rootView, revealCx, revealCy, revealRadius, 0f)
         .apply {
-          duration = 300
+          duration = REVEAL_DURATION
           interpolator = AccelerateInterpolator()
           onEnd {
             rootView.conceal()
@@ -170,20 +189,6 @@ class AddSiteActivity : AppCompatActivity(), View.OnClickListener {
           }
           start()
         }
-  }
-
-  private fun circularRevealActivity() {
-    val cx = rootView.measuredWidth / 2
-    val cy = rootView.measuredHeight / 2
-    val finalRadius = Math.max(cx, cy)
-        .toFloat()
-    val circularReveal = createCircularReveal(rootView, cx, cy, 0f, finalRadius)
-        .apply {
-          duration = 300
-          interpolator = DecelerateInterpolator()
-        }
-    rootView.show()
-    circularReveal.start()
   }
 
   // Done button
@@ -223,14 +228,14 @@ class AddSiteActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     val selectedCheckInterval = checkIntervalLayout.getSelectedCheckInterval()
-    val selectedValidationMode = getSelectedValidationMode()
-    val selectedValidationContent = getSelectedValidationContent()
+    val selectedValidationMode =
+      responseValidationMode.selectedItemPosition.indexToValidationMode()
 
     newModel = newModel.copy(
         checkInterval = selectedCheckInterval,
         lastCheck = currentTimeMillis() - selectedCheckInterval,
         validationMode = selectedValidationMode,
-        validationContent = selectedValidationContent
+        validationContent = selectedValidationMode.validationContent()
     )
 
     rootView.scopeWhileAttached(Main) {
@@ -250,25 +255,9 @@ class AddSiteActivity : AppCompatActivity(), View.OnClickListener {
 
   override fun onBackPressed() = closeActivityWithReveal()
 
-  private fun getSelectedValidationMode() = when (responseValidationMode.selectedItemPosition) {
-    0 -> STATUS_CODE
-    1 -> TERM_SEARCH
-    2 -> JAVASCRIPT
-    else -> {
-      throw IllegalStateException(
-          "Unexpected validation mode index: ${responseValidationMode.selectedItemPosition}"
-      )
-    }
-  }
-
-  private fun getSelectedValidationContent() = when (responseValidationMode.selectedItemPosition) {
-    0 -> null
-    1 -> responseValidationSearchTerm.trimmedText()
-    2 -> scriptInputLayout.getCode()
-    else -> {
-      throw IllegalStateException(
-          "Unexpected validation mode index: ${responseValidationMode.selectedItemPosition}"
-      )
-    }
+  private fun ValidationMode.validationContent() = when (this) {
+    STATUS_CODE -> null
+    TERM_SEARCH -> responseValidationSearchTerm.trimmedText()
+    JAVASCRIPT -> scriptInputLayout.getCode()
   }
 }

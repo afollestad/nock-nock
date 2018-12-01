@@ -5,13 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    tools:parentTag="android.widget.LinearLayout"
     >
 
   <TextView
       android:id="@+id/label"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:fontFamily="sans-serif"
+      android:fontFamily="@font/lato"
       android:text="@string/check_interval"
       android:textColor="?colorAccent"
       android:textSize="@dimen/caption_font_size"
@@ -32,7 +33,7 @@
         android:layout_marginEnd="@dimen/content_inset_half"
         android:layout_marginStart="-4dp"
         android:layout_weight="1"
-        android:fontFamily="sans-serif-light"
+        android:fontFamily="@font/lato_light"
         android:hint="0"
         android:inputType="number"
         android:maxLength="6"

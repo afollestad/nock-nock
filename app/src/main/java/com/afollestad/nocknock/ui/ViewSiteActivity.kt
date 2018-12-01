@@ -24,12 +24,15 @@ import androidx.core.text.HtmlCompat
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.nocknock.BuildConfig
 import com.afollestad.nocknock.R
+import com.afollestad.nocknock.data.LAST_CHECK_NONE
 import com.afollestad.nocknock.data.ServerModel
 import com.afollestad.nocknock.data.ServerStatus.CHECKING
 import com.afollestad.nocknock.data.ServerStatus.WAITING
+import com.afollestad.nocknock.data.ValidationMode
 import com.afollestad.nocknock.data.ValidationMode.JAVASCRIPT
 import com.afollestad.nocknock.data.ValidationMode.STATUS_CODE
 import com.afollestad.nocknock.data.ValidationMode.TERM_SEARCH
+import com.afollestad.nocknock.data.indexToValidationMode
 import com.afollestad.nocknock.data.textRes
 import com.afollestad.nocknock.engine.db.ServerModelStore
 import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob.Companion.ACTION_STATUS_UPDATE
@@ -41,12 +44,17 @@ import com.afollestad.nocknock.utilities.ext.isHttpOrHttps
 import com.afollestad.nocknock.utilities.ext.safeRegisterReceiver
 import com.afollestad.nocknock.utilities.ext.safeUnregisterReceiver
 import com.afollestad.nocknock.utilities.ext.scopeWhileAttached
+import com.afollestad.nocknock.viewcomponents.ext.dimenFloat
+import com.afollestad.nocknock.viewcomponents.ext.disable
+import com.afollestad.nocknock.viewcomponents.ext.enable
 import com.afollestad.nocknock.viewcomponents.ext.hide
 import com.afollestad.nocknock.viewcomponents.ext.onItemSelected
+import com.afollestad.nocknock.viewcomponents.ext.onScroll
 import com.afollestad.nocknock.viewcomponents.ext.show
 import com.afollestad.nocknock.viewcomponents.ext.showOrHide
 import com.afollestad.nocknock.viewcomponents.ext.trimmedText
 import kotlinx.android.synthetic.main.activity_viewsite.checkIntervalLayout
+import kotlinx.android.synthetic.main.activity_viewsite.disableChecksButton
 import kotlinx.android.synthetic.main.activity_viewsite.doneBtn
 import kotlinx.android.synthetic.main.activity_viewsite.iconStatus
 import kotlinx.android.synthetic.main.activity_viewsite.inputName
@@ -56,6 +64,7 @@ import kotlinx.android.synthetic.main.activity_viewsite.responseValidationMode
 import kotlinx.android.synthetic.main.activity_viewsite.responseValidationSearchTerm
 import kotlinx.android.synthetic.main.activity_viewsite.rootView
 import kotlinx.android.synthetic.main.activity_viewsite.scriptInputLayout
+import kotlinx.android.synthetic.main.activity_viewsite.scrollView
 import kotlinx.android.synthetic.main.activity_viewsite.textLastCheckResult
 import kotlinx.android.synthetic.main.activity_viewsite.textNextCheck
 import kotlinx.android.synthetic.main.activity_viewsite.textUrlWarning
@@ -122,6 +131,14 @@ class ViewSiteActivity : AppCompatActivity(),
       setOnMenuItemClickListener(this@ViewSiteActivity)
     }
 
+    scrollView.onScroll {
+      toolbar.elevation = if (it > toolbar.height / 4) {
+        toolbar.dimenFloat(R.dimen.default_elevation)
+      } else {
+        0f
+      }
+    }
+
     inputUrl.setOnFocusChangeListener { _, hasFocus ->
       if (!hasFocus) {
         val inputStr = inputUrl.text
@@ -184,7 +201,7 @@ class ViewSiteActivity : AppCompatActivity(),
     inputName.setText(this.name)
     inputUrl.setText(this.url)
 
-    if (this.lastCheck == 0L) {
+    if (this.lastCheck == LAST_CHECK_NONE) {
       textLastCheckResult.setText(R.string.none)
     } else {
       val statusText = this.status.textRes()
@@ -195,16 +212,8 @@ class ViewSiteActivity : AppCompatActivity(),
       }
     }
 
-    if (this.checkInterval == 0L) {
-      textNextCheck.setText(R.string.none_turned_off)
-      checkIntervalLayout.clear()
-    } else {
-      var lastCheck = this.lastCheck
-      if (lastCheck == 0L) {
-        lastCheck = currentTimeMillis()
-      }
-      textNextCheck.text = (lastCheck + this.checkInterval).formatDate()
-    }
+    textNextCheck.text = (this.lastCheck + this.checkInterval).formatDate()
+    checkIntervalLayout.set(this.checkInterval)
 
     responseValidationMode.setSelection(validationMode.value - 1)
 
@@ -267,14 +276,14 @@ class ViewSiteActivity : AppCompatActivity(),
     }
 
     val selectedCheckInterval = checkIntervalLayout.getSelectedCheckInterval()
-    val selectedValidationMode = getSelectedValidationMode()
-    val selectedValidationContent = getSelectedValidationContent()
+    val selectedValidationMode =
+      responseValidationMode.selectedItemPosition.indexToValidationMode()
 
     currentModel = currentModel.copy(
         checkInterval = selectedCheckInterval,
         lastCheck = currentTimeMillis() - selectedCheckInterval,
         validationMode = selectedValidationMode,
-        validationContent = selectedValidationContent
+        validationContent = selectedValidationMode.validationContent()
     )
 
     return true
@@ -307,6 +316,7 @@ class ViewSiteActivity : AppCompatActivity(),
       R.id.refresh -> {
         rootView.scopeWhileAttached(Main) {
           launch(coroutineContext) {
+            disableChecksButton.disable()
             loadingProgress.setLoading()
             updateModelFromInput(false)
             currentModel = currentModel.copy(status = WAITING)
@@ -317,6 +327,7 @@ class ViewSiteActivity : AppCompatActivity(),
             checkStatusManager.cancelCheck(currentModel)
             checkStatusManager.scheduleCheck(currentModel, rightNow = true)
             loadingProgress.setDone()
+            disableChecksButton.enable()
           }
         }
         return true
@@ -363,25 +374,9 @@ class ViewSiteActivity : AppCompatActivity(),
     item.isEnabled = currentModel.status != CHECKING && currentModel.status != WAITING
   }
 
-  private fun getSelectedValidationMode() = when (responseValidationMode.selectedItemPosition) {
-    0 -> STATUS_CODE
-    1 -> TERM_SEARCH
-    2 -> JAVASCRIPT
-    else -> {
-      throw IllegalStateException(
-          "Unexpected validation mode index: ${responseValidationMode.selectedItemPosition}"
-      )
-    }
-  }
-
-  private fun getSelectedValidationContent() = when (responseValidationMode.selectedItemPosition) {
-    0 -> null
-    1 -> responseValidationSearchTerm.trimmedText()
-    2 -> scriptInputLayout.getCode()
-    else -> {
-      throw IllegalStateException(
-          "Unexpected validation mode index: ${responseValidationMode.selectedItemPosition}"
-      )
-    }
+  private fun ValidationMode.validationContent() = when (this) {
+    STATUS_CODE -> null
+    TERM_SEARCH -> responseValidationSearchTerm.trimmedText()
+    JAVASCRIPT -> scriptInputLayout.getCode()
   }
 }

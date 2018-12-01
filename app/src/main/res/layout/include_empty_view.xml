@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/emptyText"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:layout_marginBottom="@dimen/content_inset"
+    android:fontFamily="@font/lato_light"
+    android:gravity="center"
+    android:text="@string/no_sites_added"
+    android:textSize="@dimen/empty_text_size"
+    android:textStyle="italic"
+    />

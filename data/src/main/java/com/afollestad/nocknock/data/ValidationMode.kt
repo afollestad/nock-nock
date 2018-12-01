@@ -19,7 +19,16 @@ enum class ValidationMode(val value: Int) {
       JAVASCRIPT.value -> JAVASCRIPT
       else -> throw IllegalArgumentException("Unknown validationMode: $value")
     }
+
+    fun fromIndex(index: Int) = when (index) {
+      0 -> STATUS_CODE
+      1 -> TERM_SEARCH
+      2 -> JAVASCRIPT
+      else -> throw IllegalArgumentException("Index out of range: $index")
+    }
   }
 }
 
 fun Int.toValidationMode() = ValidationMode.fromValue(this)
+
+fun Int.indexToValidationMode() = ValidationMode.fromIndex(this)

@@ -24,6 +24,14 @@ fun View.hide() {
   visibility = GONE
 }
 
+fun View.enable() {
+  isEnabled = true
+}
+
+fun View.disable() {
+  isEnabled = false
+}
+
 fun View.showOrHide(show: Boolean) = if (show) show() else hide()
 
 fun View.onLayout(cb: () -> Unit) {

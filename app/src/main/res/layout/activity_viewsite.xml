@@ -15,16 +15,20 @@
       android:orientation="vertical"
       >
 
+    <!-- Background is applied again here so programmatic elevation works -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?colorPrimary"
+        android:theme="@style/FlatToolbarTheme"
         app:navigationIcon="@drawable/ic_action_close"
         app:title="@string/view_site"
         app:titleTextColor="?android:textColorPrimary"
         />
 
     <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
@@ -66,7 +70,7 @@
                 android:id="@+id/inputName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-light"
+                android:fontFamily="@font/lato"
                 android:hint="@string/site_name"
                 android:inputType="textPersonName|textCapWords|textAutoCorrect"
                 android:singleLine="true"
@@ -74,14 +78,14 @@
                 android:textColorHint="?android:textColorSecondary"
                 android:textSize="@dimen/body_font_size"
                 android:transitionName="site_name"
-                tools:ignore="UnusedAttribute"
+                tools:ignore="Autofill,UnusedAttribute"
                 />
 
             <EditText
                 android:id="@+id/inputUrl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-light"
+                android:fontFamily="@font/lato"
                 android:hint="@string/site_url"
                 android:inputType="textUri"
                 android:singleLine="true"
@@ -89,7 +93,7 @@
                 android:textColorHint="?android:textColorSecondary"
                 android:textSize="@dimen/body_font_size"
                 android:transitionName="site_url"
-                tools:ignore="UnusedAttribute"
+                tools:ignore="Autofill,UnusedAttribute"
                 />
 
             <TextView
@@ -99,7 +103,7 @@
                 android:layout_marginEnd="4dp"
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="@dimen/list_text_spacing"
-                android:fontFamily="sans-serif-light"
+                android:fontFamily="@font/lato_light"
                 android:textColor="?android:textColorPrimary"
                 android:textSize="@dimen/caption_font_size"
                 android:visibility="gone"
@@ -132,11 +136,11 @@
             />
 
         <TextView
-            android:id="@+id/responseValidation"
+            android:id="@+id/responseValidationLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/content_inset"
-            android:fontFamily="sans-serif"
+            android:fontFamily="@font/lato"
             android:text="@string/response_validation_mode"
             android:textColor="?colorAccent"
             android:textSize="@dimen/caption_font_size"
@@ -156,7 +160,7 @@
             android:layout_marginLeft="-4dp"
             android:layout_marginRight="-4dp"
             android:layout_marginTop="-4dp"
-            android:fontFamily="sans-serif-light"
+            android:fontFamily="@font/lato_light"
             android:hint="@string/search_term"
             android:textSize="@dimen/body_font_size"
             android:visibility="gone"
@@ -177,7 +181,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/content_inset_half"
-            android:fontFamily="sans-serif-light"
+            android:fontFamily="@font/lato"
             android:lineSpacingMultiplier="1.2"
             android:text="@string/validation_mode_status_desc"
             android:textSize="@dimen/body_font_size"
@@ -199,7 +203,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/list_text_spacing"
-            android:fontFamily="sans-serif"
+            android:fontFamily="@font/lato"
             android:textColor="?android:textColorPrimary"
             android:textSize="@dimen/medium_text_size"
             tools:text="Everything checks out!"
@@ -219,7 +223,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/list_text_spacing"
-            android:fontFamily="sans-serif"
+            android:fontFamily="@font/lato"
             android:textColor="?android:textColorPrimary"
             android:textSize="@dimen/medium_text_size"
             tools:text="In 2 hours"
@@ -229,9 +233,18 @@
             android:id="@+id/doneBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/content_inset_more"
-            android:text="@string/save"
+            android:layout_marginTop="@dimen/content_inset_double"
+            android:text="@string/save_changes"
             style="@style/AccentButton"
+            />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/disableChecksButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/content_inset_half"
+            android:text="@string/disable_automatic_checks"
+            style="@style/PrimaryDarkButton"
             />
 
       </LinearLayout>

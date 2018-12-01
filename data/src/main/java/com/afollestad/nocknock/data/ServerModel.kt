@@ -12,17 +12,21 @@ import com.afollestad.nocknock.utilities.ext.timeString
 import java.io.Serializable
 import java.lang.System.currentTimeMillis
 
+const val CHECK_INTERVAL_UNSET = -1L
+const val LAST_CHECK_NONE = -1L
+
 /** @author Aidan Follestad (afollestad)*/
 data class ServerModel(
   var id: Int = 0,
-  val name: String = "Unknown",
-  val url: String = "Unknown",
+  val name: String,
+  val url: String,
   val status: ServerStatus = OK,
-  val checkInterval: Long = 0,
-  val lastCheck: Long = 0,
+  val checkInterval: Long = CHECK_INTERVAL_UNSET,
+  val lastCheck: Long = LAST_CHECK_NONE,
   val reason: String? = null,
   val validationMode: ValidationMode,
-  val validationContent: String? = null
+  val validationContent: String? = null,
+  val disabled: Boolean = false
 ) : Serializable {
 
   companion object {
@@ -36,8 +40,9 @@ data class ServerModel(
     const val COLUMN_REASON = "reason"
     const val COLUMN_VALIDATION_MODE = "validation_mode"
     const val COLUMN_VALIDATION_CONTENT = "validation_content"
+    const val COLUMN_DISABLED = "disabled"
 
-    const val DEFAULT_SORT_ORDER = "$COLUMN_NAME ASC"
+    const val DEFAULT_SORT_ORDER = "$COLUMN_NAME ASC, $COLUMN_DISABLED DESC"
 
     fun pull(cursor: Cursor): ServerModel {
       return ServerModel(
@@ -51,7 +56,8 @@ data class ServerModel(
           validationMode = cursor.getInt(
               cursor.getColumnIndex(COLUMN_VALIDATION_MODE)
           ).toValidationMode(),
-          validationContent = cursor.getString(cursor.getColumnIndex(COLUMN_VALIDATION_CONTENT))
+          validationContent = cursor.getString(cursor.getColumnIndex(COLUMN_VALIDATION_CONTENT)),
+          disabled = cursor.getInt(cursor.getColumnIndex(COLUMN_DISABLED)) == 1
       )
     }
   }
@@ -73,5 +79,6 @@ data class ServerModel(
     put(COLUMN_REASON, reason)
     put(COLUMN_VALIDATION_MODE, validationMode.value)
     put(COLUMN_VALIDATION_CONTENT, validationContent)
+    put(COLUMN_DISABLED, disabled)
   }
 }

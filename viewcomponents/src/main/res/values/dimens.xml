@@ -9,6 +9,7 @@
   <dimen name="content_inset_less">12dp</dimen>
   <dimen name="content_inset">16dp</dimen>
   <dimen name="content_inset_more">24dp</dimen>
+  <dimen name="content_inset_double">32dp</dimen>
 
   <dimen name="code_font_size">14sp</dimen>
   <dimen name="body_font_size">14sp</dimen>

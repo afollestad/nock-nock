@@ -1,6 +1,6 @@
 <resources>
 
-  <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
+  <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
     <item name="colorPrimary">@color/colorPrimary</item>
     <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
     <item name="colorAccent">@color/colorAccent</item>
@@ -27,9 +27,38 @@
     <item name="android:windowBackground">@android:color/transparent</item>
   </style>
 
+  <style name="MainToolbarTheme" parent="@style/Theme.MaterialComponents">
+    <item name="colorPrimary">@color/colorPrimary</item>
+    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+    <item name="colorAccent">@color/colorAccent</item>
+    <item name="android:fontFamily">@font/lato_black</item>
+  </style>
+
+  <style name="MainToolbarStyle" parent="@style/Widget.MaterialComponents.Toolbar">
+    <item name="android:background">?colorPrimary</item>
+    <item name="android:elevation">@dimen/default_elevation</item>
+    <item name="title">@string/app_name</item>
+    <item name="titleTextColor">#FFFFFF</item>
+    <item name="popupTheme">@style/Theme.MaterialComponents.Light.DarkActionBar</item>
+  </style>
+
+  <style name="FlatToolbarTheme" parent="@style/Theme.MaterialComponents">
+    <item name="colorPrimary">@color/colorPrimary</item>
+    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+    <item name="colorAccent">@color/colorAccent</item>
+    <item name="android:fontFamily">@font/lato_black</item>
+  </style>
+
   <style name="AccentButton" parent="Widget.MaterialComponents.Button">
     <item name="android:textColor">#fff</item>
-    <item name="android:colorButtonNormal">@color/colorAccent</item>
+    <item name="backgroundTint">@color/colorAccent</item>
+    <item name="android:fontFamily">@font/lato</item>
+  </style>
+
+  <style name="PrimaryDarkButton" parent="Widget.MaterialComponents.Button">
+    <item name="android:textColor">#fff</item>
+    <item name="backgroundTint">@color/colorPrimaryDark</item>
+    <item name="android:fontFamily">@font/lato</item>
   </style>
 
 </resources>

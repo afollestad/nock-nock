@@ -5,8 +5,6 @@
  */
 package com.afollestad.nocknock.ui
 
-import android.animation.ObjectAnimator
-import android.animation.ObjectAnimator.ofFloat
 import android.annotation.SuppressLint
 import android.app.ActivityOptions.makeSceneTransitionAnimation
 import android.content.BroadcastReceiver
@@ -15,12 +13,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.View.X
-import android.view.View.Y
-import android.view.animation.PathInterpolator
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
@@ -40,17 +32,16 @@ import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob.Companion.KEY_U
 import com.afollestad.nocknock.engine.statuscheck.CheckStatusManager
 import com.afollestad.nocknock.notifications.NockNotificationManager
 import com.afollestad.nocknock.utilities.ext.injector
-import com.afollestad.nocknock.utilities.ext.onEnd
 import com.afollestad.nocknock.utilities.ext.safeRegisterReceiver
 import com.afollestad.nocknock.utilities.ext.safeUnregisterReceiver
 import com.afollestad.nocknock.utilities.ext.scopeWhileAttached
 import com.afollestad.nocknock.viewcomponents.ext.show
 import com.afollestad.nocknock.viewcomponents.ext.showOrHide
-import com.afollestad.nocknock.utilities.util.MathUtil.bezierCurve
-import kotlinx.android.synthetic.main.activity_main.emptyText
 import kotlinx.android.synthetic.main.activity_main.fab
 import kotlinx.android.synthetic.main.activity_main.list
 import kotlinx.android.synthetic.main.activity_main.rootView
+import kotlinx.android.synthetic.main.activity_main.toolbar
+import kotlinx.android.synthetic.main.include_empty_view.emptyText
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.async
@@ -58,12 +49,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /** @author Aidan Follestad (afollestad) */
-class MainActivity : AppCompatActivity(), View.OnClickListener {
+class MainActivity : AppCompatActivity() {
 
   companion object {
     private const val ADD_SITE_RQ = 6969
     private const val VIEW_SITE_RQ = 6923
-    private const val REVEAL_DURATION = 250L
 
     private fun log(message: String) {
       if (BuildConfig.DEBUG) {
@@ -71,10 +61,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
       }
     }
   }
-
-  private var fabAnimator: ObjectAnimator? = null
-  private var originalFabX: Float = 0.toFloat()
-  private var originalFabY: Float = 0.toFloat()
 
   private val intentReceiver = object : BroadcastReceiver() {
     override fun onReceive(
@@ -105,13 +91,26 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     injector().injectInto(this)
     setContentView(R.layout.activity_main)
 
+    toolbar.inflateMenu(R.menu.menu_main)
+    toolbar.setOnMenuItemClickListener { item ->
+      if (item.itemId == R.id.about) {
+        AboutDialog.show(this)
+      }
+      return@setOnMenuItemClickListener true
+    }
+
     adapter = ServerAdapter(this::onSiteSelected)
 
     list.layoutManager = LinearLayoutManager(this)
     list.adapter = adapter
     list.addItemDecoration(DividerItemDecoration(this, VERTICAL))
 
-    fab.setOnClickListener(this)
+    fab.setOnClickListener {
+      startActivityForResult(
+          intentToAdd(fab.x, fab.y, fab.measuredWidth),
+          ADD_SITE_RQ
+      )
+    }
 
     notificationManager.createChannels()
     ensureCheckJobs()
@@ -150,46 +149,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         emptyText.showOrHide(adapter.itemCount == 0)
       }
     }
-  }
-
-  override fun onCreateOptionsMenu(menu: Menu): Boolean {
-    menuInflater.inflate(R.menu.menu_main, menu)
-    return super.onCreateOptionsMenu(menu)
-  }
-
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    if (item.itemId == R.id.about) {
-      AboutDialog.show(this)
-      return true
-    }
-    return super.onOptionsItemSelected(item)
-  }
-
-  // FAB clicked
-  override fun onClick(view: View) {
-    originalFabX = fab.x
-    originalFabY = fab.y
-
-    fabAnimator?.cancel()
-    fabAnimator = ofFloat(view, X, Y, bezierCurve(fab, list))
-        .apply {
-          interpolator = PathInterpolator(.5f, .5f)
-          duration = REVEAL_DURATION
-          onEnd {
-            startActivityForResult(
-                intentToAdd(originalFabX, originalFabY, fab.measuredWidth),
-                ADD_SITE_RQ
-            )
-            fab.postDelayed(
-                {
-                  fab.x = originalFabX
-                  fab.y = originalFabY
-                },
-                REVEAL_DURATION * 2
-            )
-          }
-          start()
-        }
   }
 
   override fun onActivityResult(

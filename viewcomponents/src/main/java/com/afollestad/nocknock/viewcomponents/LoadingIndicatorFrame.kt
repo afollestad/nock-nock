@@ -27,6 +27,8 @@ class LoadingIndicatorFrame(
     setBackgroundColor(ContextCompat.getColor(context, R.color.loading_indicator_frame_background))
     hide() // hide self by default
     inflate(context, R.layout.loading_indicator_frame, this)
+    isClickable = true
+    isFocusable = true
   }
 
   fun setLoading() {
