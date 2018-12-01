@@ -104,10 +104,7 @@ class RealViewSitePresenter @Inject constructor(
     if (intent.action == ACTION_STATUS_UPDATE) {
       val model = intent.getSerializableExtra(KEY_UPDATE_MODEL) as? ServerModel ?: return
       this.currentModel = model
-      view?.run {
-        displayModel(model)
-        setDoneLoading() // in case this is the result of a manual refresh
-      }
+      view?.displayModel(model)
     }
   }
 
@@ -208,7 +205,6 @@ class RealViewSitePresenter @Inject constructor(
   }
 
   override fun checkNow() = with(view!!) {
-    setLoading()
     val checkModel = currentModel!!.copy(
         status = WAITING
     )

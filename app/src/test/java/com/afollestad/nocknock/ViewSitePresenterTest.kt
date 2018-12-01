@@ -88,7 +88,6 @@ class ViewSitePresenterTest {
     presenter.onBroadcast(goodIntent)
     assertThat(presenter.currentModel()).isEqualTo(model)
     verify(view, times(1)).displayModel(model)
-    verify(view).setDoneLoading()
   }
 
   @Test fun onNewIntent() {
@@ -308,7 +307,7 @@ class ViewSitePresenterTest {
         )
     presenter.checkNow()
 
-    verify(view).setLoading()
+    verify(view, never()).setLoading()
     verify(view).displayModel(newModel)
     verify(checkStatusManager).scheduleCheck(
         site = newModel,

@@ -6,7 +6,9 @@
 package com.afollestad.nocknock.utilities
 
 import com.afollestad.nocknock.utilities.providers.BitmapProvider
+import com.afollestad.nocknock.utilities.providers.IntentProvider
 import com.afollestad.nocknock.utilities.providers.RealBitmapProvider
+import com.afollestad.nocknock.utilities.providers.RealIntentProvider
 import com.afollestad.nocknock.utilities.providers.RealStringProvider
 import com.afollestad.nocknock.utilities.providers.StringProvider
 import dagger.Binds
@@ -28,4 +30,10 @@ abstract class UtilitiesModule {
   abstract fun provideStringProvider(
     stringProvider: RealStringProvider
   ): StringProvider
+
+  @Binds
+  @Singleton
+  abstract fun provideIntentProvider(
+    intentProvider: RealIntentProvider
+  ): IntentProvider
 }

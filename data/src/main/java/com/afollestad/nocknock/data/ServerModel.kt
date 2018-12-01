@@ -9,7 +9,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import com.afollestad.nocknock.data.ServerStatus.OK
 import com.afollestad.nocknock.utilities.ext.timeString
-import java.io.Serializable
+import com.afollestad.nocknock.utilities.providers.IdProvider
 import java.lang.System.currentTimeMillis
 import kotlin.math.max
 
@@ -28,7 +28,7 @@ data class ServerModel(
   val validationMode: ValidationMode,
   val validationContent: String? = null,
   val disabled: Boolean = false
-) : Serializable {
+) : IdProvider {
 
   companion object {
     const val TABLE_NAME = "server_models"
@@ -62,6 +62,8 @@ data class ServerModel(
       )
     }
   }
+
+  override fun id() = id
 
   fun intervalText(): String {
     val now = currentTimeMillis()

@@ -13,14 +13,9 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.text.HtmlCompat
-import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
-import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.data.LAST_CHECK_NONE
 import com.afollestad.nocknock.data.ServerModel
-import com.afollestad.nocknock.data.ServerStatus.CHECKING
-import com.afollestad.nocknock.data.ServerStatus.WAITING
 import com.afollestad.nocknock.data.ValidationMode
 import com.afollestad.nocknock.data.ValidationMode.JAVASCRIPT
 import com.afollestad.nocknock.data.ValidationMode.STATUS_CODE
@@ -28,7 +23,6 @@ import com.afollestad.nocknock.data.ValidationMode.TERM_SEARCH
 import com.afollestad.nocknock.data.indexToValidationMode
 import com.afollestad.nocknock.data.textRes
 import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob.Companion.ACTION_STATUS_UPDATE
-import com.afollestad.nocknock.ui.main.MainActivity
 import com.afollestad.nocknock.utilities.ext.ScopeReceiver
 import com.afollestad.nocknock.utilities.ext.formatDate
 import com.afollestad.nocknock.utilities.ext.injector
@@ -61,12 +55,6 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
 /** @author Aidan Follestad (@afollestad) */
-fun MainActivity.intentToView(model: ServerModel) =
-  Intent(this, ViewSiteActivity::class.java).apply {
-    putExtra(KEY_VIEW_MODEL, model)
-  }
-
-/** @author Aidan Follestad (@afollestad) */
 class ViewSiteActivity : AppCompatActivity(), ViewSiteView {
 
   @Inject lateinit var presenter: ViewSitePresenter
@@ -88,11 +76,13 @@ class ViewSiteActivity : AppCompatActivity(), ViewSiteView {
     toolbar.run {
       setNavigationOnClickListener { finish() }
       inflateMenu(R.menu.menu_viewsite)
+      menu.findItem(R.id.refresh)
+          .setActionView(R.layout.menu_item_refresh_icon)
+          .apply {
+            actionView.setOnClickListener { presenter.checkNow() }
+          }
       setOnMenuItemClickListener {
-        when (it.itemId) {
-          R.id.refresh -> presenter.checkNow()
-          R.id.remove -> maybeRemoveSite()
-        }
+        maybeRemoveSite()
         return@setOnMenuItemClickListener true
       }
     }
@@ -190,7 +180,6 @@ class ViewSiteActivity : AppCompatActivity(), ViewSiteView {
     checkIntervalLayout.set(this.checkInterval)
 
     responseValidationMode.setSelection(validationMode.value - 1)
-
     when (this.validationMode) {
       TERM_SEARCH -> responseValidationSearchTerm.setText(this.validationContent ?: "")
       JAVASCRIPT -> scriptInputLayout.setCode(this.validationContent)
@@ -206,7 +195,7 @@ class ViewSiteActivity : AppCompatActivity(), ViewSiteView {
         else R.string.save_changes
     )
 
-    invalidateMenuForStatus()
+    invalidateMenuForStatus(model)
   }
 
   override fun setInputErrors(errors: InputErrors) {
@@ -257,43 +246,6 @@ class ViewSiteActivity : AppCompatActivity(), ViewSiteView {
   override fun onPause() {
     super.onPause()
     safeUnregisterReceiver(intentReceiver)
-  }
-
-  private fun maybeRemoveSite() {
-    val model = presenter.currentModel()
-    MaterialDialog(this).show {
-      title(R.string.remove_site)
-      message(
-          text = HtmlCompat.fromHtml(
-              context.getString(R.string.remove_site_prompt, model.name),
-              FROM_HTML_MODE_LEGACY
-          )
-      )
-      positiveButton(R.string.remove) { presenter.removeSite() }
-      negativeButton(android.R.string.cancel)
-    }
-  }
-
-  private fun maybeDisableChecks() {
-    val model = presenter.currentModel()
-    MaterialDialog(this).show {
-      title(R.string.disable_automatic_checks)
-      message(
-          text = HtmlCompat.fromHtml(
-              context.getString(R.string.disable_automatic_checks_prompt, model.name),
-              FROM_HTML_MODE_LEGACY
-          )
-      )
-      positiveButton(R.string.disable) { presenter.disableChecks() }
-      negativeButton(android.R.string.cancel)
-    }
-  }
-
-  private fun invalidateMenuForStatus() {
-    val model = presenter.currentModel()
-    val item = toolbar.menu.findItem(R.id.refresh)
-    item.isEnabled = model.status != CHECKING &&
-        model.status != WAITING
   }
 
   private fun ValidationMode.validationContent() = when (this) {

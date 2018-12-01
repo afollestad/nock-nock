@@ -8,16 +8,14 @@ package com.afollestad.nocknock.notifications
 import android.annotation.TargetApi
 import android.app.Application
 import android.app.NotificationManager
-import android.app.PendingIntent
-import android.app.PendingIntent.FLAG_CANCEL_CURRENT
-import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.os.Build.VERSION_CODES
 import android.util.Log
 import androidx.core.app.NotificationCompat.DEFAULT_VIBRATE
 import com.afollestad.nocknock.data.ServerModel
-import com.afollestad.nocknock.notifications.Channel.Statuses
+import com.afollestad.nocknock.notifications.Channel.CheckFailures
 import com.afollestad.nocknock.utilities.providers.BitmapProvider
+import com.afollestad.nocknock.utilities.providers.IntentProvider
+import com.afollestad.nocknock.utilities.providers.RealIntentProvider.Companion.BASE_NOTIFICATION_REQUEST_CODE
 import com.afollestad.nocknock.utilities.providers.StringProvider
 import com.afollestad.nocknock.utilities.qualifiers.AppIconRes
 import com.afollestad.nocknock.utilities.util.hasOreo
@@ -43,13 +41,11 @@ class RealNockNotificationManager @Inject constructor(
   @AppIconRes private val appIconRes: Int,
   private val stockManager: NotificationManager,
   private val bitmapProvider: BitmapProvider,
-  private val stringProvider: StringProvider
+  private val stringProvider: StringProvider,
+  private val intentProvider: IntentProvider
 ) : NockNotificationManager {
+
   companion object {
-    private const val BASE_REQUEST_CODE = 44
-
-    const val KEY_MODEL = "model"
-
     private fun log(message: String) {
       if (BuildConfig.DEBUG) {
         Log.d("NockNotificationManager", message)
@@ -64,10 +60,8 @@ class RealNockNotificationManager @Inject constructor(
     log("Is app open? $open")
   }
 
-  override fun createChannels() {
-    Channel.values()
-        .forEach(this::createChannel)
-  }
+  override fun createChannels() =
+    Channel.values().forEach(this::createChannel)
 
   override fun postStatusNotification(model: ServerModel) {
     if (isAppOpen) {
@@ -77,23 +71,12 @@ class RealNockNotificationManager @Inject constructor(
     }
 
     log("Posting status notification for site ${model.id}...")
-    val viewSiteActivityCls =
-      Class.forName("com.afollestad.nocknock.ui.viewsite.ViewSiteActivity")
-    val openIntent = Intent(app, viewSiteActivityCls).apply {
-      putExtra(KEY_MODEL, model)
-      addFlags(FLAG_ACTIVITY_NEW_TASK)
-    }
-    val openPendingIntent = PendingIntent.getBroadcast(
-        app,
-        BASE_REQUEST_CODE + model.id,
-        openIntent,
-        FLAG_CANCEL_CURRENT
-    )
+    val intent = intentProvider.getPendingIntentForViewSite(model)
 
-    val newNotification = notification(app, Statuses) {
+    val newNotification = notification(app, CheckFailures) {
       setContentTitle(model.name)
       setContentText(stringProvider.get(R.string.something_wrong))
-      setContentIntent(openPendingIntent)
+      setContentIntent(intent)
       setSmallIcon(R.drawable.ic_notification)
       setLargeIcon(bitmapProvider.get(appIconRes))
       setAutoCancel(true)
@@ -109,9 +92,7 @@ class RealNockNotificationManager @Inject constructor(
     log("Cancelled status notification for site ${model.id}.")
   }
 
-  override fun cancelStatusNotifications() {
-    stockManager.cancelAll()
-  }
+  override fun cancelStatusNotifications() = stockManager.cancelAll()
 
   @TargetApi(VERSION_CODES.O)
   private fun createChannel(channel: Channel) {
@@ -119,10 +100,11 @@ class RealNockNotificationManager @Inject constructor(
       log("Not running Android O, channels won't be created.")
       return
     }
+
     val notificationChannel = channel.toNotificationChannel(app)
     stockManager.createNotificationChannel(notificationChannel)
     log("Created notification channel ${channel.id}")
   }
 
-  private fun ServerModel.notificationId() = BASE_REQUEST_CODE + this.id
+  private fun ServerModel.notificationId() = BASE_NOTIFICATION_REQUEST_CODE + this.id
 }

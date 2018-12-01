@@ -93,7 +93,7 @@ class CheckStatusJob : JobService() {
                     )
                 )
               } else {
-                resultModel
+                updateStatus(site = resultModel)
               }
             }
             JAVASCRIPT -> {
@@ -108,6 +108,7 @@ class CheckStatusJob : JobService() {
             }
             STATUS_CODE -> {
               // We already know the status code is successful because we are in this else branch
+              log("Using STATUS_CODE validation, which has passed!")
               updateStatus(
                   resultModel.copy(
                       status = OK,

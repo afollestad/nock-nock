@@ -9,6 +9,8 @@ import android.app.Activity
 import android.app.Application
 import android.app.Application.ActivityLifecycleCallbacks
 import android.os.Bundle
+import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
+import androidx.core.text.HtmlCompat.fromHtml
 
 typealias ActivityLifeChange = (activity: Activity, resumed: Boolean) -> Unit
 
@@ -36,3 +38,5 @@ fun Application.onActivityLifeChange(cb: ActivityLifeChange) {
     ) = Unit
   })
 }
+
+fun String.toHtml() = fromHtml(this, FROM_HTML_MODE_LEGACY)

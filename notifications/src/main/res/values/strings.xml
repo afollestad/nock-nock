@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-  <string name="channel_server_status_title">Server Statuses</string>
-  <string name="channel_server_status_description">
-    Notifications for server status changes, whether it\'s successful statuses or error statuses.
+  <string name="channel_server_check_failures_title">Server Check Failures</string>
+  <string name="channel_server_check_failures_description">
+    Notifications for Nock Nock status checks failing for your sites. Something has gone
+    wrong if you see one of these.
   </string>
 
   <string name="something_wrong">Something\'s wrong! Tap for details.</string>

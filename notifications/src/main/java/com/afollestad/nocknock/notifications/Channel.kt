@@ -18,10 +18,10 @@ enum class Channel(
   val description: Int,
   val importance: Int
 ) {
-  Statuses(
-      id = "statuses",
-      title = R.string.channel_server_status_title,
-      description = R.string.channel_server_status_description,
+  CheckFailures(
+      id = "check_failures",
+      title = R.string.channel_server_check_failures_title,
+      description = R.string.channel_server_check_failures_description,
       importance = IMPORTANCE_DEFAULT
   )
 }

@@ -5,15 +5,12 @@
  */
 package com.afollestad.nocknock.ui.main
 
-import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
-import androidx.core.text.HtmlCompat.fromHtml
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.DividerItemDecoration.VERTICAL
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,8 +21,6 @@ import com.afollestad.nocknock.adapter.ServerAdapter
 import com.afollestad.nocknock.data.ServerModel
 import com.afollestad.nocknock.dialogs.AboutDialog
 import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob.Companion.ACTION_STATUS_UPDATE
-import com.afollestad.nocknock.ui.addsite.intentToAdd
-import com.afollestad.nocknock.ui.viewsite.intentToView
 import com.afollestad.nocknock.utilities.ext.ScopeReceiver
 import com.afollestad.nocknock.utilities.ext.injector
 import com.afollestad.nocknock.utilities.ext.safeRegisterReceiver
@@ -43,11 +38,6 @@ import kotlin.coroutines.CoroutineContext
 /** @author Aidan Follestad (@afollestad) */
 class MainActivity : AppCompatActivity(), MainView {
 
-  companion object {
-    private const val ADD_SITE_RQ = 6969
-    private const val VIEW_SITE_RQ = 6923
-  }
-
   private val intentReceiver = object : BroadcastReceiver() {
     override fun onReceive(
       context: Context,
@@ -59,7 +49,6 @@ class MainActivity : AppCompatActivity(), MainView {
 
   private lateinit var adapter: ServerAdapter
 
-  @SuppressLint("CommitPrefEdits")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
@@ -81,12 +70,14 @@ class MainActivity : AppCompatActivity(), MainView {
     list.adapter = adapter
     list.addItemDecoration(DividerItemDecoration(this, VERTICAL))
 
-    fab.setOnClickListener {
-      startActivityForResult(
-          intentToAdd(fab.x, fab.y, fab.measuredWidth),
-          ADD_SITE_RQ
-      )
-    }
+    fab.setOnClickListener { addSite() }
+
+    processIntent(intent)
+  }
+
+  override fun onNewIntent(intent: Intent?) {
+    super.onNewIntent(intent)
+    intent?.let(::processIntent)
   }
 
   override fun onResume() {
@@ -145,25 +136,8 @@ class MainActivity : AppCompatActivity(), MainView {
           }
         }
       }
-      return
-    }
-
-    startActivityForResult(intentToView(model), VIEW_SITE_RQ)
-  }
-
-  private fun maybeRemoveSite(model: ServerModel) {
-    MaterialDialog(this).show {
-      title(R.string.remove_site)
-      message(
-          text = fromHtml(
-              context.getString(R.string.remove_site_prompt, model.name),
-              FROM_HTML_MODE_LEGACY
-          )
-      )
-      positiveButton(R.string.remove) {
-        presenter.removeSite(model)
-      }
-      negativeButton(android.R.string.cancel)
+    } else {
+      viewSite(model)
     }
   }
 }

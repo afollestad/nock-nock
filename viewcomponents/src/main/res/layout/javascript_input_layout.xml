@@ -30,7 +30,7 @@
         android:background="@null"
         android:fontFamily="@font/fira_mono"
         android:gravity="top"
-        android:inputType="textMultiLine"
+        android:inputType="textMultiLine|textNoSuggestions"
         android:lineSpacingMultiplier="1.6"
         android:paddingBottom="@dimen/content_inset_less"
         android:paddingEnd="@dimen/content_inset_more"

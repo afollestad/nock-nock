@@ -7,10 +7,12 @@ package com.afollestad.nocknock.engine.db
 
 import android.app.Application
 import android.database.Cursor
+import android.util.Log
 import com.afollestad.nocknock.data.ServerModel
 import com.afollestad.nocknock.data.ServerModel.Companion.COLUMN_ID
 import com.afollestad.nocknock.data.ServerModel.Companion.DEFAULT_SORT_ORDER
 import com.afollestad.nocknock.data.ServerModel.Companion.TABLE_NAME
+import com.afollestad.nocknock.engine.BuildConfig
 import com.afollestad.nocknock.utilities.ext.diffFrom
 import javax.inject.Inject
 
@@ -31,9 +33,22 @@ interface ServerModelStore {
 }
 
 /** @author Aidan Follestad (@afollestad) */
-class RealServerModelStore @Inject constructor(
-  app: Application
-) : ServerModelStore {
+class RealServerModelStore @Inject constructor(app: Application) : ServerModelStore {
+
+  companion object {
+    private fun log(
+      message: String,
+      warning: Boolean = false
+    ) {
+      if (BuildConfig.DEBUG) {
+        if (warning) {
+          Log.w("ServerModelStore", message)
+        } else {
+          Log.d("ServerModelStore", message)
+        }
+      }
+    }
+  }
 
   private val dbHelper = ServerModelDbHelper(app)
 
@@ -84,6 +99,9 @@ class RealServerModelStore @Inject constructor(
     val newId = writer.insert(TABLE_NAME, null, model.toContentValues())
 
     return model.copy(id = newId.toInt())
+        .apply {
+          log("Inserted new site model: $this")
+        }
   }
 
   override suspend fun update(model: ServerModel): Int {
@@ -96,9 +114,15 @@ class RealServerModelStore @Inject constructor(
     val newValues = model.toContentValues()
     val valuesDiff = oldValues.diffFrom(newValues)
 
+    if (valuesDiff.size() == 0) {
+      log("Nothing has changed - nothing to update!", warning = true)
+      return 0
+    }
+
     val selection = "$COLUMN_ID = ?"
     val selectionArgs = arrayOf("${model.id}")
 
+    log("Updated model: $model")
     return writer.update(TABLE_NAME, valuesDiff, selection, selectionArgs)
   }
 
@@ -109,10 +133,13 @@ class RealServerModelStore @Inject constructor(
 
     val selection = "$COLUMN_ID = ?"
     val selectionArgs = arrayOf("$id")
+
+    log("Deleted model: $id")
     return dbHelper.writableDatabase.delete(TABLE_NAME, selection, selectionArgs)
   }
 
   override suspend fun deleteAll(): Int {
+    log("Deleted all models")
     return dbHelper.writableDatabase.delete(TABLE_NAME, null, null)
   }
 
