@@ -37,6 +37,7 @@
   <string name="last_check_result">Last Check Result</string>
   <string name="next_check">Next Check</string>
   <string name="next_check_x">Next Check: %1$s</string>
+  <string name="now">Now</string>
   <string name="none_turned_off">None (turned off)</string>
   <string name="none">None</string>
 

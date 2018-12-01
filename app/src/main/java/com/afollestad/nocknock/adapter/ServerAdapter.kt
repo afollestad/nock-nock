@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.data.ServerModel
+import com.afollestad.nocknock.data.isPending
 import com.afollestad.nocknock.data.textRes
 import com.afollestad.nocknock.utilities.ui.onDebouncedClick
 import kotlinx.android.synthetic.main.list_item_server.view.iconStatus
@@ -46,13 +47,23 @@ class ServerVH constructor(
       itemView.textStatus.setText(statusText)
     }
 
-    if (model.disabled) {
-      itemView.textInterval.setText(R.string.checks_disabled)
-    } else {
-      itemView.textInterval.text = itemView.resources.getString(
-          R.string.next_check_x,
-          model.intervalText()
-      )
+    val res = itemView.resources
+    when {
+      model.disabled -> {
+        itemView.textInterval.setText(R.string.checks_disabled)
+      }
+      model.status.isPending() -> {
+        itemView.textInterval.text = res.getString(
+            R.string.next_check_x,
+            res.getString(R.string.now)
+        )
+      }
+      else -> {
+        itemView.textInterval.text = res.getString(
+            R.string.next_check_x,
+            model.intervalText()
+        )
+      }
     }
   }
 
@@ -113,11 +124,6 @@ class ServerAdapter(private val listener: Listener) : RecyclerView.Adapter<Serve
     if (!newModels.isEmpty()) {
       this.models.addAll(newModels)
     }
-    notifyDataSetChanged()
-  }
-
-  fun clear() {
-    models.clear()
     notifyDataSetChanged()
   }
 
