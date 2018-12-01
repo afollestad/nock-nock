@@ -18,7 +18,7 @@ class LoadingIndicatorFrame(
   attrs: AttributeSet? = null
 ) : FrameLayout(context, attrs) {
   companion object {
-    private const val SHOW_DELAY_MS = 200L
+    private const val SHOW_DELAY_MS = 100L
   }
 
   private val showRunnable = Runnable { show() }

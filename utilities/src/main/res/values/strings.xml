@@ -1,3 +1,4 @@
 <resources>
   <string name="checks_disabled">Checks Disabled</string>
+  <string name="auto_checks_disabled">Automatic Checks Disabled</string>
 </resources>
