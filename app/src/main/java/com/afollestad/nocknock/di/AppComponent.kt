@@ -13,9 +13,9 @@ import com.afollestad.nocknock.engine.EngineModule
 import com.afollestad.nocknock.engine.statuscheck.BootReceiver
 import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob
 import com.afollestad.nocknock.notifications.NotificationsModule
-import com.afollestad.nocknock.ui.AddSiteActivity
-import com.afollestad.nocknock.ui.MainActivity
-import com.afollestad.nocknock.ui.ViewSiteActivity
+import com.afollestad.nocknock.ui.addsite.AddSiteActivity
+import com.afollestad.nocknock.ui.main.MainActivity
+import com.afollestad.nocknock.ui.viewsite.ViewSiteActivity
 import com.afollestad.nocknock.utilities.UtilitiesModule
 import dagger.BindsInstance
 import dagger.Component

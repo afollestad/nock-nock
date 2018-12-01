@@ -3,7 +3,7 @@
  *
  * Designed and developed by Aidan Follestad (@afollestad)
  */
-package com.afollestad.nocknock.ui
+package com.afollestad.nocknock.ui.main
 
 import android.annotation.SuppressLint
 import android.app.ActivityOptions.makeSceneTransitionAnimation
@@ -25,8 +25,8 @@ import com.afollestad.nocknock.adapter.ServerAdapter
 import com.afollestad.nocknock.data.ServerModel
 import com.afollestad.nocknock.dialogs.AboutDialog
 import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob.Companion.ACTION_STATUS_UPDATE
-import com.afollestad.nocknock.presenters.MainPresenter
-import com.afollestad.nocknock.presenters.MainView
+import com.afollestad.nocknock.ui.addsite.intentToAdd
+import com.afollestad.nocknock.ui.viewsite.intentToView
 import com.afollestad.nocknock.utilities.ext.ScopeReceiver
 import com.afollestad.nocknock.utilities.ext.injector
 import com.afollestad.nocknock.utilities.ext.safeRegisterReceiver
@@ -63,8 +63,10 @@ class MainActivity : AppCompatActivity(), MainView {
   @SuppressLint("CommitPrefEdits")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
     injector().injectInto(this)
     setContentView(R.layout.activity_main)
+    presenter.takeView(this)
 
     toolbar.inflateMenu(R.menu.menu_main)
     toolbar.setOnMenuItemClickListener { item ->
@@ -86,8 +88,6 @@ class MainActivity : AppCompatActivity(), MainView {
           ADD_SITE_RQ
       )
     }
-
-    presenter.takeView(this)
   }
 
   override fun onResume() {
@@ -110,15 +110,21 @@ class MainActivity : AppCompatActivity(), MainView {
   }
 
   override fun setModels(models: List<ServerModel>) {
-    adapter.set(models)
-    emptyText.showOrHide(models.isEmpty())
+    list.post {
+      adapter.set(models)
+      emptyText.showOrHide(models.isEmpty())
+    }
   }
 
-  override fun updateModel(model: ServerModel) = adapter.update(model)
+  override fun updateModel(model: ServerModel) {
+    list.post { adapter.update(model) }
+  }
 
   override fun onSiteDeleted(model: ServerModel) {
-    adapter.remove(model)
-    emptyText.showOrHide(adapter.itemCount == 0)
+    list.post {
+      adapter.remove(model)
+      emptyText.showOrHide(adapter.itemCount == 0)
+    }
   }
 
   override fun scopeWhileAttached(

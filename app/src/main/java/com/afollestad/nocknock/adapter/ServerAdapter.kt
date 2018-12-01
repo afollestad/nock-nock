@@ -110,10 +110,9 @@ class ServerAdapter(private val listener: Listener) : RecyclerView.Adapter<Serve
 
   fun set(newModels: List<ServerModel>) {
     this.models.clear()
-    if (newModels.isEmpty()) {
-      return
+    if (!newModels.isEmpty()) {
+      this.models.addAll(newModels)
     }
-    this.models.addAll(newModels)
     notifyDataSetChanged()
   }
 

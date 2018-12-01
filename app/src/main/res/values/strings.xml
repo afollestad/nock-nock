@@ -23,6 +23,9 @@
   <string name="please_enter_name">Please enter a name!</string>
   <string name="please_enter_url">Please enter a URL.</string>
   <string name="please_enter_valid_url">Please enter a valid URL.</string>
+  <string name="please_enter_check_interval">Please input a check interval.</string>
+  <string name="please_enter_search_term">Please input a search term.</string>
+  <string name="please_enter_javaScript">Please input a validation script.</string>
 
   <string name="options">Options</string>
   <string name="already_checking_sites">Already checking sites!</string>

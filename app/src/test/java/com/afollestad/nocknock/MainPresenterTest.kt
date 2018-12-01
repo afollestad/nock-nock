@@ -13,8 +13,8 @@ import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob.Companion.ACTIO
 import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob.Companion.KEY_UPDATE_MODEL
 import com.afollestad.nocknock.engine.statuscheck.CheckStatusManager
 import com.afollestad.nocknock.notifications.NockNotificationManager
-import com.afollestad.nocknock.presenters.MainView
-import com.afollestad.nocknock.presenters.RealMainPresenter
+import com.afollestad.nocknock.ui.main.MainView
+import com.afollestad.nocknock.ui.main.RealMainPresenter
 import com.afollestad.nocknock.utilities.ext.ScopeReceiver
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any

@@ -3,7 +3,7 @@
  *
  * Designed and developed by Aidan Follestad (@afollestad)
  */
-package com.afollestad.nocknock.presenters
+package com.afollestad.nocknock.ui.main
 
 import com.afollestad.nocknock.data.ServerModel
 import com.afollestad.nocknock.utilities.ext.ScopeReceiver

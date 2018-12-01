@@ -49,6 +49,10 @@ class CheckIntervalLayout(
     spinner.adapter = spinnerAdapter
   }
 
+  fun setError(error: String?) {
+    input.error = error
+  }
+
   fun set(interval: Long) {
     when {
       interval >= WEEK -> {

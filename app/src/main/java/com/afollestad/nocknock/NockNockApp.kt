@@ -12,9 +12,9 @@ import com.afollestad.nocknock.di.DaggerAppComponent
 import com.afollestad.nocknock.engine.statuscheck.BootReceiver
 import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob
 import com.afollestad.nocknock.notifications.NockNotificationManager
-import com.afollestad.nocknock.ui.AddSiteActivity
-import com.afollestad.nocknock.ui.MainActivity
-import com.afollestad.nocknock.ui.ViewSiteActivity
+import com.afollestad.nocknock.ui.addsite.AddSiteActivity
+import com.afollestad.nocknock.ui.main.MainActivity
+import com.afollestad.nocknock.ui.viewsite.ViewSiteActivity
 import com.afollestad.nocknock.utilities.Injector
 import com.afollestad.nocknock.utilities.ext.systemService
 import okhttp3.OkHttpClient

@@ -3,35 +3,29 @@
  *
  * Designed and developed by Aidan Follestad (@afollestad)
  */
-package com.afollestad.nocknock.ui
+package com.afollestad.nocknock.ui.addsite
 
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NO_ANIMATION
-import android.net.Uri
 import android.os.Bundle
-import android.util.Patterns.WEB_URL
-import android.view.View
 import android.view.ViewAnimationUtils.createCircularReveal
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import com.afollestad.nocknock.R
-import com.afollestad.nocknock.data.ServerModel
-import com.afollestad.nocknock.data.ServerStatus.WAITING
 import com.afollestad.nocknock.data.ValidationMode
 import com.afollestad.nocknock.data.ValidationMode.JAVASCRIPT
 import com.afollestad.nocknock.data.ValidationMode.STATUS_CODE
 import com.afollestad.nocknock.data.ValidationMode.TERM_SEARCH
 import com.afollestad.nocknock.data.indexToValidationMode
-import com.afollestad.nocknock.engine.db.ServerModelStore
-import com.afollestad.nocknock.engine.statuscheck.CheckStatusManager
+import com.afollestad.nocknock.ui.main.MainActivity
+import com.afollestad.nocknock.utilities.ext.ScopeReceiver
 import com.afollestad.nocknock.utilities.ext.injector
 import com.afollestad.nocknock.utilities.ext.onEnd
 import com.afollestad.nocknock.utilities.ext.scopeWhileAttached
 import com.afollestad.nocknock.viewcomponents.ext.conceal
-import com.afollestad.nocknock.viewcomponents.ext.hide
 import com.afollestad.nocknock.viewcomponents.ext.onItemSelected
 import com.afollestad.nocknock.viewcomponents.ext.onLayout
 import com.afollestad.nocknock.viewcomponents.ext.show
@@ -42,20 +36,15 @@ import kotlinx.android.synthetic.main.activity_addsite.doneBtn
 import kotlinx.android.synthetic.main.activity_addsite.inputName
 import kotlinx.android.synthetic.main.activity_addsite.inputUrl
 import kotlinx.android.synthetic.main.activity_addsite.loadingProgress
-import kotlinx.android.synthetic.main.activity_addsite.nameTiLayout
 import kotlinx.android.synthetic.main.activity_addsite.responseValidationMode
 import kotlinx.android.synthetic.main.activity_addsite.responseValidationSearchTerm
 import kotlinx.android.synthetic.main.activity_addsite.rootView
 import kotlinx.android.synthetic.main.activity_addsite.scriptInputLayout
 import kotlinx.android.synthetic.main.activity_addsite.textUrlWarning
 import kotlinx.android.synthetic.main.activity_addsite.toolbar
-import kotlinx.android.synthetic.main.activity_addsite.urlTiLayout
 import kotlinx.android.synthetic.main.activity_addsite.validationModeDescription
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlin.math.max
 import kotlin.properties.Delegates.notNull
 
@@ -76,7 +65,7 @@ fun MainActivity.intentToAdd(
 }
 
 /** @author Aidan Follestad (afollestad) */
-class AddSiteActivity : AppCompatActivity(), View.OnClickListener {
+class AddSiteActivity : AppCompatActivity(), AddSiteView {
 
   companion object {
     private const val REVEAL_DURATION = 300L
@@ -84,8 +73,7 @@ class AddSiteActivity : AppCompatActivity(), View.OnClickListener {
 
   private var isClosing: Boolean = false
 
-  @Inject lateinit var serverModelStore: ServerModelStore
-  @Inject lateinit var checkStatusManager: CheckStatusManager
+  @Inject lateinit var presenter: AddSitePresenter
 
   private var revealCx by notNull<Int>()
   private var revealCy by notNull<Int>()
@@ -94,9 +82,11 @@ class AddSiteActivity : AppCompatActivity(), View.OnClickListener {
   @SuppressLint("SetTextI18n")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    injector().injectInto(this)
 
+    injector().injectInto(this)
     setContentView(R.layout.activity_addsite)
+    presenter.takeView(this)
+
     toolbar.setNavigationOnClickListener { closeActivityWithReveal() }
 
     if (savedInstanceState == null) {
@@ -117,25 +107,7 @@ class AddSiteActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     inputUrl.setOnFocusChangeListener { _, hasFocus ->
-      if (!hasFocus) {
-        val inputStr = inputUrl.text
-            .toString()
-            .trim()
-        if (inputStr.isEmpty()) {
-          return@setOnFocusChangeListener
-        }
-
-        val uri = Uri.parse(inputStr)
-        if (uri.scheme == null) {
-          inputUrl.setText("http://$inputStr")
-          textUrlWarning.hide()
-        } else if ("http" != uri.scheme && "https" != uri.scheme) {
-          textUrlWarning.show()
-          textUrlWarning.setText(R.string.warning_http_url)
-        } else {
-          textUrlWarning.hide()
-        }
-      }
+      presenter.onUrlInputFocusChange(hasFocus, inputUrl.trimmedText())
     }
 
     val validationOptionsAdapter = ArrayAdapter(
@@ -146,22 +118,90 @@ class AddSiteActivity : AppCompatActivity(), View.OnClickListener {
     validationOptionsAdapter.setDropDownViewResource(R.layout.list_item_spinner_dropdown)
 
     responseValidationMode.adapter = validationOptionsAdapter
-    responseValidationMode.onItemSelected { pos ->
-      responseValidationSearchTerm.showOrHide(pos == 1)
-      scriptInputLayout.showOrHide(pos == 2)
+    responseValidationMode.onItemSelected(presenter::onValidationModeSelected)
 
-      validationModeDescription.setText(
-          when (pos) {
-            0 -> R.string.validation_mode_status_desc
-            1 -> R.string.validation_mode_term_desc
-            2 -> R.string.validation_mode_javascript_desc
-            else -> throw IllegalStateException("Unknown validation mode position: $pos")
-          }
+    doneBtn.setOnClickListener {
+      val checkInterval = checkIntervalLayout.getSelectedCheckInterval()
+      val validationMode =
+        responseValidationMode.selectedItemPosition.indexToValidationMode()
+
+      isClosing = true
+      presenter.commit(
+          name = inputName.trimmedText(),
+          url = inputUrl.trimmedText(),
+          checkInterval = checkInterval,
+          validationMode = validationMode,
+          validationContent = validationMode.validationContent()
       )
     }
-
-    doneBtn.setOnClickListener(this)
   }
+
+  override fun onDestroy() {
+    presenter.dropView()
+    super.onDestroy()
+  }
+
+  override fun setLoading() = loadingProgress.setLoading()
+
+  override fun setDoneLoading() = loadingProgress.setDone()
+
+  override fun showOrHideUrlSchemeWarning(show: Boolean) {
+    textUrlWarning.showOrHide(show)
+    if (show) {
+      textUrlWarning.setText(R.string.warning_http_url)
+    }
+  }
+
+  override fun showOrHideValidationSearchTerm(show: Boolean) =
+    responseValidationSearchTerm.showOrHide(show)
+
+  override fun showOrHideScriptInput(show: Boolean) = scriptInputLayout.showOrHide(show)
+
+  override fun setValidationModeDescription(res: Int) = validationModeDescription.setText(res)
+
+  override fun setInputErrors(errors: InputErrors) {
+    isClosing = false
+    inputName.error = if (errors.name != null) {
+      getString(errors.name!!)
+    } else {
+      null
+    }
+    inputUrl.error = if (errors.url != null) {
+      getString(errors.url!!)
+    } else {
+      null
+    }
+    checkIntervalLayout.setError(
+        if (errors.checkInterval != null) {
+          getString(errors.checkInterval!!)
+        } else {
+          null
+        }
+    )
+    responseValidationSearchTerm.error = if (errors.termSearch != null) {
+      getString(errors.termSearch!!)
+    } else {
+      null
+    }
+    scriptInputLayout.setError(
+        if (errors.javaScript != null) {
+          getString(errors.javaScript!!)
+        } else {
+          null
+        }
+    )
+  }
+
+  override fun onSiteAdded() {
+    setResult(RESULT_OK)
+    finish()
+    overridePendingTransition(R.anim.fade_out, R.anim.fade_out)
+  }
+
+  override fun scopeWhileAttached(
+    context: CoroutineContext,
+    exec: ScopeReceiver
+  ) = rootView.scopeWhileAttached(context, exec)
 
   private fun circularRevealActivity() {
     val circularReveal =
@@ -188,71 +228,6 @@ class AddSiteActivity : AppCompatActivity(), View.OnClickListener {
           }
           start()
         }
-  }
-
-  // Done button
-  override fun onClick(view: View) {
-    isClosing = true
-    var newModel = ServerModel(
-        name = inputName.trimmedText(),
-        url = inputUrl.trimmedText(),
-        status = WAITING,
-        validationMode = STATUS_CODE
-    )
-
-    if (newModel.name.isEmpty()) {
-      nameTiLayout.error = getString(R.string.please_enter_name)
-      isClosing = false
-      return
-    } else {
-      nameTiLayout.error = null
-    }
-
-    if (newModel.url.isEmpty()) {
-      urlTiLayout.error = getString(R.string.please_enter_url)
-      isClosing = false
-      return
-    } else {
-      urlTiLayout.error = null
-      if (!WEB_URL.matcher(newModel.url).find()) {
-        urlTiLayout.error = getString(R.string.please_enter_valid_url)
-        isClosing = false
-        return
-      } else {
-        val uri = Uri.parse(newModel.url)
-        if (uri.scheme == null) {
-          newModel = newModel.copy(url = "http://${newModel.url}")
-        }
-      }
-    }
-
-    val selectedCheckInterval = checkIntervalLayout.getSelectedCheckInterval()
-    val selectedValidationMode =
-      responseValidationMode.selectedItemPosition.indexToValidationMode()
-
-    newModel = newModel.copy(
-        checkInterval = selectedCheckInterval,
-        validationMode = selectedValidationMode,
-        validationContent = selectedValidationMode.validationContent()
-    )
-
-    rootView.scopeWhileAttached(Main) {
-      launch(coroutineContext) {
-        loadingProgress.setLoading()
-        val storedModel = async(IO) { serverModelStore.put(newModel) }.await()
-
-        checkStatusManager.scheduleCheck(
-            site = storedModel,
-            rightNow = true,
-            cancelPrevious = true
-        )
-        loadingProgress.setDone()
-
-        setResult(RESULT_OK)
-        finish()
-        overridePendingTransition(R.anim.fade_out, R.anim.fade_out)
-      }
-    }
   }
 
   override fun onBackPressed() = closeActivityWithReveal()

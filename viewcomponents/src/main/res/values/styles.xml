@@ -39,4 +39,10 @@
     <item name="android:textColorHint">?android:textColorSecondary</item>
   </style>
 
+  <style name="NockText.Error">
+    <item name="android:textSize">@dimen/caption_font_size</item>
+    <item name="android:fontFamily">@font/lato_light</item>
+    <item name="android:textColor">@color/md_red</item>
+  </style>
+
 </resources>

@@ -5,8 +5,10 @@
  */
 package com.afollestad.nocknock.di
 
-import com.afollestad.nocknock.presenters.MainPresenter
-import com.afollestad.nocknock.presenters.RealMainPresenter
+import com.afollestad.nocknock.ui.addsite.AddSitePresenter
+import com.afollestad.nocknock.ui.addsite.RealAddSitePresenter
+import com.afollestad.nocknock.ui.main.MainPresenter
+import com.afollestad.nocknock.ui.main.RealMainPresenter
 import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton
@@ -20,4 +22,10 @@ abstract class MainBindModule {
   abstract fun provideMainPresenter(
     presenter: RealMainPresenter
   ): MainPresenter
+
+  @Binds
+  @Singleton
+  abstract fun provideAddSitePresenter(
+    presenter: RealAddSitePresenter
+  ): AddSitePresenter
 }

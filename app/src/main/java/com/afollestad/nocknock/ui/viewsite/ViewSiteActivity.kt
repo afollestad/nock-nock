@@ -3,7 +3,7 @@
  *
  * Designed and developed by Aidan Follestad (@afollestad)
  */
-package com.afollestad.nocknock.ui
+package com.afollestad.nocknock.ui.viewsite
 
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
@@ -39,6 +39,7 @@ import com.afollestad.nocknock.engine.db.ServerModelStore
 import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob.Companion.ACTION_STATUS_UPDATE
 import com.afollestad.nocknock.engine.statuscheck.CheckStatusManager
 import com.afollestad.nocknock.notifications.NockNotificationManager
+import com.afollestad.nocknock.ui.main.MainActivity
 import com.afollestad.nocknock.utilities.ext.formatDate
 import com.afollestad.nocknock.utilities.ext.injector
 import com.afollestad.nocknock.utilities.ext.isHttpOrHttps
@@ -108,11 +109,15 @@ class ViewSiteActivity : AppCompatActivity(),
       context: Context,
       intent: Intent
     ) {
-      log("Received broadcast ${intent.action}")
+      log(
+          "Received broadcast ${intent.action}"
+      )
       val model = intent.getSerializableExtra(KEY_VIEW_MODEL) as? ServerModel
       if (model != null) {
         this@ViewSiteActivity.currentModel = model
-        log("Received model update: $currentModel")
+        log(
+            "Received model update: $currentModel"
+        )
         displayCurrentModel()
       }
     }

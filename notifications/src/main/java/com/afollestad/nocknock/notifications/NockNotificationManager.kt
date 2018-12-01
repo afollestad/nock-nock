@@ -78,7 +78,7 @@ class RealNockNotificationManager @Inject constructor(
 
     log("Posting status notification for site ${model.id}...")
     val viewSiteActivityCls =
-      Class.forName("com.afollestad.nocknock.ui.ViewSiteActivity")
+      Class.forName("com.afollestad.nocknock.ui.viewsite.ViewSiteActivity")
     val openIntent = Intent(app, viewSiteActivityCls).apply {
       putExtra(KEY_MODEL, model)
       addFlags(FLAG_ACTIVITY_NEW_TASK)

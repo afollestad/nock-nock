@@ -18,7 +18,7 @@
       tools:ignore="AllowBackup,GoogleAppIndexingWarning,UnusedAttribute">
 
     <activity
-        android:name="com.afollestad.nocknock.ui.MainActivity"
+        android:name="com.afollestad.nocknock.ui.main.MainActivity"
         android:launchMode="singleTop">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
@@ -28,14 +28,14 @@
     </activity>
 
     <activity
-        android:name="com.afollestad.nocknock.ui.AddSiteActivity"
+        android:name="com.afollestad.nocknock.ui.addsite.AddSiteActivity"
         android:label="@string/add_site"
         android:launchMode="singleTop"
         android:theme="@style/AppTheme.Transparent"
         android:windowSoftInputMode="stateHidden"/>
 
     <activity
-        android:name="com.afollestad.nocknock.ui.ViewSiteActivity"
+        android:name="com.afollestad.nocknock.ui.viewsite.ViewSiteActivity"
         android:label="@string/view_site"
         android:launchMode="singleTop"
         android:theme="@style/AppTheme.Ink"

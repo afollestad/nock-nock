@@ -3,7 +3,7 @@
  *
  * Designed and developed by Aidan Follestad (@afollestad)
  */
-package com.afollestad.nocknock.presenters
+package com.afollestad.nocknock.ui.main
 
 import android.content.Intent
 import com.afollestad.nocknock.data.ServerModel
@@ -58,14 +58,14 @@ class RealMainPresenter @Inject constructor(
 
   override fun resume() {
     notificationManager.cancelStatusNotifications()
-    view?.run {
+    view!!.run {
       setModels(listOf())
       scopeWhileAttached(Main) {
         launch(coroutineContext) {
           val models = async(IO) {
             serverModelStore.get()
-          }
-          setModels(models.await())
+          }.await()
+          setModels(models)
         }
       }
     }
@@ -82,7 +82,7 @@ class RealMainPresenter @Inject constructor(
   override fun removeSite(site: ServerModel) {
     checkStatusManager.cancelCheck(site)
     notificationManager.cancelStatusNotification(site)
-    view?.scopeWhileAttached(Main) {
+    view!!.scopeWhileAttached(Main) {
       launch(coroutineContext) {
         async(IO) { serverModelStore.delete(site) }.await()
         view?.onSiteDeleted(site)
@@ -95,7 +95,7 @@ class RealMainPresenter @Inject constructor(
   }
 
   private fun ensureCheckJobs() {
-    view?.scopeWhileAttached(IO) {
+    view!!.scopeWhileAttached(IO) {
       launch(coroutineContext) {
         checkStatusManager.ensureScheduledChecks()
       }

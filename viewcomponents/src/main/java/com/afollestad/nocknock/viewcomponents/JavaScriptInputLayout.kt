@@ -11,7 +11,9 @@ import android.widget.HorizontalScrollView
 import androidx.annotation.CheckResult
 import com.afollestad.nocknock.viewcomponents.ext.dimenFloat
 import com.afollestad.nocknock.viewcomponents.ext.dimenInt
+import com.afollestad.nocknock.viewcomponents.ext.showOrHide
 import com.afollestad.nocknock.viewcomponents.ext.trimmedText
+import kotlinx.android.synthetic.main.javascript_input_layout.view.error_text
 import kotlinx.android.synthetic.main.javascript_input_layout.view.userInput
 
 /** @author Aidan Follestad (afollestad) */
@@ -33,6 +35,11 @@ class JavaScriptInputLayout(
     inflate(context, R.layout.javascript_input_layout, this)
   }
 
+  fun setError(error: String?) {
+    error_text.showOrHide(error != null)
+    error_text.text = error
+  }
+
   fun setCode(code: String?) {
     if (code.isNullOrEmpty()) {
       setDefaultCode()
@@ -41,9 +48,9 @@ class JavaScriptInputLayout(
     userInput.setText(code.trim())
   }
 
-  fun setDefaultCode() = userInput.setText(R.string.default_js)
-
   @CheckResult fun getCode() = userInput.trimmedText()
 
   fun clear() = userInput.setText("")
+
+  private fun setDefaultCode() = userInput.setText(R.string.default_js)
 }
