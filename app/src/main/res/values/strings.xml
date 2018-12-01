@@ -19,7 +19,6 @@
   <string name="add_site">Add Site</string>
   <string name="site_name">Site Name</string>
   <string name="site_url">Site URL</string>
-  <string name="done">Done</string>
   <string name="please_enter_name">Please enter a name!</string>
   <string name="please_enter_url">Please enter a URL.</string>
   <string name="please_enter_valid_url">Please enter a valid URL.</string>

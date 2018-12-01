@@ -153,7 +153,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/content_inset_double"
-            android:text="@string/done"
+            android:text="@string/add_site"
             style="@style/AccentButton"
             />
 
