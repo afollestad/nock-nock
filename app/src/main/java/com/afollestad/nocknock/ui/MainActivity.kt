@@ -172,15 +172,22 @@ class MainActivity : AppCompatActivity() {
         title(R.string.options)
         listItems(R.array.site_long_options) { _, i, _ ->
           when (i) {
-            0 -> checkStatusManager.scheduleCheck(site = model, cancelPrevious = true)
-            1 -> maybeRemoveSite(model) {
-              adapter.remove(i)
-              emptyText.showOrHide(adapter.itemCount == 0)
+            0 -> {
+              checkStatusManager.scheduleCheck(
+                  site = model,
+                  rightNow = true,
+                  cancelPrevious = true
+              )
+            }
+            1 -> {
+              maybeRemoveSite(model) {
+                adapter.remove(model)
+                emptyText.showOrHide(adapter.itemCount == 0)
+              }
             }
             else -> throw IllegalStateException("Unexpected index: $i")
           }
         }
-        negativeButton(android.R.string.cancel)
       }
       return
     }
