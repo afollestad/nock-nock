@@ -33,7 +33,7 @@ import kotlinx.coroutines.withContext
 import java.lang.System.currentTimeMillis
 import javax.inject.Inject
 
-/** @author Aidan Follestad (afollestad)*/
+/** @author Aidan Follestad (@afollestad)*/
 class CheckStatusJob : JobService() {
 
   companion object {

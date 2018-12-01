@@ -11,7 +11,7 @@ import org.mozilla.javascript.Context
 import org.mozilla.javascript.EvaluatorException
 import org.mozilla.javascript.Function
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 object JavaScript {
 
   fun eval(

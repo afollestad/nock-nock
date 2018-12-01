@@ -22,7 +22,7 @@ import dagger.Component
 import okhttp3.OkHttpClient
 import javax.inject.Singleton
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 @Singleton
 @Component(
     modules = [

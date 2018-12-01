@@ -80,13 +80,13 @@ import javax.inject.Inject
 
 private const val KEY_VIEW_MODEL = "site_model"
 
-/** @author Aidan Follestad (afViewSiteActivityollestad) */
+/** @author Aidan Follestad (@afollestad) */
 fun MainActivity.intentToView(model: ServerModel) =
   Intent(this, ViewSiteActivity::class.java).apply {
     putExtra(KEY_VIEW_MODEL, model)
   }
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 class ViewSiteActivity : AppCompatActivity(),
     View.OnClickListener,
     Toolbar.OnMenuItemClickListener {

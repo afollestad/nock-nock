@@ -14,7 +14,7 @@ import com.afollestad.nocknock.data.ServerStatus.ERROR
 import com.afollestad.nocknock.data.ServerStatus.OK
 import com.afollestad.nocknock.data.ServerStatus.WAITING
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 class StatusImageView(
   context: Context,
   attrs: AttributeSet? = null

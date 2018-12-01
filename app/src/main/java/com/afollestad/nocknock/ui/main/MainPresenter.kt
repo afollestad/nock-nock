@@ -18,7 +18,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 interface MainPresenter {
 
   fun takeView(view: MainView)
@@ -34,7 +34,7 @@ interface MainPresenter {
   fun dropView()
 }
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 class RealMainPresenter @Inject constructor(
   private val serverModelStore: ServerModelStore,
   private val notificationManager: NockNotificationManager,

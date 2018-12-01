@@ -11,7 +11,7 @@ import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 @Module
 open class MainModule {
 

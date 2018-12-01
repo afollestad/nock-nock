@@ -9,7 +9,7 @@ import com.afollestad.nocknock.data.ServerStatus.CHECKING
 import com.afollestad.nocknock.data.ServerStatus.OK
 import com.afollestad.nocknock.data.ServerStatus.WAITING
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 enum class ServerStatus(val value: Int) {
   OK(1),
   WAITING(2),

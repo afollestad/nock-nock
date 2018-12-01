@@ -8,7 +8,7 @@ package com.afollestad.nocknock.utilities.qualifiers
 import javax.inject.Qualifier
 import kotlin.annotation.AnnotationRetention.RUNTIME
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 @Qualifier
 @Retention(RUNTIME)
 annotation class AppIconRes

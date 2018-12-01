@@ -41,7 +41,7 @@ import kotlinx.android.synthetic.main.include_empty_view.emptyText
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 class MainActivity : AppCompatActivity(), MainView {
 
   companion object {

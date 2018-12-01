@@ -9,7 +9,7 @@ import androidx.annotation.StringRes
 import com.afollestad.nocknock.utilities.ext.ScopeReceiver
 import kotlin.coroutines.CoroutineContext
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 interface AddSiteView {
 
   fun setLoading()

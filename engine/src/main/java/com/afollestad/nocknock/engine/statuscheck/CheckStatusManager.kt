@@ -25,13 +25,13 @@ import okhttp3.Response
 import java.net.SocketTimeoutException
 import javax.inject.Inject
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 data class CheckResult(
   val model: ServerModel,
   val response: Response? = null
 )
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 interface CheckStatusManager {
 
   suspend fun ensureScheduledChecks()

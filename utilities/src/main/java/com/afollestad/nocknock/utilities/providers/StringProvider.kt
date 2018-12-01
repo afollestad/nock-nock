@@ -15,7 +15,7 @@ interface StringProvider {
   fun get(@StringRes res: Int): String
 }
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 class RealStringProvider @Inject constructor(
   private val app: Application
 ) : StringProvider {

@@ -21,7 +21,7 @@ import kotlinx.android.synthetic.main.list_item_server.view.textUrl
 
 typealias Listener = (model: ServerModel, longClick: Boolean) -> Unit
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 class ServerVH constructor(
   itemView: View,
   private val adapter: ServerAdapter
@@ -62,7 +62,7 @@ class ServerVH constructor(
   }
 }
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 class ServerAdapter(private val listener: Listener) : RecyclerView.Adapter<ServerVH>() {
 
   private val models = mutableListOf<ServerModel>()

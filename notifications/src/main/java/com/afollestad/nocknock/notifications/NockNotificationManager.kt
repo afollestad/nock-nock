@@ -37,7 +37,7 @@ interface NockNotificationManager {
   fun cancelStatusNotifications()
 }
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 class RealNockNotificationManager @Inject constructor(
   private val app: Application,
   @AppIconRes private val appIconRes: Int,

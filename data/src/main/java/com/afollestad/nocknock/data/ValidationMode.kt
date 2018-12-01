@@ -5,7 +5,7 @@
  */
 package com.afollestad.nocknock.data
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 enum class ValidationMode(val value: Int) {
   STATUS_CODE(1),
   TERM_SEARCH(2),

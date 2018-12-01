@@ -14,7 +14,7 @@ import com.afollestad.nocknock.data.ServerModel.Companion.TABLE_NAME
 import com.afollestad.nocknock.utilities.ext.diffFrom
 import javax.inject.Inject
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 interface ServerModelStore {
 
   suspend fun get(id: Int? = null): List<ServerModel>
@@ -30,7 +30,7 @@ interface ServerModelStore {
   suspend fun deleteAll(): Int
 }
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 class RealServerModelStore @Inject constructor(
   app: Application
 ) : ServerModelStore {

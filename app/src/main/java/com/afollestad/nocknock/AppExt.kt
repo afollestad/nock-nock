@@ -12,7 +12,7 @@ import android.os.Bundle
 
 typealias ActivityLifeChange = (activity: Activity, resumed: Boolean) -> Unit
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 fun Application.onActivityLifeChange(cb: ActivityLifeChange) {
   registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
     override fun onActivitySaveInstanceState(

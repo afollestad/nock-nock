@@ -20,7 +20,7 @@ import kotlinx.android.synthetic.main.check_interval_layout.view.input
 import kotlinx.android.synthetic.main.check_interval_layout.view.spinner
 import kotlin.math.ceil
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 class CheckIntervalLayout(
   context: Context,
   attrs: AttributeSet? = null

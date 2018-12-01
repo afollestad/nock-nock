@@ -5,7 +5,7 @@
  */
 package com.afollestad.nocknock.utilities
 
-/** @author Aidan Follestad (afollestad)*/
+/** @author Aidan Follestad (@afollestad)*/
 interface Injector {
 
   fun injectInto(target: Any)

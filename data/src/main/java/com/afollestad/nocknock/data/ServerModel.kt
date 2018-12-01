@@ -16,7 +16,7 @@ import kotlin.math.max
 const val CHECK_INTERVAL_UNSET = -1L
 const val LAST_CHECK_NONE = -1L
 
-/** @author Aidan Follestad (afollestad)*/
+/** @author Aidan Follestad (@afollestad)*/
 data class ServerModel(
   var id: Int = 0,
   val name: String,

@@ -12,7 +12,7 @@ import androidx.fragment.app.DialogFragment
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.nocknock.R
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 class AboutDialog : DialogFragment() {
   companion object {
     private const val TAG = "[ABOUT_DIALOG]"

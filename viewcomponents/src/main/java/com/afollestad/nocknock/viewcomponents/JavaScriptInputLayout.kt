@@ -16,7 +16,7 @@ import com.afollestad.nocknock.viewcomponents.ext.trimmedText
 import kotlinx.android.synthetic.main.javascript_input_layout.view.error_text
 import kotlinx.android.synthetic.main.javascript_input_layout.view.userInput
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 class JavaScriptInputLayout(
   context: Context,
   attrs: AttributeSet? = null

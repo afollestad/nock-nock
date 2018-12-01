@@ -20,7 +20,7 @@ import com.afollestad.nocknock.utilities.ext.systemService
 import okhttp3.OkHttpClient
 import javax.inject.Inject
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 class NockNockApp : Application(), Injector {
 
   companion object {

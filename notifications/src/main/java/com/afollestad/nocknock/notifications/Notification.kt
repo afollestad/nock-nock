@@ -12,7 +12,7 @@ import androidx.core.app.NotificationCompat
 typealias NotificationBuilder = NotificationCompat.Builder
 typealias NotificationConstructor = NotificationBuilder.() -> Unit
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 fun notification(
   context: Context,
   channel: Channel,

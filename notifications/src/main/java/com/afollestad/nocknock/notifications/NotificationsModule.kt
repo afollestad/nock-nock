@@ -9,7 +9,7 @@ import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 @Module
 abstract class NotificationsModule {
 

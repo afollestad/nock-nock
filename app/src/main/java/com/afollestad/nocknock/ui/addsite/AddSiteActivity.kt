@@ -52,7 +52,7 @@ private const val KEY_FAB_X = "fab_x"
 private const val KEY_FAB_Y = "fab_y"
 private const val KEY_FAB_SIZE = "fab_size"
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 fun MainActivity.intentToAdd(
   x: Float,
   y: Float,
@@ -64,7 +64,7 @@ fun MainActivity.intentToAdd(
   addFlags(FLAG_ACTIVITY_NO_ANIMATION)
 }
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 class AddSiteActivity : AppCompatActivity(), AddSiteView {
 
   companion object {

@@ -11,13 +11,13 @@ import android.graphics.BitmapFactory.decodeResource
 import androidx.annotation.DrawableRes
 import javax.inject.Inject
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 interface BitmapProvider {
 
   fun get(@DrawableRes res: Int): Bitmap
 }
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 class RealBitmapProvider @Inject constructor(
   private val app: Application
 ) : BitmapProvider {

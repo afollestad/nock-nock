@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import okhttp3.HttpUrl
 import javax.inject.Inject
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 data class InputErrors(
   var name: Int? = null,
   var url: Int? = null,
@@ -35,7 +35,7 @@ data class InputErrors(
   }
 }
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 interface AddSitePresenter {
 
   fun takeView(view: AddSiteView)
@@ -58,7 +58,7 @@ interface AddSitePresenter {
   fun dropView()
 }
 
-/** @author Aidan Follestad (afollestad) */
+/** @author Aidan Follestad (@afollestad) */
 class RealAddSitePresenter @Inject constructor(
   private val serverModelStore: ServerModelStore,
   private val checkStatusManager: CheckStatusManager
