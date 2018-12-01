@@ -6,7 +6,6 @@
 package com.afollestad.nocknock.ui.main
 
 import android.annotation.SuppressLint
-import android.app.ActivityOptions.makeSceneTransitionAnimation
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -149,11 +148,7 @@ class MainActivity : AppCompatActivity(), MainView {
       return
     }
 
-    startActivityForResult(
-        intentToView(model),
-        VIEW_SITE_RQ,
-        makeSceneTransitionAnimation(this).toBundle()
-    )
+    startActivityForResult(intentToView(model), VIEW_SITE_RQ)
   }
 
   private fun maybeRemoveSite(model: ServerModel) {
