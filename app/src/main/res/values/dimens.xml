@@ -1,10 +1,8 @@
 <resources>
 
-  <dimen name="title_font_size">20sp</dimen>
-  <dimen name="medium_text_size">16sp</dimen>
-  <dimen name="empty_text_size">26sp</dimen>
+  <dimen name="empty_text_size">28sp</dimen>
 
-  <dimen name="list_text_spacing">4dp</dimen>
+  <dimen name="list_text_spacing">6dp</dimen>
 
   <dimen name="fab_elevation">4dp</dimen>
   <dimen name="fab_elevation_pressed">8dp</dimen>
