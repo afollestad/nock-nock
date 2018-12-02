@@ -5,17 +5,16 @@
  */
 package com.afollestad.nocknock.engine.statuscheck
 
-import android.app.Application
-import android.app.job.JobInfo.NETWORK_TYPE_ANY
 import android.app.job.JobScheduler
 import android.app.job.JobScheduler.RESULT_SUCCESS
-import android.os.PersistableBundle
 import com.afollestad.nocknock.data.ServerModel
 import com.afollestad.nocknock.data.ServerStatus.ERROR
 import com.afollestad.nocknock.data.ServerStatus.OK
 import com.afollestad.nocknock.engine.R
 import com.afollestad.nocknock.engine.db.ServerModelStore
 import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob.Companion.KEY_SITE_ID
+import com.afollestad.nocknock.utilities.providers.BundleProvider
+import com.afollestad.nocknock.utilities.providers.JobInfoProvider
 import com.afollestad.nocknock.utilities.providers.StringProvider
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -38,7 +37,7 @@ interface CheckStatusManager {
   fun scheduleCheck(
     site: ServerModel,
     rightNow: Boolean = false,
-    cancelPrevious: Boolean = false,
+    cancelPrevious: Boolean = rightNow,
     fromFinishingJob: Boolean = false
   )
 
@@ -48,10 +47,11 @@ interface CheckStatusManager {
 }
 
 class RealCheckStatusManager @Inject constructor(
-  private val app: Application,
   private val jobScheduler: JobScheduler,
   private val okHttpClient: OkHttpClient,
   private val stringProvider: StringProvider,
+  private val bundleProvider: BundleProvider,
+  private val jobInfoProvider: JobInfoProvider,
   private val siteStore: ServerModelStore
 ) : CheckStatusManager {
 
@@ -90,25 +90,21 @@ class RealCheckStatusManager @Inject constructor(
     }
 
     log("Requesting a check job for site to be scheduled: $site")
-    val extras = PersistableBundle().apply {
+    val extras = bundleProvider.createPersistable {
       putInt(KEY_SITE_ID, site.id)
     }
+    val jobInfo = jobInfoProvider.createCheckJob(
+        id = site.id,
+        onlyUnmeteredNetwork = false,
+        delayMs = if (rightNow) {
+          1
+        } else {
+          site.checkInterval
+        },
+        extras = extras,
+        target = CheckStatusJob::class.java
+    )
 
-    // Note: we don't use the periodic feature of JobScheduler because it requires a
-    // minimum of 15 minutes between each execution which may not be what's requested by the
-    // user of the app.
-    val jobInfo = jobInfo(app, site.id, CheckStatusJob::class.java) {
-      setRequiredNetworkType(NETWORK_TYPE_ANY)
-      if (rightNow) {
-        log(">> Job for site ${site.id} should be executed now")
-        setMinimumLatency(1)
-      } else {
-        log(">> Job for site ${site.id} should be in ${site.checkInterval}ms")
-        setMinimumLatency(site.checkInterval)
-      }
-      setExtras(extras)
-      setPersisted(true)
-    }
     val dispatchResult = jobScheduler.schedule(jobInfo)
     if (dispatchResult != RESULT_SUCCESS) {
       log("Failed to schedule a check job for site: ${site.id}")

@@ -6,11 +6,15 @@
 package com.afollestad.nocknock.utilities
 
 import com.afollestad.nocknock.utilities.providers.BitmapProvider
+import com.afollestad.nocknock.utilities.providers.BundleProvider
 import com.afollestad.nocknock.utilities.providers.IntentProvider
+import com.afollestad.nocknock.utilities.providers.JobInfoProvider
 import com.afollestad.nocknock.utilities.providers.NotificationChannelProvider
 import com.afollestad.nocknock.utilities.providers.NotificationProvider
 import com.afollestad.nocknock.utilities.providers.RealBitmapProvider
+import com.afollestad.nocknock.utilities.providers.RealBundleProvider
 import com.afollestad.nocknock.utilities.providers.RealIntentProvider
+import com.afollestad.nocknock.utilities.providers.RealJobInfoProvider
 import com.afollestad.nocknock.utilities.providers.RealNotificationChannelProvider
 import com.afollestad.nocknock.utilities.providers.RealNotificationProvider
 import com.afollestad.nocknock.utilities.providers.RealSdkProvider
@@ -60,4 +64,16 @@ abstract class UtilitiesModule {
   abstract fun provideNotificationProvider(
     notificationProvider: RealNotificationProvider
   ): NotificationProvider
+
+  @Binds
+  @Singleton
+  abstract fun provideBundleProvider(
+    bundleProvider: RealBundleProvider
+  ): BundleProvider
+
+  @Binds
+  @Singleton
+  abstract fun provideJobInfoProvider(
+    jobInfoProvider: RealJobInfoProvider
+  ): JobInfoProvider
 }
