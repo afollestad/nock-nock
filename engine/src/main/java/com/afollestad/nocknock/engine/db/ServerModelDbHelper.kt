@@ -45,7 +45,7 @@ class ServerModelDbHelper(context: Context) : SQLiteOpenHelper(
     oldVersion: Int,
     newVersion: Int
   ) {
-    if (newVersion == 3 && oldVersion == 2) {
+    if (oldVersion < 3) {
       db.execSQL(
           "ALTER TABLE ${ServerModel.TABLE_NAME} " +
               "ADD COLUMN ${ServerModel.COLUMN_NETWORK_TIMEOUT} INTEGER DEFAULT 10000"
