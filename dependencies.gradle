@@ -23,6 +23,7 @@ ext.versions = [
     rxkPrefs          : '1.2.0',
 
     timber            : '4.7.1',
+    testRunner        : '1.0.2',
     junit             : '4.12',
     mockito           : '2.23.0',
     mockitoKotlin     : '2.0.0-RC1',

@@ -52,4 +52,9 @@ class ServerModelDbHelper(context: Context) : SQLiteOpenHelper(
     oldVersion: Int,
     newVersion: Int
   ) = onUpgrade(db, oldVersion, newVersion)
+
+  fun wipe() {
+    this.writableDatabase.execSQL(SQL_DELETE_ENTRIES)
+    onCreate(this.writableDatabase)
+  }
 }

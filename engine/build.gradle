@@ -10,6 +10,8 @@ android {
     targetSdkVersion versions.compileSdk
     versionCode versions.publishVersionCode
     versionName versions.publishVersion
+
+    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
   }
 }
 
@@ -32,6 +34,9 @@ dependencies {
   testImplementation 'org.mockito:mockito-core:' + versions.mockito
   testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:' + versions.mockitoKotlin
   testImplementation 'com.google.truth:truth:' + versions.truth
+
+  androidTestImplementation 'com.android.support.test:runner:' + versions.testRunner
+  androidTestImplementation 'com.google.truth:truth:' + versions.truth
 }
 
 apply from: '../spotless.gradle'

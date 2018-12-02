@@ -12,9 +12,10 @@ import com.afollestad.nocknock.data.ServerModel.Companion.COLUMN_ID
 import com.afollestad.nocknock.data.ServerModel.Companion.DEFAULT_SORT_ORDER
 import com.afollestad.nocknock.data.ServerModel.Companion.TABLE_NAME
 import com.afollestad.nocknock.utilities.ext.diffFrom
+import org.jetbrains.annotations.TestOnly
+import javax.inject.Inject
 import timber.log.Timber.d as log
 import timber.log.Timber.w as warn
-import javax.inject.Inject
 
 /** @author Aidan Follestad (@afollestad) */
 interface ServerModelStore {
@@ -127,6 +128,8 @@ class RealServerModelStore @Inject constructor(app: Application) : ServerModelSt
     log("Deleted all models")
     return dbHelper.writableDatabase.delete(TABLE_NAME, null, null)
   }
+
+  @TestOnly fun db() = dbHelper
 
   private fun readModels(cursor: Cursor): List<ServerModel> {
     val results = mutableListOf<ServerModel>()
