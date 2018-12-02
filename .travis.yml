@@ -1,4 +1,8 @@
 language: android
+env:
+  - CODECOV_TOKEN=bfdfe8e9-af1c-454f-aa27-87291922866e
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
 jdk: oraclejdk8
 android:
   components:
