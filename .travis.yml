@@ -1,8 +1,4 @@
 language: android
-env:
-  - CODECOV_TOKEN=bfdfe8e9-af1c-454f-aa27-87291922866e
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
 jdk: oraclejdk8
 android:
   components:
@@ -13,14 +9,6 @@ android:
     - extra-android-support
     - extra-android-m2repository
     - extra-google-m2repository
-
-    # Additional components
-    #- extra-google-google_play_services
-    #- addon-google_apis-google-19
-
-    # Specify at least one system image, if you need to run emulator(s) during your tests
-    #- sys-img-armeabi-v7a-android-19
-    #- sys-img-x86-android-17
 
   licenses:
     - '.+'
