@@ -22,12 +22,14 @@ import com.afollestad.nocknock.viewcomponents.ext.conceal
 import com.afollestad.nocknock.viewcomponents.ext.onItemSelected
 import com.afollestad.nocknock.viewcomponents.ext.onLayout
 import com.afollestad.nocknock.viewcomponents.ext.showOrHide
+import com.afollestad.nocknock.viewcomponents.ext.textAsInt
 import com.afollestad.nocknock.viewcomponents.ext.trimmedText
 import kotlinx.android.synthetic.main.activity_addsite.checkIntervalLayout
 import kotlinx.android.synthetic.main.activity_addsite.doneBtn
 import kotlinx.android.synthetic.main.activity_addsite.inputName
 import kotlinx.android.synthetic.main.activity_addsite.inputUrl
 import kotlinx.android.synthetic.main.activity_addsite.loadingProgress
+import kotlinx.android.synthetic.main.activity_addsite.responseTimeoutInput
 import kotlinx.android.synthetic.main.activity_addsite.responseValidationMode
 import kotlinx.android.synthetic.main.activity_addsite.responseValidationSearchTerm
 import kotlinx.android.synthetic.main.activity_addsite.rootView
@@ -99,6 +101,7 @@ class AddSiteActivity : AppCompatActivity(), AddSiteView {
       val checkInterval = checkIntervalLayout.getSelectedCheckInterval()
       val validationMode =
         responseValidationMode.selectedItemPosition.indexToValidationMode()
+      val defaultTimeout = getString(R.string.response_timeout_default).toInt()
 
       isClosing = true
       presenter.commit(
@@ -106,7 +109,8 @@ class AddSiteActivity : AppCompatActivity(), AddSiteView {
           url = inputUrl.trimmedText(),
           checkInterval = checkInterval,
           validationMode = validationMode,
-          validationContent = validationMode.validationContent()
+          validationContent = validationMode.validationContent(),
+          networkTimeout = responseTimeoutInput.textAsInt(defaultValue = defaultTimeout)
       )
     }
   }
@@ -165,6 +169,11 @@ class AddSiteActivity : AppCompatActivity(), AddSiteView {
           null
         }
     )
+    responseTimeoutInput.error = if (errors.networkTimeout != null) {
+      getString(errors.networkTimeout!!)
+    } else {
+      null
+    }
   }
 
   override fun onSiteAdded() {

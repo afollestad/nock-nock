@@ -156,7 +156,8 @@ class ViewSitePresenterTest {
         "https://test.com",
         1,
         STATUS_CODE,
-        null
+        null,
+        60000
     )
 
     val inputErrorsCaptor = argumentCaptor<InputErrors>()
@@ -174,7 +175,8 @@ class ViewSitePresenterTest {
         "",
         1,
         STATUS_CODE,
-        null
+        null,
+        60000
     )
 
     val inputErrorsCaptor = argumentCaptor<InputErrors>()
@@ -192,7 +194,8 @@ class ViewSitePresenterTest {
         "ftp://hello.com",
         1,
         STATUS_CODE,
-        null
+        null,
+        60000
     )
 
     val inputErrorsCaptor = argumentCaptor<InputErrors>()
@@ -210,7 +213,8 @@ class ViewSitePresenterTest {
         "https://hello.com",
         -1,
         STATUS_CODE,
-        null
+        null,
+        60000
     )
 
     val inputErrorsCaptor = argumentCaptor<InputErrors>()
@@ -228,7 +232,8 @@ class ViewSitePresenterTest {
         "https://hello.com",
         1,
         TERM_SEARCH,
-        null
+        null,
+        60000
     )
 
     val inputErrorsCaptor = argumentCaptor<InputErrors>()
@@ -246,7 +251,8 @@ class ViewSitePresenterTest {
         "https://hello.com",
         1,
         JAVASCRIPT,
-        null
+        null,
+        60000
     )
 
     val inputErrorsCaptor = argumentCaptor<InputErrors>()
@@ -256,6 +262,25 @@ class ViewSitePresenterTest {
 
     val errors = inputErrorsCaptor.firstValue
     assertThat(errors.javaScript).isEqualTo(R.string.please_enter_javaScript)
+  }
+
+  @Test fun commit_networkTimeout_error() {
+    presenter.commit(
+        "Testing",
+        "https://hello.com",
+        1,
+        STATUS_CODE,
+        null,
+        0
+    )
+
+    val inputErrorsCaptor = argumentCaptor<InputErrors>()
+    verify(view).setInputErrors(inputErrorsCaptor.capture())
+    verify(checkStatusManager, never())
+        .scheduleCheck(any(), any(), any(), any())
+
+    val errors = inputErrorsCaptor.firstValue
+    assertThat(errors.networkTimeout).isEqualTo(R.string.please_enter_networkTimeout)
   }
 
   @Test fun commit_success() = runBlocking {
@@ -274,7 +299,8 @@ class ViewSitePresenterTest {
         url,
         checkInterval,
         validationMode,
-        validationContent
+        validationContent,
+        60000
     )
 
     val modelCaptor = argumentCaptor<ServerModel>()

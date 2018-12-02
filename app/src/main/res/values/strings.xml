@@ -25,6 +25,7 @@
   <string name="please_enter_check_interval">Please input a check interval.</string>
   <string name="please_enter_search_term">Please input a search term.</string>
   <string name="please_enter_javaScript">Please input a validation script.</string>
+  <string name="please_enter_networkTimeout">Please enter a network timeout greater than 0.</string>
 
   <string name="options">Options</string>
   <string name="already_checking_sites">Already checking sites!</string>
@@ -48,6 +49,9 @@
   ]]></string>
   <string name="disable">Disable</string>
   <string name="renable_and_save_changes">Enable Checks &amp; Save Changes</string>
+
+  <string name="response_timeout">Network Response Timeout</string>
+  <string name="response_timeout_default">10000</string>
 
   <string name="refresh_status">Refresh Status</string>
 

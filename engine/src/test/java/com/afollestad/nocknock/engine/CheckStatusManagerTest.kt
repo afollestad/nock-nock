@@ -55,7 +55,12 @@ class CheckStatusManagerTest {
       bundleProvider,
       jobInfoProvider,
       store
-  )
+  ).apply {
+    setClientTimeoutChanger { _, timeout ->
+      whenever(okHttpClient.callTimeoutMillis()).doReturn(timeout)
+      return@setClientTimeoutChanger okHttpClient
+    }
+  }
 
   @Test fun ensureScheduledChecks_noEnabledSites() = runBlocking {
     val model1 = fakeModel().copy(disabled = true)
@@ -234,6 +239,8 @@ class CheckStatusManagerTest {
             reason = null
         )
     )
+    assertThat(okHttpClient.callTimeoutMillis())
+        .isEqualTo(model1.networkTimeout)
   }
 
   @Test fun performCheck_401_butStillSuccess() = runBlocking {
@@ -280,7 +287,8 @@ class CheckStatusManagerTest {
       id = 1,
       name = "Wakanda Forever",
       url = "https://www.wakanda.gov",
-      validationMode = STATUS_CODE
+      validationMode = STATUS_CODE,
+      networkTimeout = 60000
   )
 
   private fun fakeJob(id: Int): JobInfo {

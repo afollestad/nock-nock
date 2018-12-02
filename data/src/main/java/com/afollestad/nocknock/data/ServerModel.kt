@@ -27,7 +27,8 @@ data class ServerModel(
   val reason: String? = null,
   val validationMode: ValidationMode,
   val validationContent: String? = null,
-  val disabled: Boolean = false
+  val disabled: Boolean = false,
+  val networkTimeout: Int = 0
 ) : IdProvider {
 
   companion object {
@@ -42,6 +43,7 @@ data class ServerModel(
     const val COLUMN_VALIDATION_MODE = "validation_mode"
     const val COLUMN_VALIDATION_CONTENT = "validation_content"
     const val COLUMN_DISABLED = "disabled"
+    const val COLUMN_NETWORK_TIMEOUT = "network_timeout"
 
     const val DEFAULT_SORT_ORDER = "$COLUMN_NAME ASC, $COLUMN_DISABLED DESC"
 
@@ -58,7 +60,8 @@ data class ServerModel(
               cursor.getColumnIndex(COLUMN_VALIDATION_MODE)
           ).toValidationMode(),
           validationContent = cursor.getString(cursor.getColumnIndex(COLUMN_VALIDATION_CONTENT)),
-          disabled = cursor.getInt(cursor.getColumnIndex(COLUMN_DISABLED)) == 1
+          disabled = cursor.getInt(cursor.getColumnIndex(COLUMN_DISABLED)) == 1,
+          networkTimeout = cursor.getInt(cursor.getColumnIndex(COLUMN_NETWORK_TIMEOUT))
       )
     }
   }
@@ -81,5 +84,6 @@ data class ServerModel(
     put(COLUMN_VALIDATION_MODE, validationMode.value)
     put(COLUMN_VALIDATION_CONTENT, validationContent)
     put(COLUMN_DISABLED, disabled)
+    put(COLUMN_NETWORK_TIMEOUT, networkTimeout)
   }
 }

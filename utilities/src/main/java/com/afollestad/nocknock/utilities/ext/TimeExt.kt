@@ -24,7 +24,13 @@ fun Long.timeString() = when {
     "${ceil((this.toFloat() / DAY.toFloat()).toDouble()).toInt()}d"
   this >= HOUR ->
     "${ceil((this.toFloat() / HOUR.toFloat()).toDouble()).toInt()}h"
-  this >= MINUTE ->
-    "${ceil((this.toFloat() / MINUTE.toFloat()).toDouble()).toInt()}m"
+  this >= MINUTE -> {
+    val result = "${ceil((this.toFloat() / MINUTE.toFloat()).toDouble()).toInt()}m"
+    if (result == "60m") {
+      "1h"
+    } else {
+      result
+    }
+  }
   else -> "<1m"
 }

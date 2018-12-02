@@ -9,9 +9,14 @@ import android.widget.TextView
 
 fun TextView.trimmedText() = text.toString().trim()
 
-fun TextView.textAsLong(): Long {
+fun TextView.textAsInt(defaultValue: Int = 0): Int {
   val text = trimmedText()
-  return if (text.isEmpty()) 0L else text.toLong()
+  return if (text.isEmpty()) defaultValue else text.toInt()
+}
+
+fun TextView.textAsLong(defaultValue: Long = 0L): Long {
+  val text = trimmedText()
+  return if (text.isEmpty()) defaultValue else text.toLong()
 }
 
 ///** @author https://stackoverflow.com/a/53296137/309644 */

@@ -34,11 +34,12 @@ data class InputErrors(
   var url: Int? = null,
   var checkInterval: Int? = null,
   var termSearch: Int? = null,
-  var javaScript: Int? = null
+  var javaScript: Int? = null,
+  var networkTimeout: Int? = null
 ) {
   @CheckResult fun any(): Boolean {
     return name != null || url != null || checkInterval != null ||
-        termSearch != null || javaScript != null
+        termSearch != null || javaScript != null || networkTimeout != null
   }
 }
 
@@ -66,7 +67,8 @@ interface ViewSitePresenter {
     url: String,
     checkInterval: Long,
     validationMode: ValidationMode,
-    validationContent: String?
+    validationContent: String?,
+    networkTimeout: Int
   )
 
   fun checkNow()
@@ -151,7 +153,8 @@ class RealViewSitePresenter @Inject constructor(
     url: String,
     checkInterval: Long,
     validationMode: ValidationMode,
-    validationContent: String?
+    validationContent: String?,
+    networkTimeout: Int
   ) {
     val inputErrors = InputErrors()
 
@@ -171,6 +174,9 @@ class RealViewSitePresenter @Inject constructor(
     } else if (validationMode == JAVASCRIPT && validationContent.isNullOrEmpty()) {
       inputErrors.javaScript = R.string.please_enter_javaScript
     }
+    if (networkTimeout <= 0) {
+      inputErrors.networkTimeout = R.string.please_enter_networkTimeout
+    }
 
     if (inputErrors.any()) {
       view?.setInputErrors(inputErrors)
@@ -184,7 +190,8 @@ class RealViewSitePresenter @Inject constructor(
         checkInterval = checkInterval,
         validationMode = validationMode,
         validationContent = validationContent,
-        disabled = false
+        disabled = false,
+        networkTimeout = networkTimeout
     )
 
     with(view!!) {

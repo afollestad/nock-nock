@@ -33,6 +33,7 @@ import com.afollestad.nocknock.viewcomponents.ext.dimenFloat
 import com.afollestad.nocknock.viewcomponents.ext.onItemSelected
 import com.afollestad.nocknock.viewcomponents.ext.onScroll
 import com.afollestad.nocknock.viewcomponents.ext.showOrHide
+import com.afollestad.nocknock.viewcomponents.ext.textAsInt
 import com.afollestad.nocknock.viewcomponents.ext.trimmedText
 import kotlinx.android.synthetic.main.activity_viewsite.checkIntervalLayout
 import kotlinx.android.synthetic.main.activity_viewsite.disableChecksButton
@@ -41,6 +42,7 @@ import kotlinx.android.synthetic.main.activity_viewsite.iconStatus
 import kotlinx.android.synthetic.main.activity_viewsite.inputName
 import kotlinx.android.synthetic.main.activity_viewsite.inputUrl
 import kotlinx.android.synthetic.main.activity_viewsite.loadingProgress
+import kotlinx.android.synthetic.main.activity_viewsite.responseTimeoutInput
 import kotlinx.android.synthetic.main.activity_viewsite.responseValidationMode
 import kotlinx.android.synthetic.main.activity_viewsite.responseValidationSearchTerm
 import kotlinx.android.synthetic.main.activity_viewsite.rootView
@@ -113,13 +115,15 @@ class ViewSiteActivity : AppCompatActivity(), ViewSiteView {
       val checkInterval = checkIntervalLayout.getSelectedCheckInterval()
       val validationMode =
         responseValidationMode.selectedItemPosition.indexToValidationMode()
+      val defaultTimeout = getString(R.string.response_timeout_default).toInt()
 
       presenter.commit(
           name = inputName.trimmedText(),
           url = inputUrl.trimmedText(),
           checkInterval = checkInterval,
           validationMode = validationMode,
-          validationContent = validationMode.validationContent()
+          validationContent = validationMode.validationContent(),
+          networkTimeout = responseTimeoutInput.textAsInt(defaultValue = defaultTimeout)
       )
     }
 
@@ -189,6 +193,8 @@ class ViewSiteActivity : AppCompatActivity(), ViewSiteView {
       }
     }
 
+    responseTimeoutInput.setText(model.networkTimeout.toString())
+
     disableChecksButton.showOrHide(!this.disabled)
     doneBtn.setText(
         if (this.disabled) R.string.renable_and_save_changes
@@ -228,6 +234,11 @@ class ViewSiteActivity : AppCompatActivity(), ViewSiteView {
           null
         }
     )
+    responseTimeoutInput.error = if (errors.networkTimeout != null) {
+      getString(errors.networkTimeout!!)
+    } else {
+      null
+    }
   }
 
   override fun scopeWhileAttached(

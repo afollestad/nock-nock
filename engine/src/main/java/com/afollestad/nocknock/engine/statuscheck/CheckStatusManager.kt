@@ -19,7 +19,9 @@ import com.afollestad.nocknock.utilities.providers.StringProvider
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import org.jetbrains.annotations.TestOnly
 import java.net.SocketTimeoutException
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import javax.inject.Inject
 import timber.log.Timber.d as log
 
@@ -28,6 +30,8 @@ data class CheckResult(
   val model: ServerModel,
   val response: Response? = null
 )
+
+typealias ClientTimeoutChanger = (client: OkHttpClient, timeout: Int) -> OkHttpClient
 
 /** @author Aidan Follestad (@afollestad) */
 interface CheckStatusManager {
@@ -54,6 +58,12 @@ class RealCheckStatusManager @Inject constructor(
   private val jobInfoProvider: JobInfoProvider,
   private val siteStore: ServerModelStore
 ) : CheckStatusManager {
+
+  private var clientTimeoutChanger: ClientTimeoutChanger = { client, timeout ->
+    client.newBuilder()
+        .callTimeout(timeout.toLong(), MILLISECONDS)
+        .build()
+  }
 
   override suspend fun ensureScheduledChecks() {
     val sites = siteStore.get()
@@ -121,6 +131,7 @@ class RealCheckStatusManager @Inject constructor(
 
   override suspend fun performCheck(site: ServerModel): CheckResult {
     check(site.id != 0) { "Cannot schedule checks for jobs with no ID." }
+    check(site.networkTimeout > 0) { "Network timeout not set for site ${site.id}" }
     log("performCheck(${site.id}) - GET ${site.url}")
 
     val request = Request.Builder()
@@ -129,8 +140,10 @@ class RealCheckStatusManager @Inject constructor(
         .build()
 
     return try {
-      val response = okHttpClient.newCall(request)
+      val client = clientTimeoutChanger(okHttpClient, site.networkTimeout)
+      val response = client.newCall(request)
           .execute()
+
       if (response.isSuccessful || response.code() == 401) {
         log("performCheck(${site.id}) = Successful")
         CheckResult(
@@ -164,4 +177,8 @@ class RealCheckStatusManager @Inject constructor(
   private fun jobForSite(site: ServerModel) =
     jobScheduler.allPendingJobs
         .firstOrNull { job -> job.id == site.id }
+
+  @TestOnly fun setClientTimeoutChanger(changer: ClientTimeoutChanger) {
+    this.clientTimeoutChanger = changer
+  }
 }
