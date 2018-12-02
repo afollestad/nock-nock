@@ -63,7 +63,7 @@ class ViewSitePresenterTest {
     }.whenever(view)
         .scopeWhileAttached(any(), any())
 
-    val model = fakeModel().copy(lastCheck = 0)
+    val model = fakeModel()
     val intent = fakeIntent("")
     whenever(intent.getSerializableExtra(KEY_VIEW_MODEL))
         .doReturn(model)
@@ -80,7 +80,7 @@ class ViewSitePresenterTest {
     val badIntent = fakeIntent("Hello World")
     presenter.onBroadcast(badIntent)
 
-    val model = fakeModel()
+    val model = fakeModel().copy(lastCheck = 0)
     val goodIntent = fakeIntent(ACTION_STATUS_UPDATE)
     whenever(goodIntent.getSerializableExtra(KEY_UPDATE_MODEL))
         .doReturn(model)
@@ -94,7 +94,7 @@ class ViewSitePresenterTest {
     val badIntent = fakeIntent(ACTION_STATUS_UPDATE)
     presenter.onBroadcast(badIntent)
 
-    val model = fakeModel()
+    val model = fakeModel().copy(lastCheck = 0)
     val goodIntent = fakeIntent(ACTION_STATUS_UPDATE)
     whenever(goodIntent.getSerializableExtra(KEY_VIEW_MODEL))
         .doReturn(model)
