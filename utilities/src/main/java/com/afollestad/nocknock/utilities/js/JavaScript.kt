@@ -5,8 +5,6 @@
  */
 package com.afollestad.nocknock.utilities.js
 
-import android.util.Log
-import com.afollestad.nocknock.utilities.BuildConfig
 import org.mozilla.javascript.Context
 import org.mozilla.javascript.EvaluatorException
 import org.mozilla.javascript.Function
@@ -62,21 +60,12 @@ object JavaScript {
           }
         }
 
-        log(
-            "Evaluated to $message ($success): $code"
-        )
         return if (!success) message else null
       } finally {
         Context.exit()
       }
     } catch (e: EvaluatorException) {
       return e.message
-    }
-  }
-
-  private fun log(message: String) {
-    if (BuildConfig.DEBUG) {
-      Log.d("JavaScript", message)
     }
   }
 }

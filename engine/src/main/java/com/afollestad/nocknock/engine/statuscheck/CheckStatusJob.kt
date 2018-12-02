@@ -8,7 +8,6 @@ package com.afollestad.nocknock.engine.statuscheck
 import android.app.job.JobParameters
 import android.app.job.JobService
 import android.content.Intent
-import android.util.Log
 import com.afollestad.nocknock.data.ServerModel
 import com.afollestad.nocknock.data.ServerStatus
 import com.afollestad.nocknock.data.ServerStatus.CHECKING
@@ -21,7 +20,6 @@ import com.afollestad.nocknock.data.isPending
 import com.afollestad.nocknock.engine.BuildConfig.APPLICATION_ID
 import com.afollestad.nocknock.engine.db.ServerModelStore
 import com.afollestad.nocknock.notifications.NockNotificationManager
-import com.afollestad.nocknock.utilities.BuildConfig
 import com.afollestad.nocknock.utilities.ext.injector
 import com.afollestad.nocknock.utilities.js.JavaScript
 import kotlinx.coroutines.Dispatchers.IO
@@ -32,6 +30,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.System.currentTimeMillis
 import javax.inject.Inject
+import timber.log.Timber.d as log
 
 /** @author Aidan Follestad (@afollestad)*/
 class CheckStatusJob : JobService() {
@@ -41,12 +40,6 @@ class CheckStatusJob : JobService() {
     const val ACTION_JOB_RUNNING = "$APPLICATION_ID.STATUS_JOB_RUNNING"
     const val KEY_UPDATE_MODEL = "site_model"
     const val KEY_SITE_ID = "site.id"
-
-    private fun log(message: String) {
-      if (BuildConfig.DEBUG) {
-        Log.d("CheckStatusJob", message)
-      }
-    }
   }
 
   @Inject lateinit var modelStore: ServerModelStore

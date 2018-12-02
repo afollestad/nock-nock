@@ -7,13 +7,13 @@ package com.afollestad.nocknock.engine.db
 
 import android.app.Application
 import android.database.Cursor
-import android.util.Log
 import com.afollestad.nocknock.data.ServerModel
 import com.afollestad.nocknock.data.ServerModel.Companion.COLUMN_ID
 import com.afollestad.nocknock.data.ServerModel.Companion.DEFAULT_SORT_ORDER
 import com.afollestad.nocknock.data.ServerModel.Companion.TABLE_NAME
-import com.afollestad.nocknock.engine.BuildConfig
 import com.afollestad.nocknock.utilities.ext.diffFrom
+import timber.log.Timber.d as log
+import timber.log.Timber.w as warn
 import javax.inject.Inject
 
 /** @author Aidan Follestad (@afollestad) */
@@ -34,21 +34,6 @@ interface ServerModelStore {
 
 /** @author Aidan Follestad (@afollestad) */
 class RealServerModelStore @Inject constructor(app: Application) : ServerModelStore {
-
-  companion object {
-    private fun log(
-      message: String,
-      warning: Boolean = false
-    ) {
-      if (BuildConfig.DEBUG) {
-        if (warning) {
-          Log.w("ServerModelStore", message)
-        } else {
-          Log.d("ServerModelStore", message)
-        }
-      }
-    }
-  }
 
   private val dbHelper = ServerModelDbHelper(app)
 
@@ -115,7 +100,7 @@ class RealServerModelStore @Inject constructor(app: Application) : ServerModelSt
     val valuesDiff = oldValues.diffFrom(newValues)
 
     if (valuesDiff.size() == 0) {
-      log("Nothing has changed - nothing to update!", warning = true)
+      warn("Nothing has changed - nothing to update!")
       return 0
     }
 

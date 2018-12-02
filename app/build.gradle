@@ -35,6 +35,7 @@ dependencies {
 
   implementation 'com.afollestad.material-dialogs:core:' + versions.materialDialogs
 
+  implementation 'com.jakewharton.timber:timber:' + versions.timber
   testImplementation 'junit:junit:' + versions.junit
   testImplementation 'org.mockito:mockito-core:' + versions.mockito
   testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:' + versions.mockitoKotlin

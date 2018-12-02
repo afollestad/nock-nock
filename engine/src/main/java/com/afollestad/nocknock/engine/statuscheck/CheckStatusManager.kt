@@ -10,20 +10,19 @@ import android.app.job.JobInfo.NETWORK_TYPE_ANY
 import android.app.job.JobScheduler
 import android.app.job.JobScheduler.RESULT_SUCCESS
 import android.os.PersistableBundle
-import android.util.Log
 import com.afollestad.nocknock.data.ServerModel
 import com.afollestad.nocknock.data.ServerStatus.ERROR
 import com.afollestad.nocknock.data.ServerStatus.OK
 import com.afollestad.nocknock.engine.R
 import com.afollestad.nocknock.engine.db.ServerModelStore
 import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob.Companion.KEY_SITE_ID
-import com.afollestad.nocknock.utilities.BuildConfig
 import com.afollestad.nocknock.utilities.providers.StringProvider
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import java.net.SocketTimeoutException
 import javax.inject.Inject
+import timber.log.Timber.d as log
 
 /** @author Aidan Follestad (@afollestad) */
 data class CheckResult(
@@ -55,14 +54,6 @@ class RealCheckStatusManager @Inject constructor(
   private val stringProvider: StringProvider,
   private val siteStore: ServerModelStore
 ) : CheckStatusManager {
-
-  companion object {
-    private fun log(message: String) {
-      if (BuildConfig.DEBUG) {
-        Log.d("CheckStatusManager", message)
-      }
-    }
-  }
 
   override suspend fun ensureScheduledChecks() {
     val sites = siteStore.get()

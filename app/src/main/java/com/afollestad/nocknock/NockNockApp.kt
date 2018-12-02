@@ -6,7 +6,6 @@
 package com.afollestad.nocknock
 
 import android.app.Application
-import android.util.Log
 import com.afollestad.nocknock.di.AppComponent
 import com.afollestad.nocknock.di.DaggerAppComponent
 import com.afollestad.nocknock.engine.statuscheck.BootReceiver
@@ -18,18 +17,13 @@ import com.afollestad.nocknock.ui.viewsite.ViewSiteActivity
 import com.afollestad.nocknock.utilities.Injector
 import com.afollestad.nocknock.utilities.ext.systemService
 import okhttp3.OkHttpClient
+import timber.log.Timber
+import timber.log.Timber.DebugTree
 import javax.inject.Inject
+import timber.log.Timber.d as log
 
 /** @author Aidan Follestad (@afollestad) */
 class NockNockApp : Application(), Injector {
-
-  companion object {
-    private fun log(message: String) {
-      if (BuildConfig.DEBUG) {
-        Log.d("NockNockApp", message)
-      }
-    }
-  }
 
   private lateinit var appComponent: AppComponent
   @Inject lateinit var nockNotificationManager: NockNotificationManager
@@ -38,6 +32,10 @@ class NockNockApp : Application(), Injector {
 
   override fun onCreate() {
     super.onCreate()
+
+    if (BuildConfig.DEBUG) {
+      Timber.plant(DebugTree())
+    }
 
     val okHttpClient = OkHttpClient.Builder()
         .addNetworkInterceptor { chain ->

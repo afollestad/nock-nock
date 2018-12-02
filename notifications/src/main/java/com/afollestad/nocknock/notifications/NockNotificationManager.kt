@@ -6,20 +6,19 @@
 package com.afollestad.nocknock.notifications
 
 import android.annotation.TargetApi
-import android.app.Application
 import android.app.NotificationManager
 import android.os.Build.VERSION_CODES
-import android.util.Log
-import androidx.core.app.NotificationCompat.DEFAULT_VIBRATE
 import com.afollestad.nocknock.data.ServerModel
 import com.afollestad.nocknock.notifications.Channel.CheckFailures
 import com.afollestad.nocknock.utilities.providers.BitmapProvider
 import com.afollestad.nocknock.utilities.providers.IntentProvider
+import com.afollestad.nocknock.utilities.providers.NotificationChannelProvider
+import com.afollestad.nocknock.utilities.providers.NotificationProvider
 import com.afollestad.nocknock.utilities.providers.RealIntentProvider.Companion.BASE_NOTIFICATION_REQUEST_CODE
 import com.afollestad.nocknock.utilities.providers.StringProvider
 import com.afollestad.nocknock.utilities.qualifiers.AppIconRes
-import com.afollestad.nocknock.utilities.util.hasOreo
 import javax.inject.Inject
+import timber.log.Timber.d as log
 
 /** @author Aidan Follestad (@afollestad) */
 interface NockNotificationManager {
@@ -37,21 +36,14 @@ interface NockNotificationManager {
 
 /** @author Aidan Follestad (@afollestad) */
 class RealNockNotificationManager @Inject constructor(
-  private val app: Application,
   @AppIconRes private val appIconRes: Int,
   private val stockManager: NotificationManager,
   private val bitmapProvider: BitmapProvider,
   private val stringProvider: StringProvider,
-  private val intentProvider: IntentProvider
+  private val intentProvider: IntentProvider,
+  private val channelProvider: NotificationChannelProvider,
+  private val notificationProvider: NotificationProvider
 ) : NockNotificationManager {
-
-  companion object {
-    private fun log(message: String) {
-      if (BuildConfig.DEBUG) {
-        Log.d("NockNotificationManager", message)
-      }
-    }
-  }
 
   private var isAppOpen = false
 
@@ -73,15 +65,14 @@ class RealNockNotificationManager @Inject constructor(
     log("Posting status notification for site ${model.id}...")
     val intent = intentProvider.getPendingIntentForViewSite(model)
 
-    val newNotification = notification(app, CheckFailures) {
-      setContentTitle(model.name)
-      setContentText(stringProvider.get(R.string.something_wrong))
-      setContentIntent(intent)
-      setSmallIcon(R.drawable.ic_notification)
-      setLargeIcon(bitmapProvider.get(appIconRes))
-      setAutoCancel(true)
-      setDefaults(DEFAULT_VIBRATE)
-    }
+    val newNotification = notificationProvider.create(
+        channelId = CheckFailures.id,
+        title = model.name,
+        content = stringProvider.get(R.string.something_wrong),
+        intent = intent,
+        smallIcon = R.drawable.ic_notification,
+        largeIcon = bitmapProvider.get(appIconRes)
+    )
 
     stockManager.notify(model.url, model.notificationId(), newNotification)
     log("Posted status notification for site ${model.notificationId()}.")
@@ -96,13 +87,13 @@ class RealNockNotificationManager @Inject constructor(
 
   @TargetApi(VERSION_CODES.O)
   private fun createChannel(channel: Channel) {
-    if (!hasOreo()) {
-      log("Not running Android O, channels won't be created.")
-      return
-    }
-
-    val notificationChannel = channel.toNotificationChannel(app)
-    stockManager.createNotificationChannel(notificationChannel)
+    val notificationChannel = channelProvider.create(
+        id = channel.id,
+        title = stringProvider.get(channel.title),
+        description = stringProvider.get(channel.description),
+        importance = channel.importance
+    )
+    notificationChannel?.let(stockManager::createNotificationChannel)
     log("Created notification channel ${channel.id}")
   }
 
