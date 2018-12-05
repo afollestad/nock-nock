@@ -17,13 +17,13 @@ package com.afollestad.nocknock.engine
 
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
-import com.afollestad.nocknock.data.ServerModel
-import com.afollestad.nocknock.data.ServerStatus.ERROR
-import com.afollestad.nocknock.data.ServerStatus.OK
-import com.afollestad.nocknock.data.ValidationMode.STATUS_CODE
-import com.afollestad.nocknock.engine.db.ServerModelStore
-import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob.Companion.KEY_SITE_ID
-import com.afollestad.nocknock.engine.statuscheck.RealCheckStatusManager
+import com.afollestad.nocknock.data.legacy.ServerModel
+import com.afollestad.nocknock.data.model.Status.ERROR
+import com.afollestad.nocknock.data.model.Status.OK
+import com.afollestad.nocknock.data.model.ValidationMode.STATUS_CODE
+import com.afollestad.nocknock.data.legacy.ServerModelStore
+import com.afollestad.nocknock.engine.statuscheck.ValidationJob.Companion.KEY_SITE_ID
+import com.afollestad.nocknock.engine.statuscheck.RealValidationManager
 import com.afollestad.nocknock.utilities.providers.StringProvider
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
@@ -58,7 +58,7 @@ class CheckStatusManagerTest {
   private val jobInfoProvider = testJobInfoProvider()
   private val store = mock<ServerModelStore>()
 
-  private val manager = RealCheckStatusManager(
+  private val manager = RealValidationManager(
       jobScheduler,
       okHttpClient,
       stringProvider,

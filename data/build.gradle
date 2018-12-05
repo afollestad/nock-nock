@@ -1,6 +1,7 @@
 apply from: '../dependencies.gradle'
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
   compileSdkVersion versions.compileSdk
@@ -10,6 +11,8 @@ android {
     targetSdkVersion versions.compileSdk
     versionCode versions.publishVersionCode
     versionName versions.publishVersion
+
+    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
   }
 }
 
@@ -17,6 +20,17 @@ dependencies {
   implementation project(':utilities')
 
   implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:' + versions.kotlin
+
+  implementation 'com.google.dagger:dagger:' + versions.dagger
+  annotationProcessor 'com.google.dagger:dagger-compiler:' + versions.dagger
+
+  api 'androidx.room:room-runtime:' + versions.room
+  kapt 'androidx.room:room-compiler:' + versions.room
+
+  androidTestImplementation 'androidx.test:runner:' + versions.androidxTestRunner
+  androidTestImplementation 'androidx.test:rules:' + versions.androidxTestRunner
+  androidTestImplementation 'androidx.test:core:' + versions.androidxTest
+  androidTestImplementation 'com.google.truth:truth:' + versions.truth
 }
 
 apply from: '../spotless.gradle'

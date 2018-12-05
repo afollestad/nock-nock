@@ -20,8 +20,8 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.graphics.Bitmap
-import com.afollestad.nocknock.data.ServerModel
-import com.afollestad.nocknock.data.ValidationMode.STATUS_CODE
+import com.afollestad.nocknock.data.legacy.ServerModel
+import com.afollestad.nocknock.data.model.ValidationMode.STATUS_CODE
 import com.afollestad.nocknock.notifications.Channel.CheckFailures
 import com.afollestad.nocknock.utilities.providers.BitmapProvider
 import com.afollestad.nocknock.utilities.providers.IntentProvider

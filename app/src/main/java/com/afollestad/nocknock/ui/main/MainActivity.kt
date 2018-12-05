@@ -28,9 +28,9 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItems
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.adapter.ServerAdapter
-import com.afollestad.nocknock.data.ServerModel
+import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.dialogs.AboutDialog
-import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob.Companion.ACTION_STATUS_UPDATE
+import com.afollestad.nocknock.engine.statuscheck.ValidationJob.Companion.ACTION_STATUS_UPDATE
 import com.afollestad.nocknock.utilities.ext.ScopeReceiver
 import com.afollestad.nocknock.utilities.ext.injector
 import com.afollestad.nocknock.utilities.ext.safeRegisterReceiver
@@ -39,6 +39,7 @@ import com.afollestad.nocknock.utilities.ext.scopeWhileAttached
 import com.afollestad.nocknock.viewcomponents.ext.showOrHide
 import kotlinx.android.synthetic.main.activity_main.fab
 import kotlinx.android.synthetic.main.activity_main.list
+import kotlinx.android.synthetic.main.activity_main.loadingProgress
 import kotlinx.android.synthetic.main.activity_main.rootView
 import kotlinx.android.synthetic.main.activity_main.toolbar
 import kotlinx.android.synthetic.main.include_empty_view.emptyText
@@ -109,18 +110,22 @@ class MainActivity : AppCompatActivity(), MainView {
     super.onDestroy()
   }
 
-  override fun setModels(models: List<ServerModel>) {
+  override fun setLoading() = loadingProgress.setLoading()
+
+  override fun setDoneLoading() = loadingProgress.setDone()
+
+  override fun setModels(models: List<Site>) {
     list.post {
       adapter.set(models)
       emptyText.showOrHide(models.isEmpty())
     }
   }
 
-  override fun updateModel(model: ServerModel) {
+  override fun updateModel(model: Site) {
     list.post { adapter.update(model) }
   }
 
-  override fun onSiteDeleted(model: ServerModel) {
+  override fun onSiteDeleted(model: Site) {
     list.post {
       adapter.remove(model)
       emptyText.showOrHide(adapter.itemCount == 0)
@@ -133,7 +138,7 @@ class MainActivity : AppCompatActivity(), MainView {
   ) = rootView.scopeWhileAttached(context, exec)
 
   private fun onSiteSelected(
-    model: ServerModel,
+    model: Site,
     longClick: Boolean
   ) {
     if (longClick) {

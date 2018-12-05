@@ -16,16 +16,17 @@
 package com.afollestad.nocknock
 
 import android.content.Intent
-import com.afollestad.nocknock.data.LAST_CHECK_NONE
-import com.afollestad.nocknock.data.ServerModel
-import com.afollestad.nocknock.data.ServerStatus.WAITING
-import com.afollestad.nocknock.data.ValidationMode.JAVASCRIPT
-import com.afollestad.nocknock.data.ValidationMode.STATUS_CODE
-import com.afollestad.nocknock.data.ValidationMode.TERM_SEARCH
-import com.afollestad.nocknock.engine.db.ServerModelStore
-import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob.Companion.ACTION_STATUS_UPDATE
-import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob.Companion.KEY_UPDATE_MODEL
-import com.afollestad.nocknock.engine.statuscheck.CheckStatusManager
+import com.afollestad.nocknock.data.model.Site
+import com.afollestad.nocknock.data.model.SiteSettings
+import com.afollestad.nocknock.data.model.Status.ERROR
+import com.afollestad.nocknock.data.model.Status.WAITING
+import com.afollestad.nocknock.data.model.ValidationMode.JAVASCRIPT
+import com.afollestad.nocknock.data.model.ValidationMode.STATUS_CODE
+import com.afollestad.nocknock.data.model.ValidationMode.TERM_SEARCH
+import com.afollestad.nocknock.data.model.ValidationResult
+import com.afollestad.nocknock.engine.statuscheck.ValidationJob.Companion.ACTION_STATUS_UPDATE
+import com.afollestad.nocknock.engine.statuscheck.ValidationJob.Companion.KEY_UPDATE_MODEL
+import com.afollestad.nocknock.engine.statuscheck.ValidationManager
 import com.afollestad.nocknock.notifications.NockNotificationManager
 import com.afollestad.nocknock.ui.viewsite.InputErrors
 import com.afollestad.nocknock.ui.viewsite.KEY_VIEW_MODEL
@@ -47,20 +48,17 @@ import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import java.lang.System.currentTimeMillis
 
 class ViewSitePresenterTest {
 
-  private val serverModelStore = mock<ServerModelStore> {
-    on { runBlocking { put(any()) } } doAnswer { inv ->
-      inv.getArgument<ServerModel>(0)
-    }
-  }
-  private val checkStatusManager = mock<CheckStatusManager>()
+  private val database = mockDatabase()
+  private val checkStatusManager = mock<ValidationManager>()
   private val notificationManager = mock<NockNotificationManager>()
   private val view = mock<ViewSiteView>()
 
   private val presenter = RealViewSitePresenter(
-      serverModelStore,
+      database,
       checkStatusManager,
       notificationManager
   )
@@ -73,13 +71,12 @@ class ViewSitePresenterTest {
     }.whenever(view)
         .scopeWhileAttached(any(), any())
 
-    val model = fakeModel()
     val intent = fakeIntent("")
     whenever(intent.getSerializableExtra(KEY_VIEW_MODEL))
-        .doReturn(model)
+        .doReturn(MOCK_MODEL_1)
     presenter.takeView(view, intent)
-    assertThat(presenter.currentModel()).isEqualTo(model)
-    verify(view, times(1)).displayModel(model)
+    assertThat(presenter.currentModel()).isEqualTo(MOCK_MODEL_1)
+    verify(view, times(1)).displayModel(MOCK_MODEL_1)
   }
 
   @After fun destroy() {
@@ -90,27 +87,25 @@ class ViewSitePresenterTest {
     val badIntent = fakeIntent("Hello World")
     presenter.onBroadcast(badIntent)
 
-    val model = fakeModel().copy(lastCheck = 0)
     val goodIntent = fakeIntent(ACTION_STATUS_UPDATE)
     whenever(goodIntent.getSerializableExtra(KEY_UPDATE_MODEL))
-        .doReturn(model)
+        .doReturn(MOCK_MODEL_2)
 
     presenter.onBroadcast(goodIntent)
-    assertThat(presenter.currentModel()).isEqualTo(model)
-    verify(view, times(1)).displayModel(model)
+    assertThat(presenter.currentModel()).isEqualTo(MOCK_MODEL_2)
+    verify(view, times(1)).displayModel(MOCK_MODEL_2)
   }
 
   @Test fun onNewIntent() {
     val badIntent = fakeIntent(ACTION_STATUS_UPDATE)
     presenter.onBroadcast(badIntent)
 
-    val model = fakeModel().copy(lastCheck = 0)
     val goodIntent = fakeIntent(ACTION_STATUS_UPDATE)
     whenever(goodIntent.getSerializableExtra(KEY_VIEW_MODEL))
-        .doReturn(model)
+        .doReturn(MOCK_MODEL_3)
     presenter.onBroadcast(goodIntent)
 
-    verify(view, times(1)).displayModel(model)
+    verify(view, times(1)).displayModel(MOCK_MODEL_3)
   }
 
   @Test fun onUrlInputFocusChange_focused() {
@@ -298,10 +293,19 @@ class ViewSitePresenterTest {
     val url = "https://hello.com"
     val checkInterval = 60000L
     val validationMode = TERM_SEARCH
-    val validationContent = "Hello World"
+    val validationArgs = "Hello World"
 
-    val disabledModel = presenter.currentModel()
-        .copy(disabled = true)
+    val currentModel = presenter.currentModel()
+    val initialLastResult = ValidationResult(
+        siteId = currentModel.id,
+        timestampMs = currentTimeMillis() - 60000,
+        status = ERROR,
+        reason = "Oh no!"
+    )
+    val disabledModel = currentModel.copy(
+        settings = currentModel.settings!!.copy(disabled = true),
+        lastResult = initialLastResult
+    )
     presenter.setModel(disabledModel)
 
     presenter.commit(
@@ -309,21 +313,38 @@ class ViewSitePresenterTest {
         url,
         checkInterval,
         validationMode,
-        validationContent,
+        validationArgs,
         60000
     )
 
-    val modelCaptor = argumentCaptor<ServerModel>()
-    verify(view).setLoading()
-    verify(serverModelStore).update(modelCaptor.capture())
+    val siteCaptor = argumentCaptor<Site>()
+    val settingsCaptor = argumentCaptor<SiteSettings>()
+    val resultCaptor = argumentCaptor<ValidationResult>()
 
-    val model = modelCaptor.firstValue
-    assertThat(model.name).isEqualTo(name)
-    assertThat(model.url).isEqualTo(url)
-    assertThat(model.checkInterval).isEqualTo(checkInterval)
-    assertThat(model.validationMode).isEqualTo(validationMode)
-    assertThat(model.validationContent).isEqualTo(validationContent)
-    assertThat(model.disabled).isFalse()
+    verify(view).setLoading()
+    verify(database.siteDao()).update(siteCaptor.capture())
+    verify(database.siteSettingsDao()).update(settingsCaptor.capture())
+    verify(database.validationResultsDao()).update(resultCaptor.capture())
+
+    val model = siteCaptor.firstValue
+    model.apply {
+      assertThat(this.name).isEqualTo(name)
+      assertThat(this.url).isEqualTo(url)
+    }
+
+    val settings = settingsCaptor.firstValue
+    settings.apply {
+      assertThat(this.validationIntervalMs).isEqualTo(checkInterval)
+      assertThat(this.validationArgs).isEqualTo(validationArgs)
+      assertThat(this.disabled).isFalse()
+    }
+
+    val result = resultCaptor.firstValue
+    result.apply {
+      assertThat(this.status).isEqualTo(WAITING)
+      assertThat(this.reason).isNull()
+      assertThat(this.timestampMs).isGreaterThan(0)
+    }
 
     verify(view, never()).setInputErrors(any())
     verify(checkStatusManager).scheduleCheck(
@@ -338,9 +359,7 @@ class ViewSitePresenterTest {
 
   @Test fun checkNow() {
     val newModel = presenter.currentModel()
-        .copy(
-            status = WAITING
-        )
+        .withStatus(status = WAITING)
     presenter.checkNow()
 
     verify(view, never()).setLoading()
@@ -360,11 +379,18 @@ class ViewSitePresenterTest {
     verify(notificationManager).cancelStatusNotification(model)
     verify(view).setLoading()
 
-    val modelCaptor = argumentCaptor<ServerModel>()
-    verify(serverModelStore).update(modelCaptor.capture())
+    val modelCaptor = argumentCaptor<Site>()
+    val settingsCaptor = argumentCaptor<SiteSettings>()
+    val resultCaptor = argumentCaptor<ValidationResult>()
+
+    verify(database.siteDao()).update(modelCaptor.capture())
+    verify(database.siteSettingsDao()).update(settingsCaptor.capture())
+    verify(database.validationResultsDao()).update(resultCaptor.capture())
+
     val newModel = modelCaptor.firstValue
-    assertThat(newModel.disabled).isTrue()
-    assertThat(newModel.lastCheck).isEqualTo(LAST_CHECK_NONE)
+    val newSettings = settingsCaptor.firstValue
+    val result = resultCaptor.firstValue
+    assertThat(newSettings.disabled).isTrue()
 
     verify(view).setDoneLoading()
     verify(view, times(1)).displayModel(newModel)
@@ -377,17 +403,14 @@ class ViewSitePresenterTest {
     verify(checkStatusManager).cancelCheck(model)
     verify(notificationManager).cancelStatusNotification(model)
     verify(view).setLoading()
-    verify(serverModelStore).delete(model)
+
+    verify(database.siteSettingsDao()).delete(model.settings!!)
+    verify(database.validationResultsDao()).delete(model.lastResult!!)
+    verify(database.siteDao()).delete(model)
+
     verify(view).setDoneLoading()
     verify(view).finish()
   }
-
-  private fun fakeModel() = ServerModel(
-      id = 1,
-      name = "Test",
-      url = "https://test.com",
-      validationMode = STATUS_CODE
-  )
 
   private fun fakeIntent(action: String): Intent {
     return mock {

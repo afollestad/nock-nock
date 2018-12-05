@@ -13,25 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.afollestad.nocknock.data
+@file:Suppress("DEPRECATION")
+
+package com.afollestad.nocknock.data.legacy
 
 import android.content.ContentValues
 import android.database.Cursor
-import com.afollestad.nocknock.data.ServerStatus.OK
-import com.afollestad.nocknock.utilities.ext.timeString
-import com.afollestad.nocknock.utilities.providers.IdProvider
-import java.lang.System.currentTimeMillis
-import kotlin.math.max
+import com.afollestad.nocknock.data.model.Status
+import com.afollestad.nocknock.data.model.Status.OK
+import com.afollestad.nocknock.data.model.ValidationMode
+import com.afollestad.nocknock.data.model.toSiteStatus
+import com.afollestad.nocknock.data.model.toValidationMode
 
 const val CHECK_INTERVAL_UNSET = -1L
 const val LAST_CHECK_NONE = -1L
 
 /** @author Aidan Follestad (@afollestad)*/
+@Deprecated("Deprecated in favor of Site.")
 data class ServerModel(
   var id: Int = 0,
   val name: String,
   val url: String,
-  val status: ServerStatus = OK,
+  val status: Status = OK,
   val checkInterval: Long = CHECK_INTERVAL_UNSET,
   val lastCheck: Long = LAST_CHECK_NONE,
   val reason: String? = null,
@@ -39,7 +42,7 @@ data class ServerModel(
   val validationContent: String? = null,
   val disabled: Boolean = false,
   val networkTimeout: Int = 0
-) : IdProvider {
+) {
 
   companion object {
     const val TABLE_NAME = "server_models"
@@ -59,29 +62,63 @@ data class ServerModel(
 
     fun pull(cursor: Cursor): ServerModel {
       return ServerModel(
-          id = cursor.getInt(cursor.getColumnIndex(COLUMN_ID)),
-          name = cursor.getString(cursor.getColumnIndex(COLUMN_NAME)),
-          url = cursor.getString(cursor.getColumnIndex(COLUMN_URL)),
-          status = cursor.getInt(cursor.getColumnIndex(COLUMN_STATUS)).toServerStatus(),
-          checkInterval = cursor.getLong(cursor.getColumnIndex(COLUMN_CHECK_INTERVAL)),
-          lastCheck = cursor.getLong(cursor.getColumnIndex(COLUMN_LAST_CHECK)),
-          reason = cursor.getString(cursor.getColumnIndex(COLUMN_REASON)),
+          id = cursor.getInt(
+              cursor.getColumnIndex(
+                  COLUMN_ID
+              )
+          ),
+          name = cursor.getString(
+              cursor.getColumnIndex(
+                  COLUMN_NAME
+              )
+          ),
+          url = cursor.getString(
+              cursor.getColumnIndex(
+                  COLUMN_URL
+              )
+          ),
+          status = cursor.getInt(
+              cursor.getColumnIndex(
+                  COLUMN_STATUS
+              )
+          ).toSiteStatus(),
+          checkInterval = cursor.getLong(
+              cursor.getColumnIndex(
+                  COLUMN_CHECK_INTERVAL
+              )
+          ),
+          lastCheck = cursor.getLong(
+              cursor.getColumnIndex(
+                  COLUMN_LAST_CHECK
+              )
+          ),
+          reason = cursor.getString(
+              cursor.getColumnIndex(
+                  COLUMN_REASON
+              )
+          ),
           validationMode = cursor.getInt(
-              cursor.getColumnIndex(COLUMN_VALIDATION_MODE)
+              cursor.getColumnIndex(
+                  COLUMN_VALIDATION_MODE
+              )
           ).toValidationMode(),
-          validationContent = cursor.getString(cursor.getColumnIndex(COLUMN_VALIDATION_CONTENT)),
-          disabled = cursor.getInt(cursor.getColumnIndex(COLUMN_DISABLED)) == 1,
-          networkTimeout = cursor.getInt(cursor.getColumnIndex(COLUMN_NETWORK_TIMEOUT))
+          validationContent = cursor.getString(
+              cursor.getColumnIndex(
+                  COLUMN_VALIDATION_CONTENT
+              )
+          ),
+          disabled = cursor.getInt(
+              cursor.getColumnIndex(
+                  COLUMN_DISABLED
+              )
+          ) == 1,
+          networkTimeout = cursor.getInt(
+              cursor.getColumnIndex(
+                  COLUMN_NETWORK_TIMEOUT
+              )
+          )
       )
     }
-  }
-
-  override fun id() = id
-
-  fun intervalText(): String {
-    val now = currentTimeMillis()
-    val nextCheck = max(lastCheck, 0) + checkInterval
-    return (nextCheck - now).timeString()
   }
 
   fun toContentValues() = ContentValues().apply {

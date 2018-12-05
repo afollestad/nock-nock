@@ -15,18 +15,25 @@
  */
 package com.afollestad.nocknock.ui.main
 
+import android.app.Application
+import android.content.Context.MODE_PRIVATE
 import android.content.Intent
-import com.afollestad.nocknock.data.ServerModel
-import com.afollestad.nocknock.engine.db.ServerModelStore
-import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob.Companion.ACTION_STATUS_UPDATE
-import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob.Companion.KEY_UPDATE_MODEL
-import com.afollestad.nocknock.engine.statuscheck.CheckStatusManager
+import com.afollestad.nocknock.data.AppDatabase
+import com.afollestad.nocknock.data.allSites
+import com.afollestad.nocknock.data.deleteSite
+import com.afollestad.nocknock.data.legacy.DbMigrator
+import com.afollestad.nocknock.data.model.Site
+import com.afollestad.nocknock.engine.statuscheck.ValidationJob.Companion.ACTION_STATUS_UPDATE
+import com.afollestad.nocknock.engine.statuscheck.ValidationJob.Companion.KEY_UPDATE_MODEL
+import com.afollestad.nocknock.engine.statuscheck.ValidationManager
 import com.afollestad.nocknock.notifications.NockNotificationManager
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import timber.log.Timber.d as log
 
 /** @author Aidan Follestad (@afollestad) */
 interface MainPresenter {
@@ -37,18 +44,19 @@ interface MainPresenter {
 
   fun resume()
 
-  fun refreshSite(site: ServerModel)
+  fun refreshSite(site: Site)
 
-  fun removeSite(site: ServerModel)
+  fun removeSite(site: Site)
 
   fun dropView()
 }
 
 /** @author Aidan Follestad (@afollestad) */
 class RealMainPresenter @Inject constructor(
-  private val serverModelStore: ServerModelStore,
+  private val app: Application,
+  private val database: AppDatabase,
   private val notificationManager: NockNotificationManager,
-  private val checkStatusManager: CheckStatusManager
+  private val checkStatusManager: ValidationManager
 ) : MainPresenter {
 
   private var view: MainView? = null
@@ -61,40 +69,46 @@ class RealMainPresenter @Inject constructor(
 
   override fun onBroadcast(intent: Intent) {
     if (intent.action == ACTION_STATUS_UPDATE) {
-      val model = intent.getSerializableExtra(KEY_UPDATE_MODEL) as? ServerModel ?: return
+      val model = intent.getSerializableExtra(KEY_UPDATE_MODEL) as? Site
+          ?: return
       view?.updateModel(model)
     }
   }
 
   override fun resume() {
     notificationManager.cancelStatusNotifications()
+
     view!!.run {
       setModels(listOf())
+      setLoading()
+
       scopeWhileAttached(Main) {
         launch(coroutineContext) {
-          val models = async(IO) {
-            serverModelStore.get()
-          }.await()
+          doMigrationIfNeeded()
+
+          val models = async(IO) { database.allSites() }.await()
+
           setModels(models)
+          setDoneLoading()
         }
       }
     }
   }
 
-  override fun refreshSite(site: ServerModel) {
+  override fun refreshSite(site: Site) =
     checkStatusManager.scheduleCheck(
         site = site,
         rightNow = true,
         cancelPrevious = true
     )
-  }
 
-  override fun removeSite(site: ServerModel) {
+  override fun removeSite(site: Site) {
     checkStatusManager.cancelCheck(site)
     notificationManager.cancelStatusNotification(site)
+
     view!!.scopeWhileAttached(Main) {
       launch(coroutineContext) {
-        async(IO) { serverModelStore.delete(site) }.await()
+        async(IO) { database.deleteSite(site) }.await()
         view?.onSiteDeleted(site)
       }
     }
@@ -103,6 +117,28 @@ class RealMainPresenter @Inject constructor(
   override fun dropView() {
     view = null
   }
+
+  private suspend fun CoroutineScope.doMigrationIfNeeded() {
+    if (needDbMigration()) {
+      log("Doing database migration...")
+      val migratedCount = async(IO) {
+        DbMigrator(app, database).migrateAll()
+      }.await()
+      didDbMigration()
+      log("Database migration done! Migrated $migratedCount models.")
+      ensureCheckJobs()
+    }
+  }
+
+  private fun needDbMigration(): Boolean =
+    !app.getSharedPreferences("settings", MODE_PRIVATE)
+        .getBoolean("did_db_migration", false)
+
+  private fun didDbMigration() =
+    app.getSharedPreferences("settings", MODE_PRIVATE)
+        .edit()
+        .putBoolean("did_db_migration", true)
+        .apply()
 
   private fun ensureCheckJobs() {
     view!!.scopeWhileAttached(IO) {

@@ -31,7 +31,7 @@ import timber.log.Timber.d as log
 /** @author Aidan Follestad (@afollestad) */
 class BootReceiver : BroadcastReceiver() {
 
-  @Inject lateinit var checkStatusManager: CheckStatusManager
+  @Inject lateinit var checkStatusManager: ValidationManager
 
   override fun onReceive(
     context: Context,

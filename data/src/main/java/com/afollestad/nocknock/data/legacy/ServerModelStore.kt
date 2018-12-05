@@ -13,42 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.afollestad.nocknock.engine.db
+@file:Suppress("DEPRECATION")
+
+package com.afollestad.nocknock.data.legacy
 
 import android.app.Application
+import android.content.ContentValues
 import android.database.Cursor
-import com.afollestad.nocknock.data.ServerModel
-import com.afollestad.nocknock.data.ServerModel.Companion.COLUMN_ID
-import com.afollestad.nocknock.data.ServerModel.Companion.DEFAULT_SORT_ORDER
-import com.afollestad.nocknock.data.ServerModel.Companion.TABLE_NAME
-import com.afollestad.nocknock.utilities.ext.diffFrom
-import org.jetbrains.annotations.TestOnly
-import javax.inject.Inject
-import timber.log.Timber.d as log
-import timber.log.Timber.w as warn
+import com.afollestad.nocknock.data.legacy.ServerModel.Companion.COLUMN_ID
+import com.afollestad.nocknock.data.legacy.ServerModel.Companion.DEFAULT_SORT_ORDER
+import com.afollestad.nocknock.data.legacy.ServerModel.Companion.TABLE_NAME
 
 /** @author Aidan Follestad (@afollestad) */
-interface ServerModelStore {
-
-  suspend fun get(id: Int? = null): List<ServerModel>
-
-  suspend fun put(model: ServerModel): ServerModel
-
-  suspend fun update(model: ServerModel): Int
-
-  suspend fun delete(model: ServerModel): Int
-
-  suspend fun delete(id: Int): Int
-
-  suspend fun deleteAll(): Int
-}
-
-/** @author Aidan Follestad (@afollestad) */
-class RealServerModelStore @Inject constructor(app: Application) : ServerModelStore {
+@Deprecated("Deprecated in favor of AppDatabase.")
+internal class ServerModelStore(app: Application) {
 
   private val dbHelper = ServerModelDbHelper(app)
 
-  override suspend fun get(id: Int?): List<ServerModel> {
+  fun get(id: Int? = null): List<ServerModel> {
     if (id == null) {
       return getAll()
     }
@@ -88,19 +70,16 @@ class RealServerModelStore @Inject constructor(app: Application) : ServerModelSt
     cursor.use { return readModels(it) }
   }
 
-  override suspend fun put(model: ServerModel): ServerModel {
+  fun put(model: ServerModel): ServerModel {
     check(model.id == 0) { "Cannot put a model that already has an ID." }
 
     val writer = dbHelper.writableDatabase
     val newId = writer.insert(TABLE_NAME, null, model.toContentValues())
 
     return model.copy(id = newId.toInt())
-        .apply {
-          log("Inserted new site model: $this")
-        }
   }
 
-  override suspend fun update(model: ServerModel): Int {
+  fun update(model: ServerModel): Int {
     check(model.id != 0) { "Cannot update a model that does not have an ID." }
 
     val oldModel = get(model.id).single()
@@ -111,35 +90,27 @@ class RealServerModelStore @Inject constructor(app: Application) : ServerModelSt
     val valuesDiff = oldValues.diffFrom(newValues)
 
     if (valuesDiff.size() == 0) {
-      warn("Nothing has changed - nothing to update!")
       return 0
     }
 
     val selection = "$COLUMN_ID = ?"
     val selectionArgs = arrayOf("${model.id}")
 
-    log("Updated model: $model")
     return writer.update(TABLE_NAME, valuesDiff, selection, selectionArgs)
   }
 
-  override suspend fun delete(model: ServerModel) = delete(model.id)
+  fun delete(model: ServerModel) = delete(model.id)
 
-  override suspend fun delete(id: Int): Int {
+  fun delete(id: Int): Int {
     check(id != 0) { "Cannot delete a model that doesn't have an ID." }
 
     val selection = "$COLUMN_ID = ?"
     val selectionArgs = arrayOf("$id")
 
-    log("Deleted model: $id")
     return dbHelper.writableDatabase.delete(TABLE_NAME, selection, selectionArgs)
   }
 
-  override suspend fun deleteAll(): Int {
-    log("Deleted all models")
-    return dbHelper.writableDatabase.delete(TABLE_NAME, null, null)
-  }
-
-  @TestOnly fun db() = dbHelper
+  fun wipe() = dbHelper.wipe()
 
   private fun readModels(cursor: Cursor): List<ServerModel> {
     val results = mutableListOf<ServerModel>()
@@ -147,5 +118,46 @@ class RealServerModelStore @Inject constructor(app: Application) : ServerModelSt
       results.add(ServerModel.pull(cursor))
     }
     return results
+  }
+
+  /**
+   * Returns a [ContentValues] instance which contains only values that have changed between
+   * the receiver (original) and parameter (new) instances.
+   */
+  private fun ContentValues.diffFrom(contentValues: ContentValues): ContentValues {
+    val diff = ContentValues()
+    for ((name, oldValue) in this.valueSet()) {
+      val newValue = contentValues.get(name)
+      if (newValue != oldValue) {
+        diff.putAny(name, newValue)
+      }
+    }
+    return diff
+  }
+
+  /**
+   * Auto casts an [Any] value and uses the appropriate `put` method to store it
+   * in the [ContentValues] instance.
+   */
+  private fun ContentValues.putAny(
+    name: String,
+    value: Any?
+  ) {
+    if (value == null) {
+      putNull(name)
+      return
+    }
+    when (value) {
+      is String -> put(name, value)
+      is Byte -> put(name, value)
+      is Short -> put(name, value)
+      is Int -> put(name, value)
+      is Long -> put(name, value)
+      is Float -> put(name, value)
+      is Double -> put(name, value)
+      is Boolean -> put(name, value)
+      is ByteArray -> put(name, value)
+      else -> throw IllegalArgumentException("ContentValues can't hold $value")
+    }
   }
 }

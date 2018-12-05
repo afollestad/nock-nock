@@ -18,7 +18,7 @@ package com.afollestad.nocknock.ui.main
 import android.content.Intent
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.nocknock.R
-import com.afollestad.nocknock.data.ServerModel
+import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.toHtml
 import com.afollestad.nocknock.ui.addsite.AddSiteActivity
 import com.afollestad.nocknock.ui.addsite.KEY_FAB_SIZE
@@ -47,16 +47,16 @@ private fun MainActivity.intentToAdd(
   addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
 }
 
-internal fun MainActivity.viewSite(model: ServerModel) {
+internal fun MainActivity.viewSite(model: Site) {
   startActivityForResult(intentToView(model), VIEW_SITE_RQ)
 }
 
-private fun MainActivity.intentToView(model: ServerModel) =
+private fun MainActivity.intentToView(model: Site) =
   Intent(this, ViewSiteActivity::class.java).apply {
     putExtra(KEY_VIEW_MODEL, model)
   }
 
-internal fun MainActivity.maybeRemoveSite(model: ServerModel) {
+internal fun MainActivity.maybeRemoveSite(model: Site) {
   MaterialDialog(this).show {
     title(R.string.remove_site)
     message(text = context.getString(R.string.remove_site_prompt, model.name).toHtml())
@@ -67,7 +67,7 @@ internal fun MainActivity.maybeRemoveSite(model: ServerModel) {
 
 internal fun MainActivity.processIntent(intent: Intent) {
   if (intent.hasExtra(KEY_VIEW_NOTIFICATION_MODEL)) {
-    val model = intent.getSerializableExtra(KEY_VIEW_NOTIFICATION_MODEL) as ServerModel
+    val model = intent.getSerializableExtra(KEY_VIEW_NOTIFICATION_MODEL) as Site
     viewSite(model)
   }
 }

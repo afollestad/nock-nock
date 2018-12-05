@@ -1,4 +1,4 @@
-/**
+/*
  * Designed and developed by Aidan Follestad (@afollestad)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.afollestad.nocknock.notifications
+package com.afollestad.nocknock.engine;
 
-import dagger.Binds
-import dagger.Module
-import javax.inject.Singleton
+import com.afollestad.nocknock.engine.statuscheck.RealValidationManager;
+import com.afollestad.nocknock.engine.statuscheck.ValidationManager;
+import dagger.Binds;
+import dagger.Module;
+import javax.inject.Singleton;
 
 /** @author Aidan Follestad (@afollestad) */
 @Module
-abstract class NotificationsModule {
+public abstract class EngineModule {
 
   @Binds
   @Singleton
-  abstract fun provideNockNotificationManager(
-    notificationManager: RealNockNotificationManager
-  ): NockNotificationManager
+  abstract ValidationManager provideCheckStatusManager(RealValidationManager checkStatusManager);
 }

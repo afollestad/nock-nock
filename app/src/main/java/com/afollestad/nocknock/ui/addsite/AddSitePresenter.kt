@@ -17,13 +17,14 @@ package com.afollestad.nocknock.ui.addsite
 
 import androidx.annotation.CheckResult
 import com.afollestad.nocknock.R
-import com.afollestad.nocknock.data.ServerModel
-import com.afollestad.nocknock.data.ServerStatus.WAITING
-import com.afollestad.nocknock.data.ValidationMode
-import com.afollestad.nocknock.data.ValidationMode.JAVASCRIPT
-import com.afollestad.nocknock.data.ValidationMode.TERM_SEARCH
-import com.afollestad.nocknock.engine.db.ServerModelStore
-import com.afollestad.nocknock.engine.statuscheck.CheckStatusManager
+import com.afollestad.nocknock.data.AppDatabase
+import com.afollestad.nocknock.data.model.Site
+import com.afollestad.nocknock.data.model.SiteSettings
+import com.afollestad.nocknock.data.model.ValidationMode
+import com.afollestad.nocknock.data.model.ValidationMode.JAVASCRIPT
+import com.afollestad.nocknock.data.model.ValidationMode.TERM_SEARCH
+import com.afollestad.nocknock.data.putSite
+import com.afollestad.nocknock.engine.statuscheck.ValidationManager
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.async
@@ -63,7 +64,7 @@ interface AddSitePresenter {
     url: String,
     checkInterval: Long,
     validationMode: ValidationMode,
-    validationContent: String?,
+    validationArgs: String?,
     networkTimeout: Int
   )
 
@@ -72,8 +73,8 @@ interface AddSitePresenter {
 
 /** @author Aidan Follestad (@afollestad) */
 class RealAddSitePresenter @Inject constructor(
-  private val serverModelStore: ServerModelStore,
-  private val checkStatusManager: CheckStatusManager
+  private val database: AppDatabase,
+  private val checkStatusManager: ValidationManager
 ) : AddSitePresenter {
 
   private var view: AddSiteView? = null
@@ -118,7 +119,7 @@ class RealAddSitePresenter @Inject constructor(
     url: String,
     checkInterval: Long,
     validationMode: ValidationMode,
-    validationContent: String?,
+    validationArgs: String?,
     networkTimeout: Int
   ) {
     val inputErrors = InputErrors()
@@ -134,9 +135,9 @@ class RealAddSitePresenter @Inject constructor(
     if (checkInterval <= 0) {
       inputErrors.checkInterval = R.string.please_enter_check_interval
     }
-    if (validationMode == TERM_SEARCH && validationContent.isNullOrEmpty()) {
+    if (validationMode == TERM_SEARCH && validationArgs.isNullOrEmpty()) {
       inputErrors.termSearch = R.string.please_enter_search_term
-    } else if (validationMode == JAVASCRIPT && validationContent.isNullOrEmpty()) {
+    } else if (validationMode == JAVASCRIPT && validationArgs.isNullOrEmpty()) {
       inputErrors.javaScript = R.string.please_enter_javaScript
     }
     if (networkTimeout <= 0) {
@@ -148,14 +149,19 @@ class RealAddSitePresenter @Inject constructor(
       return
     }
 
-    val newModel = ServerModel(
+    val newSettings = SiteSettings(
+        validationIntervalMs = checkInterval,
+        validationMode = validationMode,
+        validationArgs = validationArgs,
+        networkTimeout = networkTimeout,
+        disabled = false
+    )
+    val newModel = Site(
+        id = 0,
         name = name,
         url = url,
-        status = WAITING,
-        checkInterval = checkInterval,
-        validationMode = validationMode,
-        validationContent = validationContent,
-        networkTimeout = networkTimeout
+        settings = newSettings,
+        lastResult = null
     )
 
     with(view!!) {
@@ -163,7 +169,7 @@ class RealAddSitePresenter @Inject constructor(
         launch(coroutineContext) {
           setLoading()
           val storedModel = async(IO) {
-            serverModelStore.put(newModel)
+            database.putSite(newModel)
           }.await()
 
           checkStatusManager.scheduleCheck(

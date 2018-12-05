@@ -18,11 +18,11 @@ package com.afollestad.nocknock.viewcomponents
 import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatImageView
-import com.afollestad.nocknock.data.ServerStatus
-import com.afollestad.nocknock.data.ServerStatus.CHECKING
-import com.afollestad.nocknock.data.ServerStatus.ERROR
-import com.afollestad.nocknock.data.ServerStatus.OK
-import com.afollestad.nocknock.data.ServerStatus.WAITING
+import com.afollestad.nocknock.data.model.Status
+import com.afollestad.nocknock.data.model.Status.CHECKING
+import com.afollestad.nocknock.data.model.Status.ERROR
+import com.afollestad.nocknock.data.model.Status.OK
+import com.afollestad.nocknock.data.model.Status.WAITING
 
 /** @author Aidan Follestad (@afollestad) */
 class StatusImageView(
@@ -34,7 +34,7 @@ class StatusImageView(
     setStatus(OK)
   }
 
-  fun setStatus(status: ServerStatus) = when (status) {
+  fun setStatus(status: Status) = when (status) {
     CHECKING, WAITING -> {
       setImageResource(R.drawable.status_progress)
       setBackgroundResource(R.drawable.yellow_circle)

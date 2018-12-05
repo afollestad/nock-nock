@@ -15,12 +15,12 @@
  */
 package com.afollestad.nocknock
 
-import com.afollestad.nocknock.data.ServerModel
-import com.afollestad.nocknock.data.ValidationMode.JAVASCRIPT
-import com.afollestad.nocknock.data.ValidationMode.STATUS_CODE
-import com.afollestad.nocknock.data.ValidationMode.TERM_SEARCH
-import com.afollestad.nocknock.engine.db.ServerModelStore
-import com.afollestad.nocknock.engine.statuscheck.CheckStatusManager
+import com.afollestad.nocknock.data.model.Site
+import com.afollestad.nocknock.data.model.SiteSettings
+import com.afollestad.nocknock.data.model.ValidationMode.JAVASCRIPT
+import com.afollestad.nocknock.data.model.ValidationMode.STATUS_CODE
+import com.afollestad.nocknock.data.model.ValidationMode.TERM_SEARCH
+import com.afollestad.nocknock.engine.statuscheck.ValidationManager
 import com.afollestad.nocknock.ui.addsite.AddSiteView
 import com.afollestad.nocknock.ui.addsite.InputErrors
 import com.afollestad.nocknock.ui.addsite.RealAddSitePresenter
@@ -42,16 +42,12 @@ import org.junit.Test
 
 class AddSitePresenterTest {
 
-  private val serverModelStore = mock<ServerModelStore> {
-    on { runBlocking { put(any()) } } doAnswer { inv ->
-      inv.getArgument<ServerModel>(0)
-    }
-  }
-  private val checkStatusManager = mock<CheckStatusManager>()
+  private val database = mockDatabase()
+  private val checkStatusManager = mock<ValidationManager>()
   private val view = mock<AddSiteView>()
 
   private val presenter = RealAddSitePresenter(
-      serverModelStore,
+      database,
       checkStatusManager
   )
 
@@ -260,10 +256,21 @@ class AddSitePresenterTest {
         60000
     )
 
-    val modelCaptor = argumentCaptor<ServerModel>()
+    val siteCaptor = argumentCaptor<Site>()
+    val settingsCaptor = argumentCaptor<SiteSettings>()
+
     verify(view).setLoading()
-    verify(serverModelStore).put(modelCaptor.capture())
-    val model = modelCaptor.firstValue
+    verify(database.siteDao()).insert(siteCaptor.capture())
+    verify(database.siteSettingsDao()).insert(settingsCaptor.capture())
+    verify(database.validationResultsDao(), never()).insert(any())
+
+    val settings = settingsCaptor.firstValue
+    val model = siteCaptor.firstValue.copy(
+        id = 1, // fill it in because our insert captor doesn't catch this
+        settings = settings,
+        lastResult = null
+    )
+
     verify(view, never()).setInputErrors(any())
     verify(checkStatusManager).scheduleCheck(
         site = model,
@@ -271,6 +278,7 @@ class AddSitePresenterTest {
         cancelPrevious = true,
         fromFinishingJob = false
     )
+
     verify(view).setDoneLoading()
     verify(view).onSiteAdded()
   }

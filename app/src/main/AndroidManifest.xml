@@ -42,7 +42,7 @@
         android:windowSoftInputMode="stateHidden"/>
 
     <service
-        android:name=".engine.statuscheck.CheckStatusJob"
+        android:name=".engine.statuscheck.ValidationJob"
         android:label="@string/check_service_name"
         android:permission="android.permission.BIND_JOB_SERVICE"/>
 

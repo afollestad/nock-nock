@@ -15,13 +15,14 @@
  */
 package com.afollestad.nocknock
 
+import android.app.Application
+import android.content.Context.MODE_PRIVATE
 import android.content.Intent
-import com.afollestad.nocknock.data.ServerModel
-import com.afollestad.nocknock.data.ValidationMode.STATUS_CODE
-import com.afollestad.nocknock.engine.db.ServerModelStore
-import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob.Companion.ACTION_STATUS_UPDATE
-import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob.Companion.KEY_UPDATE_MODEL
-import com.afollestad.nocknock.engine.statuscheck.CheckStatusManager
+import android.content.SharedPreferences
+import com.afollestad.nocknock.data.model.Site
+import com.afollestad.nocknock.engine.statuscheck.ValidationJob.Companion.ACTION_STATUS_UPDATE
+import com.afollestad.nocknock.engine.statuscheck.ValidationJob.Companion.KEY_UPDATE_MODEL
+import com.afollestad.nocknock.engine.statuscheck.ValidationManager
 import com.afollestad.nocknock.notifications.NockNotificationManager
 import com.afollestad.nocknock.ui.main.MainView
 import com.afollestad.nocknock.ui.main.RealMainPresenter
@@ -42,13 +43,22 @@ import org.junit.Test
 
 class MainPresenterTest {
 
-  private val serverModelStore = mock<ServerModelStore>()
+  private val prefs = mock<SharedPreferences> {
+    on { getBoolean("did_db_migration", false) } doReturn true
+  }
+  private val app = mock<Application> {
+    on { getSharedPreferences("settings", MODE_PRIVATE) } doReturn prefs
+  }
+
+  private val database = mockDatabase()
+
   private val notificationManager = mock<NockNotificationManager>()
-  private val checkStatusManager = mock<CheckStatusManager>()
+  private val checkStatusManager = mock<ValidationManager>()
   private val view = mock<MainView>()
 
   private val presenter = RealMainPresenter(
-      serverModelStore,
+      app,
+      database,
       notificationManager,
       checkStatusManager
   )
@@ -72,54 +82,44 @@ class MainPresenterTest {
     val badIntent = fakeIntent("Hello World")
     presenter.onBroadcast(badIntent)
 
-    val model = fakeModel()
     val goodIntent = fakeIntent(ACTION_STATUS_UPDATE)
     whenever(goodIntent.getSerializableExtra(KEY_UPDATE_MODEL))
-        .doReturn(model)
+        .doReturn(MOCK_MODEL_2)
 
     presenter.onBroadcast(goodIntent)
-    verify(view, times(1)).updateModel(model)
+    verify(view, times(1)).updateModel(MOCK_MODEL_2)
   }
 
   @Test fun resume() = runBlocking {
-    val model = fakeModel()
-    whenever(serverModelStore.get()).doReturn(listOf(model))
     presenter.resume()
 
     verify(notificationManager).cancelStatusNotifications()
 
-    val modelsCaptor = argumentCaptor<List<ServerModel>>()
+    val modelsCaptor = argumentCaptor<List<Site>>()
     verify(view, times(2)).setModels(modelsCaptor.capture())
     assertThat(modelsCaptor.firstValue).isEmpty()
-    assertThat(modelsCaptor.lastValue.single()).isEqualTo(model)
+    assertThat(modelsCaptor.lastValue).isEqualTo(ALL_MOCK_MODELS)
   }
 
   @Test fun refreshSite() {
-    val model = fakeModel()
-    presenter.refreshSite(model)
+    presenter.refreshSite(MOCK_MODEL_3)
 
     verify(checkStatusManager).scheduleCheck(
-        site = model,
+        site = MOCK_MODEL_3,
         rightNow = true,
         cancelPrevious = true
     )
   }
 
   @Test fun removeSite() = runBlocking {
-    val model = fakeModel()
-    presenter.removeSite(model)
+    presenter.removeSite(MOCK_MODEL_1)
 
-    verify(checkStatusManager).cancelCheck(model)
-    verify(notificationManager).cancelStatusNotification(model)
-    verify(serverModelStore).delete(model)
-    verify(view).onSiteDeleted(model)
+    verify(checkStatusManager).cancelCheck(MOCK_MODEL_1)
+    verify(notificationManager).cancelStatusNotification(MOCK_MODEL_1)
+    verify(database.siteDao()).delete(MOCK_MODEL_1)
+    verify(database.siteSettingsDao()).delete(MOCK_MODEL_1.settings!!)
+    verify(view).onSiteDeleted(MOCK_MODEL_1)
   }
-
-  private fun fakeModel() = ServerModel(
-      name = "Test",
-      url = "https://test.com",
-      validationMode = STATUS_CODE
-  )
 
   private fun fakeIntent(action: String): Intent {
     return mock {

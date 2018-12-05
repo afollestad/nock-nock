@@ -18,9 +18,9 @@ android {
 }
 
 dependencies {
-  implementation project(':data')
   implementation project(':utilities')
   implementation project(':engine')
+  implementation project(':data')
   implementation project(':notifications')
   implementation project(':viewcomponents')
 

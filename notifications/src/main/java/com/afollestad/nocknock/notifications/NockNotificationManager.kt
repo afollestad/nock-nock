@@ -18,9 +18,9 @@ package com.afollestad.nocknock.notifications
 import android.annotation.TargetApi
 import android.app.NotificationManager
 import android.os.Build.VERSION_CODES
-import com.afollestad.nocknock.data.ServerModel
 import com.afollestad.nocknock.notifications.Channel.CheckFailures
 import com.afollestad.nocknock.utilities.providers.BitmapProvider
+import com.afollestad.nocknock.utilities.providers.CanNotifyModel
 import com.afollestad.nocknock.utilities.providers.IntentProvider
 import com.afollestad.nocknock.utilities.providers.NotificationChannelProvider
 import com.afollestad.nocknock.utilities.providers.NotificationProvider
@@ -37,9 +37,9 @@ interface NockNotificationManager {
 
   fun createChannels()
 
-  fun postStatusNotification(model: ServerModel)
+  fun postStatusNotification(model: CanNotifyModel)
 
-  fun cancelStatusNotification(model: ServerModel)
+  fun cancelStatusNotification(model: CanNotifyModel)
 
   fun cancelStatusNotifications()
 }
@@ -65,32 +65,32 @@ class RealNockNotificationManager @Inject constructor(
   override fun createChannels() =
     Channel.values().forEach(this::createChannel)
 
-  override fun postStatusNotification(model: ServerModel) {
+  override fun postStatusNotification(model: CanNotifyModel) {
     if (isAppOpen) {
       // Don't show notifications while the app is open
-      log("App is open, status notification for site ${model.id} won't be posted.")
+      log("App is open, status notification for site ${model.notiId()} won't be posted.")
       return
     }
 
-    log("Posting status notification for site ${model.id}...")
+    log("Posting status notification for site ${model.notiId()}...")
     val intent = intentProvider.getPendingIntentForViewSite(model)
 
     val newNotification = notificationProvider.create(
         channelId = CheckFailures.id,
-        title = model.name,
+        title = model.notiName(),
         content = stringProvider.get(R.string.something_wrong),
         intent = intent,
         smallIcon = R.drawable.ic_notification,
         largeIcon = bitmapProvider.get(appIconRes)
     )
 
-    stockManager.notify(model.url, model.notificationId(), newNotification)
+    stockManager.notify(model.notiTag(), model.notificationId(), newNotification)
     log("Posted status notification for site ${model.notificationId()}.")
   }
 
-  override fun cancelStatusNotification(model: ServerModel) {
+  override fun cancelStatusNotification(model: CanNotifyModel) {
     stockManager.cancel(model.notificationId())
-    log("Cancelled status notification for site ${model.id}.")
+    log("Cancelled status notification for site ${model.notiId()}.")
   }
 
   override fun cancelStatusNotifications() = stockManager.cancelAll()
@@ -107,5 +107,5 @@ class RealNockNotificationManager @Inject constructor(
     log("Created notification channel ${channel.id}")
   }
 
-  private fun ServerModel.notificationId() = BASE_NOTIFICATION_REQUEST_CODE + this.id
+  private fun CanNotifyModel.notificationId() = BASE_NOTIFICATION_REQUEST_CODE + this.notiId()
 }

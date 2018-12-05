@@ -17,12 +17,13 @@ package com.afollestad.nocknock.engine.statuscheck
 
 import android.app.job.JobScheduler
 import android.app.job.JobScheduler.RESULT_SUCCESS
-import com.afollestad.nocknock.data.ServerModel
-import com.afollestad.nocknock.data.ServerStatus.ERROR
-import com.afollestad.nocknock.data.ServerStatus.OK
+import com.afollestad.nocknock.data.AppDatabase
+import com.afollestad.nocknock.data.allSites
+import com.afollestad.nocknock.data.model.Site
+import com.afollestad.nocknock.data.model.Status.ERROR
+import com.afollestad.nocknock.data.model.Status.OK
 import com.afollestad.nocknock.engine.R
-import com.afollestad.nocknock.engine.db.ServerModelStore
-import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob.Companion.KEY_SITE_ID
+import com.afollestad.nocknock.engine.statuscheck.ValidationJob.Companion.KEY_SITE_ID
 import com.afollestad.nocknock.utilities.providers.BundleProvider
 import com.afollestad.nocknock.utilities.providers.JobInfoProvider
 import com.afollestad.nocknock.utilities.providers.StringProvider
@@ -37,37 +38,37 @@ import timber.log.Timber.d as log
 
 /** @author Aidan Follestad (@afollestad) */
 data class CheckResult(
-  val model: ServerModel,
+  val model: Site,
   val response: Response? = null
 )
 
 typealias ClientTimeoutChanger = (client: OkHttpClient, timeout: Int) -> OkHttpClient
 
 /** @author Aidan Follestad (@afollestad) */
-interface CheckStatusManager {
+interface ValidationManager {
 
   suspend fun ensureScheduledChecks()
 
   fun scheduleCheck(
-    site: ServerModel,
+    site: Site,
     rightNow: Boolean = false,
     cancelPrevious: Boolean = rightNow,
     fromFinishingJob: Boolean = false
   )
 
-  fun cancelCheck(site: ServerModel)
+  fun cancelCheck(site: Site)
 
-  suspend fun performCheck(site: ServerModel): CheckResult
+  suspend fun performCheck(site: Site): CheckResult
 }
 
-class RealCheckStatusManager @Inject constructor(
+class RealValidationManager @Inject constructor(
   private val jobScheduler: JobScheduler,
   private val okHttpClient: OkHttpClient,
   private val stringProvider: StringProvider,
   private val bundleProvider: BundleProvider,
   private val jobInfoProvider: JobInfoProvider,
-  private val siteStore: ServerModelStore
-) : CheckStatusManager {
+  private val database: AppDatabase
+) : ValidationManager {
 
   private var clientTimeoutChanger: ClientTimeoutChanger = { client, timeout ->
     client.newBuilder()
@@ -76,12 +77,12 @@ class RealCheckStatusManager @Inject constructor(
   }
 
   override suspend fun ensureScheduledChecks() {
-    val sites = siteStore.get()
+    val sites = database.allSites()
     if (sites.isEmpty()) {
       return
     }
     log("Ensuring enabled sites have scheduled checks.")
-    sites.filter { !it.disabled }
+    sites.filter { it.settings?.disabled != true }
         .forEach { site ->
           val existingJob = jobForSite(site)
           if (existingJob == null) {
@@ -94,12 +95,15 @@ class RealCheckStatusManager @Inject constructor(
   }
 
   override fun scheduleCheck(
-    site: ServerModel,
+    site: Site,
     rightNow: Boolean,
     cancelPrevious: Boolean,
     fromFinishingJob: Boolean
   ) {
-    check(site.id != 0) { "Cannot schedule checks for jobs with no ID." }
+    check(site.id != 0L) { "Cannot schedule checks for jobs with no ID." }
+    val siteSettings = site.settings
+    requireNotNull(siteSettings) { "Site settings must be populated." }
+
     if (cancelPrevious) {
       cancelCheck(site)
     } else if (!fromFinishingJob) {
@@ -111,18 +115,18 @@ class RealCheckStatusManager @Inject constructor(
 
     log("Requesting a check job for site to be scheduled: $site")
     val extras = bundleProvider.createPersistable {
-      putInt(KEY_SITE_ID, site.id)
+      putLong(KEY_SITE_ID, site.id)
     }
     val jobInfo = jobInfoProvider.createCheckJob(
-        id = site.id,
+        id = site.id.toInt(),
         onlyUnmeteredNetwork = false,
         delayMs = if (rightNow) {
           1
         } else {
-          site.checkInterval
+          siteSettings.validationIntervalMs
         },
         extras = extras,
-        target = CheckStatusJob::class.java
+        target = ValidationJob::class.java
     )
 
     val dispatchResult = jobScheduler.schedule(jobInfo)
@@ -133,15 +137,17 @@ class RealCheckStatusManager @Inject constructor(
     }
   }
 
-  override fun cancelCheck(site: ServerModel) {
-    check(site.id != 0) { "Cannot cancel scheduled checks for jobs with no ID." }
+  override fun cancelCheck(site: Site) {
+    check(site.id != 0L) { "Cannot cancel scheduled checks for jobs with no ID." }
     log("Cancelling scheduled checks for site: ${site.id}")
-    jobScheduler.cancel(site.id)
+    jobScheduler.cancel(site.id.toInt())
   }
 
-  override suspend fun performCheck(site: ServerModel): CheckResult {
-    check(site.id != 0) { "Cannot schedule checks for jobs with no ID." }
-    check(site.networkTimeout > 0) { "Network timeout not set for site ${site.id}" }
+  override suspend fun performCheck(site: Site): CheckResult {
+    check(site.id != 0L) { "Cannot schedule checks for jobs with no ID." }
+    val siteSettings = site.settings
+    requireNotNull(siteSettings) { "Site settings must be populated." }
+    check(siteSettings.networkTimeout > 0) { "Network timeout not set for site ${site.id}" }
     log("performCheck(${site.id}) - GET ${site.url}")
 
     val request = Request.Builder()
@@ -150,20 +156,20 @@ class RealCheckStatusManager @Inject constructor(
         .build()
 
     return try {
-      val client = clientTimeoutChanger(okHttpClient, site.networkTimeout)
+      val client = clientTimeoutChanger(okHttpClient, siteSettings.networkTimeout)
       val response = client.newCall(request)
           .execute()
 
       if (response.isSuccessful || response.code() == 401) {
         log("performCheck(${site.id}) = Successful")
         CheckResult(
-            model = site.copy(status = OK, reason = null),
+            model = site.withStatus(status = OK, reason = null),
             response = response
         )
       } else {
         log("performCheck(${site.id}) = Failure, HTTP code ${response.code()}")
         CheckResult(
-            model = site.copy(
+            model = site.withStatus(
                 status = ERROR,
                 reason = "Response ${response.code()} - ${response.body()?.string() ?: "Unknown"}"
             ),
@@ -173,20 +179,20 @@ class RealCheckStatusManager @Inject constructor(
     } catch (timeoutEx: SocketTimeoutException) {
       log("performCheck(${site.id}) = Socket Timeout")
       CheckResult(
-          model = site.copy(
+          model = site.withStatus(
               status = ERROR,
               reason = stringProvider.get(R.string.timeout)
           )
       )
     } catch (ex: Exception) {
       log("performCheck(${site.id}) = Error: ${ex.message}")
-      CheckResult(model = site.copy(status = ERROR, reason = ex.message))
+      CheckResult(model = site.withStatus(status = ERROR, reason = ex.message))
     }
   }
 
-  private fun jobForSite(site: ServerModel) =
+  private fun jobForSite(site: Site) =
     jobScheduler.allPendingJobs
-        .firstOrNull { job -> job.id == site.id }
+        .firstOrNull { job -> job.id == site.id.toInt() }
 
   @TestOnly fun setClientTimeoutChanger(changer: ClientTimeoutChanger) {
     this.clientTimeoutChanger = changer

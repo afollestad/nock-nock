@@ -18,15 +18,17 @@ package com.afollestad.nocknock.ui.viewsite
 import android.content.Intent
 import androidx.annotation.CheckResult
 import com.afollestad.nocknock.R
-import com.afollestad.nocknock.data.ServerModel
-import com.afollestad.nocknock.data.ServerStatus.WAITING
-import com.afollestad.nocknock.data.ValidationMode
-import com.afollestad.nocknock.data.ValidationMode.JAVASCRIPT
-import com.afollestad.nocknock.data.ValidationMode.TERM_SEARCH
-import com.afollestad.nocknock.engine.db.ServerModelStore
-import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob.Companion.ACTION_STATUS_UPDATE
-import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob.Companion.KEY_UPDATE_MODEL
-import com.afollestad.nocknock.engine.statuscheck.CheckStatusManager
+import com.afollestad.nocknock.data.AppDatabase
+import com.afollestad.nocknock.data.deleteSite
+import com.afollestad.nocknock.data.model.Site
+import com.afollestad.nocknock.data.model.Status.WAITING
+import com.afollestad.nocknock.data.model.ValidationMode
+import com.afollestad.nocknock.data.model.ValidationMode.JAVASCRIPT
+import com.afollestad.nocknock.data.model.ValidationMode.TERM_SEARCH
+import com.afollestad.nocknock.data.updateSite
+import com.afollestad.nocknock.engine.statuscheck.ValidationJob.Companion.ACTION_STATUS_UPDATE
+import com.afollestad.nocknock.engine.statuscheck.ValidationJob.Companion.KEY_UPDATE_MODEL
+import com.afollestad.nocknock.engine.statuscheck.ValidationManager
 import com.afollestad.nocknock.notifications.NockNotificationManager
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -77,7 +79,7 @@ interface ViewSitePresenter {
     url: String,
     checkInterval: Long,
     validationMode: ValidationMode,
-    validationContent: String?,
+    validationArgs: String?,
     networkTimeout: Int
   )
 
@@ -87,26 +89,26 @@ interface ViewSitePresenter {
 
   fun removeSite()
 
-  fun currentModel(): ServerModel
+  fun currentModel(): Site
 
   fun dropView()
 }
 
 /** @author Aidan Follestad (@afollestad) */
 class RealViewSitePresenter @Inject constructor(
-  private val serverModelStore: ServerModelStore,
-  private val checkStatusManager: CheckStatusManager,
+  private val database: AppDatabase,
+  private val checkStatusManager: ValidationManager,
   private val notificationManager: NockNotificationManager
 ) : ViewSitePresenter {
 
   private var view: ViewSiteView? = null
-  private var currentModel: ServerModel? = null
+  private var currentModel: Site? = null
 
   override fun takeView(
     view: ViewSiteView,
     intent: Intent
   ) {
-    this.currentModel = intent.getSerializableExtra(KEY_VIEW_MODEL) as ServerModel
+    this.currentModel = intent.getSerializableExtra(KEY_VIEW_MODEL) as Site
     this.view = view.apply {
       displayModel(currentModel!!)
     }
@@ -114,7 +116,8 @@ class RealViewSitePresenter @Inject constructor(
 
   override fun onBroadcast(intent: Intent) {
     if (intent.action == ACTION_STATUS_UPDATE) {
-      val model = intent.getSerializableExtra(KEY_UPDATE_MODEL) as? ServerModel ?: return
+      val model = intent.getSerializableExtra(KEY_UPDATE_MODEL) as? Site
+          ?: return
       this.currentModel = model
       view?.displayModel(model)
     }
@@ -122,7 +125,7 @@ class RealViewSitePresenter @Inject constructor(
 
   override fun onNewIntent(intent: Intent?) {
     if (intent != null && intent.hasExtra(KEY_VIEW_MODEL)) {
-      currentModel = intent.getSerializableExtra(KEY_VIEW_MODEL) as ServerModel
+      currentModel = intent.getSerializableExtra(KEY_VIEW_MODEL) as Site
       view?.displayModel(currentModel!!)
     }
   }
@@ -163,7 +166,7 @@ class RealViewSitePresenter @Inject constructor(
     url: String,
     checkInterval: Long,
     validationMode: ValidationMode,
-    validationContent: String?,
+    validationArgs: String?,
     networkTimeout: Int
   ) {
     val inputErrors = InputErrors()
@@ -179,9 +182,9 @@ class RealViewSitePresenter @Inject constructor(
     if (checkInterval <= 0) {
       inputErrors.checkInterval = R.string.please_enter_check_interval
     }
-    if (validationMode == TERM_SEARCH && validationContent.isNullOrEmpty()) {
+    if (validationMode == TERM_SEARCH && validationArgs.isNullOrEmpty()) {
       inputErrors.termSearch = R.string.please_enter_search_term
-    } else if (validationMode == JAVASCRIPT && validationContent.isNullOrEmpty()) {
+    } else if (validationMode == JAVASCRIPT && validationArgs.isNullOrEmpty()) {
       inputErrors.javaScript = R.string.please_enter_javaScript
     }
     if (networkTimeout <= 0) {
@@ -193,27 +196,34 @@ class RealViewSitePresenter @Inject constructor(
       return
     }
 
-    val newModel = currentModel!!.copy(
-        name = name,
-        url = url,
-        status = WAITING,
-        checkInterval = checkInterval,
+    val updatedSettings = currentModel!!.settings!!.copy(
+        validationIntervalMs = checkInterval,
         validationMode = validationMode,
-        validationContent = validationContent,
+        validationArgs = validationArgs,
         disabled = false,
         networkTimeout = networkTimeout
     )
+    val updatedModel = currentModel!!.copy(
+        name = name,
+        url = url,
+        settings = updatedSettings
+    )
+        .withStatus(status = WAITING)
 
     with(view!!) {
       scopeWhileAttached(Main) {
         launch(coroutineContext) {
           setLoading()
-          async(IO) { serverModelStore.update(newModel) }.await()
+          async(IO) {
+            database.updateSite(updatedModel)
+          }.await()
+
           checkStatusManager.scheduleCheck(
-              site = newModel,
+              site = updatedModel,
               rightNow = true,
               cancelPrevious = true
           )
+
           setDoneLoading()
           view?.finish()
         }
@@ -222,7 +232,7 @@ class RealViewSitePresenter @Inject constructor(
   }
 
   override fun checkNow() = with(view!!) {
-    val checkModel = currentModel!!.copy(
+    val checkModel = currentModel!!.withStatus(
         status = WAITING
     )
     view?.displayModel(checkModel)
@@ -242,8 +252,16 @@ class RealViewSitePresenter @Inject constructor(
       scopeWhileAttached(Main) {
         launch(coroutineContext) {
           setLoading()
-          currentModel = currentModel!!.copy(disabled = true)
-          async(IO) { serverModelStore.update(currentModel!!) }.await()
+          currentModel = currentModel!!.copy(
+              settings = currentModel!!.settings!!.copy(
+                  disabled = true
+              )
+          )
+
+          async(IO) {
+            database.updateSite(currentModel!!)
+          }.await()
+
           setDoneLoading()
           view?.displayModel(currentModel!!)
         }
@@ -260,7 +278,9 @@ class RealViewSitePresenter @Inject constructor(
       scopeWhileAttached(Main) {
         launch(coroutineContext) {
           setLoading()
-          async(IO) { serverModelStore.delete(site) }.await()
+          async(IO) {
+            database.deleteSite(site)
+          }.await()
           setDoneLoading()
           view?.finish()
         }
@@ -275,7 +295,7 @@ class RealViewSitePresenter @Inject constructor(
     currentModel = null
   }
 
-  @TestOnly fun setModel(model: ServerModel) {
+  @TestOnly fun setModel(model: Site) {
     this.currentModel = model
   }
 }

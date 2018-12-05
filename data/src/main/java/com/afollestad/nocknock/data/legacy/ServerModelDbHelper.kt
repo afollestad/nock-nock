@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.afollestad.nocknock.engine.db
+@file:Suppress("DEPRECATION")
+
+package com.afollestad.nocknock.data.legacy
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import com.afollestad.nocknock.data.ServerModel
 
 private const val SQL_CREATE_ENTRIES =
   "CREATE TABLE ${ServerModel.TABLE_NAME} (" +
@@ -38,8 +39,10 @@ private const val SQL_CREATE_ENTRIES =
 private const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${ServerModel.TABLE_NAME}"
 
 /** @author Aidan Follestad (@afollestad) */
-class ServerModelDbHelper(context: Context) : SQLiteOpenHelper(
-    context, DATABASE_NAME, null, DATABASE_VERSION
+@Deprecated("Use AppDatabase.")
+internal class ServerModelDbHelper(context: Context) : SQLiteOpenHelper(
+    context, DATABASE_NAME, null,
+    DATABASE_VERSION
 ) {
   companion object {
     const val DATABASE_VERSION = 3
@@ -71,6 +74,5 @@ class ServerModelDbHelper(context: Context) : SQLiteOpenHelper(
 
   fun wipe() {
     this.writableDatabase.execSQL(SQL_DELETE_ENTRIES)
-    onCreate(this.writableDatabase)
   }
 }

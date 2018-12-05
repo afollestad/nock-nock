@@ -20,9 +20,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.nocknock.R
-import com.afollestad.nocknock.data.ServerModel
-import com.afollestad.nocknock.data.isPending
-import com.afollestad.nocknock.data.textRes
+import com.afollestad.nocknock.data.model.Site
+import com.afollestad.nocknock.data.model.Status.WAITING
+import com.afollestad.nocknock.data.model.isPending
+import com.afollestad.nocknock.data.model.textRes
 import com.afollestad.nocknock.utilities.ui.onDebouncedClick
 import kotlinx.android.synthetic.main.list_item_server.view.iconStatus
 import kotlinx.android.synthetic.main.list_item_server.view.textInterval
@@ -30,10 +31,10 @@ import kotlinx.android.synthetic.main.list_item_server.view.textName
 import kotlinx.android.synthetic.main.list_item_server.view.textStatus
 import kotlinx.android.synthetic.main.list_item_server.view.textUrl
 
-typealias Listener = (model: ServerModel, longClick: Boolean) -> Unit
+typealias Listener = (model: Site, longClick: Boolean) -> Unit
 
 /** @author Aidan Follestad (@afollestad) */
-class ServerVH constructor(
+class SiteViewHolder constructor(
   itemView: View,
   private val adapter: ServerAdapter
 ) : RecyclerView.ViewHolder(itemView), View.OnLongClickListener {
@@ -45,24 +46,32 @@ class ServerVH constructor(
     itemView.setOnLongClickListener(this)
   }
 
-  fun bind(model: ServerModel) {
+  fun bind(model: Site) {
+    requireNotNull(model.settings) { "Settings must be populated." }
+
     itemView.textName.text = model.name
     itemView.textUrl.text = model.url
-    itemView.iconStatus.setStatus(model.status)
 
-    val statusText = model.status.textRes()
-    if (statusText == 0) {
-      itemView.textStatus.text = model.reason
+    val lastResult = model.lastResult
+    if (lastResult != null) {
+      itemView.iconStatus.setStatus(lastResult.status)
+      val statusText = lastResult.status.textRes()
+      if (statusText == 0) {
+        itemView.textStatus.text = lastResult.reason
+      } else {
+        itemView.textStatus.setText(statusText)
+      }
     } else {
-      itemView.textStatus.setText(statusText)
+      itemView.iconStatus.setStatus(WAITING)
+      itemView.textStatus.setText(R.string.none)
     }
 
     val res = itemView.resources
     when {
-      model.disabled -> {
+      model.settings?.disabled == true -> {
         itemView.textInterval.setText(R.string.checks_disabled)
       }
-      model.status.isPending() -> {
+      model.lastResult?.status.isPending() -> {
         itemView.textInterval.text = res.getString(
             R.string.next_check_x,
             res.getString(R.string.now)
@@ -84,21 +93,21 @@ class ServerVH constructor(
 }
 
 /** @author Aidan Follestad (@afollestad) */
-class ServerAdapter(private val listener: Listener) : RecyclerView.Adapter<ServerVH>() {
+class ServerAdapter(private val listener: Listener) : RecyclerView.Adapter<SiteViewHolder>() {
 
-  private val models = mutableListOf<ServerModel>()
+  private val models = mutableListOf<Site>()
 
   internal fun performClick(
     index: Int,
     longClick: Boolean
   ) = listener.invoke(models[index], longClick)
 
-  fun add(model: ServerModel) {
+  fun add(model: Site) {
     models.add(model)
     notifyItemInserted(models.size - 1)
   }
 
-  fun update(target: ServerModel) {
+  fun update(target: Site) {
     for ((i, model) in models.withIndex()) {
       if (model.id == target.id) {
         update(i, target)
@@ -109,7 +118,7 @@ class ServerAdapter(private val listener: Listener) : RecyclerView.Adapter<Serve
 
   private fun update(
     index: Int,
-    model: ServerModel
+    model: Site
   ) {
     models[index] = model
     notifyItemChanged(index)
@@ -120,7 +129,7 @@ class ServerAdapter(private val listener: Listener) : RecyclerView.Adapter<Serve
     notifyItemRemoved(index)
   }
 
-  fun remove(target: ServerModel) {
+  fun remove(target: Site) {
     for ((i, model) in models.withIndex()) {
       if (model.id == target.id) {
         remove(i)
@@ -129,7 +138,7 @@ class ServerAdapter(private val listener: Listener) : RecyclerView.Adapter<Serve
     }
   }
 
-  fun set(newModels: List<ServerModel>) {
+  fun set(newModels: List<Site>) {
     this.models.clear()
     if (!newModels.isEmpty()) {
       this.models.addAll(newModels)
@@ -140,14 +149,14 @@ class ServerAdapter(private val listener: Listener) : RecyclerView.Adapter<Serve
   override fun onCreateViewHolder(
     parent: ViewGroup,
     viewType: Int
-  ): ServerVH {
+  ): SiteViewHolder {
     val v = LayoutInflater.from(parent.context)
         .inflate(R.layout.list_item_server, parent, false)
-    return ServerVH(v, this)
+    return SiteViewHolder(v, this)
   }
 
   override fun onBindViewHolder(
-    holder: ServerVH,
+    holder: SiteViewHolder,
     position: Int
   ) {
     val model = models[position]

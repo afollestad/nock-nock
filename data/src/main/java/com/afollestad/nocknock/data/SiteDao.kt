@@ -13,27 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.afollestad.nocknock.di
+package com.afollestad.nocknock.data
 
-import com.afollestad.nocknock.R
-import com.afollestad.nocknock.ui.main.MainActivity
-import com.afollestad.nocknock.utilities.qualifiers.AppIconRes
-import com.afollestad.nocknock.utilities.qualifiers.MainActivityClass
-import dagger.Module
-import dagger.Provides
-import javax.inject.Singleton
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy.FAIL
+import androidx.room.Query
+import androidx.room.Update
+import com.afollestad.nocknock.data.model.Site
 
 /** @author Aidan Follestad (@afollestad) */
-@Module
-open class MainModule {
+@Dao
+interface SiteDao {
 
-  @Provides
-  @Singleton
-  @AppIconRes
-  fun provideAppIconRes(): Int = R.mipmap.ic_launcher
+  @Query("SELECT * FROM sites ORDER BY name ASC")
+  fun all(): List<Site>
 
-  @Provides
-  @Singleton
-  @MainActivityClass
-  fun provideMainActivityClass(): Class<*> = MainActivity::class.java
+  @Query("SELECT * FROM sites WHERE id = :id LIMIT 1")
+  fun one(id: Long): List<Site>
+
+  @Insert(onConflict = FAIL)
+  fun insert(site: Site): Long
+
+  @Update(onConflict = FAIL)
+  fun update(site: Site): Int
+
+  @Delete
+  fun delete(site: Site): Int
 }

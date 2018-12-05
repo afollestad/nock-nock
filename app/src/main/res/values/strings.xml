@@ -22,33 +22,32 @@
   <string name="please_enter_name">Please enter a name!</string>
   <string name="please_enter_url">Please enter a URL.</string>
   <string name="please_enter_valid_url">Please enter a valid URL.</string>
-  <string name="please_enter_check_interval">Please input a check interval.</string>
+  <string name="please_enter_check_interval">Please input a validation interval.</string>
   <string name="please_enter_search_term">Please input a search term.</string>
   <string name="please_enter_javaScript">Please input a validation script.</string>
   <string name="please_enter_networkTimeout">Please enter a network timeout greater than 0.</string>
 
   <string name="options">Options</string>
-  <string name="already_checking_sites">Already checking sites!</string>
   <string name="remove_site">Remove Site</string>
   <string name="remove_site_prompt"><![CDATA[Remove <b>%1$s</b> from your sites?]]></string>
   <string name="remove">Remove</string>
   <string name="save_changes">Save Changes</string>
   <string name="view_site">View Site</string>
-  <string name="last_check_result">Last Check Result</string>
-  <string name="next_check">Next Check</string>
-  <string name="next_check_x">Next Check: %1$s</string>
+  <string name="last_check_result">Last Validation Result</string>
+  <string name="next_check">Next Validation</string>
+  <string name="next_check_x">Next Validation: %1$s</string>
   <string name="now">Now</string>
   <string name="none_turned_off">None (turned off)</string>
   <string name="none">None</string>
 
-  <string name="disable_automatic_checks">Disable Automatic Checks</string>
+  <string name="disable_automatic_checks">Disable Automatic Validation</string>
   <string name="disable_automatic_checks_prompt"><![CDATA[
-      Disable automatic checks for <b>%1$s</b>? The site will not be validated in the background
-      until you re-enable checks for it. You can still manually perform checks by tapping the
+      Disable automatic validation for <b>%1$s</b>? The site will not be checked in the background
+      until you re-enable validation for it. You can still manually perform validation by tapping the
       Refresh icon at the top of this page.
   ]]></string>
   <string name="disable">Disable</string>
-  <string name="renable_and_save_changes">Enable Checks &amp; Save Changes</string>
+  <string name="renable_and_save_changes">Enable Auto Validation &amp; Save Changes</string>
 
   <string name="response_timeout">Network Response Timeout</string>
   <string name="response_timeout_default">10000</string>
@@ -56,22 +55,22 @@
   <string name="refresh_status">Refresh Status</string>
 
   <string name="warning_http_url">
-    Warning: this app checks for server availability with HTTP requests. It\'s recommended that you
+    Warning: this app validates sites availability with HTTP requests. It\'s recommended that you
     use an HTTP URL.
   </string>
   <string name="response_validation_mode">Response Validation Mode</string>
   <string name="search_term">Search term…</string>
 
   <string name="validation_mode_status_desc">
-    The HTTP status code is checked. If it\'s a successful status code, the site passes the check.
+    The HTTP status code is checked. If it\'s a successful status code, the site passes validation.
   </string>
   <string name="validation_mode_term_desc">
     The status code check is done first. If it\'s successful, the response body is checked.
-    If it contains your search term, the site passes the check.
+    If it contains your search term, the site passes validation.
   </string>
   <string name="validation_mode_javascript_desc">
     The status code check is done first. If it\'s successful, the response body is passed to the
-    JavaScript function above. If the function returns true, the site passes the check. Throw an
+    JavaScript function above. If the function returns true, the site passes validation. Throw an
     exception to pass custom error messages to Nock Nock.
   </string>
 

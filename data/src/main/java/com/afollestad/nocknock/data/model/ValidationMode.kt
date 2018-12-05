@@ -13,12 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.afollestad.nocknock.data
+package com.afollestad.nocknock.data.model
 
-/** @author Aidan Follestad (@afollestad) */
+/**
+ * Represents the validation mode of a [Site] - this is the type of
+ * check that is performed to get the site's current [Status].
+ *
+ * @author Aidan Follestad (@afollestad)
+ */
 enum class ValidationMode(val value: Int) {
+  /** The site is running normally if its status code is successful. */
   STATUS_CODE(1),
+  /** The site is running normally if a piece of text is found in its response body. */
   TERM_SEARCH(2),
+  /** The site is running normally if a block of given JavaScript executes successfully. */
   JAVASCRIPT(3);
 
   companion object {
@@ -39,6 +47,8 @@ enum class ValidationMode(val value: Int) {
   }
 }
 
-fun Int.toValidationMode() = ValidationMode.fromValue(this)
+fun Int.toValidationMode() =
+  ValidationMode.fromValue(this)
 
-fun Int.indexToValidationMode() = ValidationMode.fromIndex(this)
+fun Int.indexToValidationMode() =
+  ValidationMode.fromIndex(this)

@@ -18,8 +18,8 @@ package com.afollestad.nocknock.ui.viewsite
 import android.widget.ImageView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.nocknock.R
-import com.afollestad.nocknock.data.ServerModel
-import com.afollestad.nocknock.data.isPending
+import com.afollestad.nocknock.data.model.Site
+import com.afollestad.nocknock.data.model.isPending
 import com.afollestad.nocknock.toHtml
 import com.afollestad.nocknock.utilities.ext.animateRotation
 import kotlinx.android.synthetic.main.activity_viewsite.toolbar
@@ -46,11 +46,11 @@ internal fun ViewSiteActivity.maybeDisableChecks() {
   }
 }
 
-internal fun ViewSiteActivity.invalidateMenuForStatus(model: ServerModel) {
+internal fun ViewSiteActivity.invalidateMenuForStatus(model: Site) {
   val refreshIcon = toolbar.menu.findItem(R.id.refresh)
       .actionView as ImageView
 
-  if (model.status.isPending()) {
+  if (model.lastResult?.status.isPending()) {
     refreshIcon.animateRotation()
   } else {
     refreshIcon.run {

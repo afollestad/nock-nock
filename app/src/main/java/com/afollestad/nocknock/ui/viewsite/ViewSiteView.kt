@@ -16,7 +16,7 @@
 package com.afollestad.nocknock.ui.viewsite
 
 import androidx.annotation.StringRes
-import com.afollestad.nocknock.data.ServerModel
+import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.utilities.ext.ScopeReceiver
 import kotlin.coroutines.CoroutineContext
 
@@ -27,7 +27,7 @@ interface ViewSiteView {
 
   fun setDoneLoading()
 
-  fun displayModel(model: ServerModel)
+  fun displayModel(model: Site)
 
   fun showOrHideUrlSchemeWarning(show: Boolean)
 

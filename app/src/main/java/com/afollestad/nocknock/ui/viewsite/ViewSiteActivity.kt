@@ -24,15 +24,15 @@ import android.os.Bundle
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import com.afollestad.nocknock.R
-import com.afollestad.nocknock.data.LAST_CHECK_NONE
-import com.afollestad.nocknock.data.ServerModel
-import com.afollestad.nocknock.data.ValidationMode
-import com.afollestad.nocknock.data.ValidationMode.JAVASCRIPT
-import com.afollestad.nocknock.data.ValidationMode.STATUS_CODE
-import com.afollestad.nocknock.data.ValidationMode.TERM_SEARCH
-import com.afollestad.nocknock.data.indexToValidationMode
-import com.afollestad.nocknock.data.textRes
-import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob.Companion.ACTION_STATUS_UPDATE
+import com.afollestad.nocknock.data.model.Site
+import com.afollestad.nocknock.data.model.Status.WAITING
+import com.afollestad.nocknock.data.model.ValidationMode
+import com.afollestad.nocknock.data.model.ValidationMode.JAVASCRIPT
+import com.afollestad.nocknock.data.model.ValidationMode.STATUS_CODE
+import com.afollestad.nocknock.data.model.ValidationMode.TERM_SEARCH
+import com.afollestad.nocknock.data.model.indexToValidationMode
+import com.afollestad.nocknock.data.model.textRes
+import com.afollestad.nocknock.engine.statuscheck.ValidationJob.Companion.ACTION_STATUS_UPDATE
 import com.afollestad.nocknock.utilities.ext.ScopeReceiver
 import com.afollestad.nocknock.utilities.ext.formatDate
 import com.afollestad.nocknock.utilities.ext.injector
@@ -63,6 +63,7 @@ import kotlinx.android.synthetic.main.activity_viewsite.textNextCheck
 import kotlinx.android.synthetic.main.activity_viewsite.textUrlWarning
 import kotlinx.android.synthetic.main.activity_viewsite.toolbar
 import kotlinx.android.synthetic.main.activity_viewsite.validationModeDescription
+import java.lang.System.currentTimeMillis
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -132,7 +133,7 @@ class ViewSiteActivity : AppCompatActivity(), ViewSiteView {
           url = inputUrl.trimmedText(),
           checkInterval = checkInterval,
           validationMode = validationMode,
-          validationContent = validationMode.validationContent(),
+          validationArgs = validationMode.validationContent(),
           networkTimeout = responseTimeoutInput.textAsInt(defaultValue = defaultTimeout)
       )
     }
@@ -170,44 +171,48 @@ class ViewSiteActivity : AppCompatActivity(), ViewSiteView {
 
   override fun setValidationModeDescription(res: Int) = validationModeDescription.setText(res)
 
-  override fun displayModel(model: ServerModel) = with(model) {
-    iconStatus.setStatus(this.status)
+  override fun displayModel(model: Site) = with(model) {
+    val siteSettings = this.settings
+    requireNotNull(siteSettings) { "Site settings must be populated." }
+
+    iconStatus.setStatus(this.lastResult?.status ?: WAITING)
     inputName.setText(this.name)
     inputUrl.setText(this.url)
 
-    if (this.lastCheck == LAST_CHECK_NONE) {
+    if (this.lastResult == null) {
       textLastCheckResult.setText(R.string.none)
     } else {
-      val statusText = this.status.textRes()
+      val statusText = this.lastResult!!.status.textRes()
       textLastCheckResult.text = if (statusText == 0) {
-        this.reason
+        this.lastResult!!.reason
       } else {
         getString(statusText)
       }
     }
 
-    if (this.disabled) {
+    if (siteSettings.disabled) {
       textNextCheck.setText(R.string.auto_checks_disabled)
     } else {
-      textNextCheck.text = (this.lastCheck + this.checkInterval).formatDate()
+      val lastCheck = this.lastResult?.timestampMs ?: currentTimeMillis()
+      textNextCheck.text = (lastCheck + siteSettings.validationIntervalMs).formatDate()
     }
-    checkIntervalLayout.set(this.checkInterval)
+    checkIntervalLayout.set(siteSettings.validationIntervalMs)
 
-    responseValidationMode.setSelection(validationMode.value - 1)
-    when (this.validationMode) {
-      TERM_SEARCH -> responseValidationSearchTerm.setText(this.validationContent ?: "")
-      JAVASCRIPT -> scriptInputLayout.setCode(this.validationContent)
+    responseValidationMode.setSelection(siteSettings.validationMode.value - 1)
+    when (siteSettings.validationMode) {
+      TERM_SEARCH -> responseValidationSearchTerm.setText(siteSettings.validationArgs ?: "")
+      JAVASCRIPT -> scriptInputLayout.setCode(siteSettings.validationArgs)
       else -> {
         responseValidationSearchTerm.setText("")
         scriptInputLayout.clear()
       }
     }
 
-    responseTimeoutInput.setText(model.networkTimeout.toString())
+    responseTimeoutInput.setText(siteSettings.networkTimeout.toString())
 
-    disableChecksButton.showOrHide(!this.disabled)
+    disableChecksButton.showOrHide(!siteSettings.disabled)
     doneBtn.setText(
-        if (this.disabled) R.string.renable_and_save_changes
+        if (siteSettings.disabled) R.string.renable_and_save_changes
         else R.string.save_changes
     )
 

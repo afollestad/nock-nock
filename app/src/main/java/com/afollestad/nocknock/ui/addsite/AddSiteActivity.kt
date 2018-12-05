@@ -20,11 +20,11 @@ import android.os.Bundle
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import com.afollestad.nocknock.R
-import com.afollestad.nocknock.data.ValidationMode
-import com.afollestad.nocknock.data.ValidationMode.JAVASCRIPT
-import com.afollestad.nocknock.data.ValidationMode.STATUS_CODE
-import com.afollestad.nocknock.data.ValidationMode.TERM_SEARCH
-import com.afollestad.nocknock.data.indexToValidationMode
+import com.afollestad.nocknock.data.model.ValidationMode
+import com.afollestad.nocknock.data.model.ValidationMode.JAVASCRIPT
+import com.afollestad.nocknock.data.model.ValidationMode.STATUS_CODE
+import com.afollestad.nocknock.data.model.ValidationMode.TERM_SEARCH
+import com.afollestad.nocknock.data.model.indexToValidationMode
 import com.afollestad.nocknock.utilities.ext.ScopeReceiver
 import com.afollestad.nocknock.utilities.ext.injector
 import com.afollestad.nocknock.utilities.ext.scopeWhileAttached
@@ -119,7 +119,7 @@ class AddSiteActivity : AppCompatActivity(), AddSiteView {
           url = inputUrl.trimmedText(),
           checkInterval = checkInterval,
           validationMode = validationMode,
-          validationContent = validationMode.validationContent(),
+          validationArgs = validationMode.validationContent(),
           networkTimeout = responseTimeoutInput.textAsInt(defaultValue = defaultTimeout)
       )
     }

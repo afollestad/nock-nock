@@ -18,17 +18,20 @@ package com.afollestad.nocknock.engine.statuscheck
 import android.app.job.JobParameters
 import android.app.job.JobService
 import android.content.Intent
-import com.afollestad.nocknock.data.ServerModel
-import com.afollestad.nocknock.data.ServerStatus
-import com.afollestad.nocknock.data.ServerStatus.CHECKING
-import com.afollestad.nocknock.data.ServerStatus.ERROR
-import com.afollestad.nocknock.data.ServerStatus.OK
-import com.afollestad.nocknock.data.ValidationMode.JAVASCRIPT
-import com.afollestad.nocknock.data.ValidationMode.STATUS_CODE
-import com.afollestad.nocknock.data.ValidationMode.TERM_SEARCH
-import com.afollestad.nocknock.data.isPending
+import com.afollestad.nocknock.data.AppDatabase
+import com.afollestad.nocknock.data.model.Site
+import com.afollestad.nocknock.data.model.Status
+import com.afollestad.nocknock.data.model.Status.CHECKING
+import com.afollestad.nocknock.data.model.Status.ERROR
+import com.afollestad.nocknock.data.model.Status.OK
+import com.afollestad.nocknock.data.model.Status.WAITING
+import com.afollestad.nocknock.data.model.ValidationMode.JAVASCRIPT
+import com.afollestad.nocknock.data.model.ValidationMode.STATUS_CODE
+import com.afollestad.nocknock.data.model.ValidationMode.TERM_SEARCH
+import com.afollestad.nocknock.data.model.isPending
+import com.afollestad.nocknock.data.getSite
+import com.afollestad.nocknock.data.updateSite
 import com.afollestad.nocknock.engine.BuildConfig.APPLICATION_ID
-import com.afollestad.nocknock.engine.db.ServerModelStore
 import com.afollestad.nocknock.notifications.NockNotificationManager
 import com.afollestad.nocknock.utilities.ext.injector
 import com.afollestad.nocknock.utilities.js.JavaScript
@@ -42,8 +45,12 @@ import java.lang.System.currentTimeMillis
 import javax.inject.Inject
 import timber.log.Timber.d as log
 
-/** @author Aidan Follestad (@afollestad)*/
-class CheckStatusJob : JobService() {
+/**
+ * The job which is sent to the system JobScheduler to perform site validation in the background.
+ *
+ * @author Aidan Follestad (@afollestad)
+ */
+class ValidationJob : JobService() {
 
   companion object {
     const val ACTION_STATUS_UPDATE = "$APPLICATION_ID.STATUS_UPDATE"
@@ -52,47 +59,50 @@ class CheckStatusJob : JobService() {
     const val KEY_SITE_ID = "site.id"
   }
 
-  @Inject lateinit var modelStore: ServerModelStore
-  @Inject lateinit var checkStatusManager: CheckStatusManager
+  @Inject lateinit var database: AppDatabase
+  @Inject lateinit var checkStatusManager: ValidationManager
   @Inject lateinit var notificationManager: NockNotificationManager
 
   override fun onStartJob(params: JobParameters): Boolean {
     injector().injectInto(this)
-    val siteId = params.extras.getInt(KEY_SITE_ID)
+    val siteId = params.extras.getLong(KEY_SITE_ID)
 
     GlobalScope.launch(Main) {
-      val sites = async(IO) { modelStore.get(id = siteId) }.await()
-      if (sites.isEmpty()) {
-        log("Unable to find any sites for ID $siteId, this job will not be rescheduled.")
+      val site = async(IO) { database.getSite(siteId) }.await()
+      if (site == null) {
+        log("Unable to find a site for ID $siteId, this job will not be rescheduled.")
         return@launch jobFinished(params, false)
       }
 
-      val site = sites.single()
+      val siteSettings = site.settings
+      requireNotNull(siteSettings) { "Site settings must be populated." }
+
       log("Performing status checks on site ${site.id}...")
       sendBroadcast(Intent(ACTION_JOB_RUNNING).apply { putExtra(KEY_SITE_ID, site.id) })
 
       log("Checking ${site.name} (${site.url})...")
 
-      val result = async(IO) {
+      val jobResult = async(IO) {
         updateStatus(site, CHECKING)
         val checkResult = checkStatusManager.performCheck(site)
         val resultModel = checkResult.model
         val resultResponse = checkResult.response
+        val result = resultModel.lastResult!!
 
-        if (resultModel.status != OK) {
-          log("Got unsuccessful check status back: ${resultModel.reason}")
+        if (result.status != OK) {
+          log("Got unsuccessful check status back: ${result.reason}")
           return@async updateStatus(site = resultModel)
         } else {
-          when (site.validationMode) {
+          when (siteSettings.validationMode) {
             TERM_SEARCH -> {
               val body = resultResponse?.body()?.string() ?: ""
               log("Using TERM_SEARCH validation mode on body of length: ${body.length}")
 
-              return@async if (!body.contains(site.validationContent ?: "")) {
+              return@async if (!body.contains(siteSettings.validationArgs ?: "")) {
                 updateStatus(
-                    resultModel.copy(
+                    resultModel.withStatus(
                         status = ERROR,
-                        reason = "Term \"${site.validationContent}\" not found in response body."
+                        reason = "Term \"${siteSettings.validationArgs}\" not found in response body."
                     )
                 )
               } else {
@@ -102,9 +112,9 @@ class CheckStatusJob : JobService() {
             JAVASCRIPT -> {
               val body = resultResponse?.body()?.string() ?: ""
               log("Using JAVASCRIPT validation mode on body of length: ${body.length}")
-              val reason = JavaScript.eval(resultModel.validationContent ?: "", body)
+              val reason = JavaScript.eval(siteSettings.validationArgs ?: "", body)
               return@async if (reason != null) {
-                updateStatus(resultModel.copy(reason = reason), status = ERROR)
+                updateStatus(resultModel.withStatus(reason = reason), status = ERROR)
               } else {
                 resultModel
               }
@@ -113,27 +123,29 @@ class CheckStatusJob : JobService() {
               // We already know the status code is successful because we are in this else branch
               log("Using STATUS_CODE validation, which has passed!")
               updateStatus(
-                  resultModel.copy(
+                  resultModel.withStatus(
                       status = OK,
                       reason = null
                   )
               )
             }
             else -> {
-              throw IllegalArgumentException("Unknown validation mode: ${site.validationMode}")
+              throw IllegalArgumentException(
+                  "Unknown validation mode: ${siteSettings.validationArgs}"
+              )
             }
           }
         }
       }.await()
 
-      if (result.status == OK) {
-        notificationManager.cancelStatusNotification(result)
+      if (jobResult.lastResult!!.status == OK) {
+        notificationManager.cancelStatusNotification(jobResult)
       } else {
-        notificationManager.postStatusNotification(result)
+        notificationManager.postStatusNotification(jobResult)
       }
 
       checkStatusManager.scheduleCheck(
-          site = result,
+          site = jobResult,
           fromFinishingJob = true
       )
     }
@@ -148,28 +160,30 @@ class CheckStatusJob : JobService() {
   }
 
   private suspend fun updateStatus(
-    site: ServerModel,
-    status: ServerStatus = site.status
-  ): ServerModel {
+    site: Site,
+    status: Status = site.lastResult?.status ?: WAITING
+  ): Site {
     log("Updating ${site.name} (${site.url}) status to $status...")
 
     val lastCheckTime =
-      if (status.isPending()) site.lastCheck
+      if (status.isPending()) site.lastResult?.timestampMs ?: -1
       else currentTimeMillis()
     val reason =
       if (status == OK) null
-      else site.reason
+      else site.lastResult?.reason ?: "Unknown"
 
-    val newSiteModel = site.copy(
+    val updatedModel = site.withStatus(
         status = status,
-        lastCheck = lastCheckTime,
+        timestamp = lastCheckTime,
         reason = reason
     )
-    modelStore.update(newSiteModel)
+    database.updateSite(updatedModel)
 
     withContext(Main) {
-      sendBroadcast(Intent(ACTION_STATUS_UPDATE).apply { putExtra(KEY_UPDATE_MODEL, newSiteModel) })
+      sendBroadcast(Intent(ACTION_STATUS_UPDATE).apply {
+        putExtra(KEY_UPDATE_MODEL, updatedModel)
+      })
     }
-    return newSiteModel
+    return updatedModel
   }
 }

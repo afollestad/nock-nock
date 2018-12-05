@@ -24,16 +24,20 @@ import java.io.Serializable
 import javax.inject.Inject
 
 /** @author Aidan Follestad (@afollestad) */
-interface IdProvider : Serializable {
+interface CanNotifyModel : Serializable {
 
-  fun id(): Int
+  fun notiId(): Int
+
+  fun notiName(): String
+
+  fun notiTag(): String
 }
 
 /** @author Aidan Follestad (@afollestad) */
 interface IntentProvider {
 
   fun getPendingIntentForViewSite(
-    model: IdProvider
+    model: CanNotifyModel
   ): PendingIntent
 }
 
@@ -48,17 +52,17 @@ class RealIntentProvider @Inject constructor(
     const val KEY_VIEW_NOTIFICATION_MODEL = "model"
   }
 
-  override fun getPendingIntentForViewSite(model: IdProvider): PendingIntent {
+  override fun getPendingIntentForViewSite(model: CanNotifyModel): PendingIntent {
     val openIntent = getIntentForViewSite(model)
     return PendingIntent.getActivity(
         app,
-        BASE_NOTIFICATION_REQUEST_CODE + model.id(),
+        BASE_NOTIFICATION_REQUEST_CODE + model.notiId(),
         openIntent,
         FLAG_CANCEL_CURRENT
     )
   }
 
-  private fun getIntentForViewSite(model: IdProvider) =
+  private fun getIntentForViewSite(model: CanNotifyModel) =
     Intent(app, mainActivity).apply {
       putExtra(KEY_VIEW_NOTIFICATION_MODEL, model)
     }

@@ -16,6 +16,7 @@
 package com.afollestad.nocknock.viewcomponents
 
 import android.content.Context
+import android.os.Handler
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
@@ -32,6 +33,7 @@ class LoadingIndicatorFrame(
   }
 
   private val showRunnable = Runnable { show() }
+  private val delayHandler = Handler()
 
   init {
     setBackgroundColor(ContextCompat.getColor(context, R.color.loading_indicator_frame_background))
@@ -42,11 +44,11 @@ class LoadingIndicatorFrame(
   }
 
   fun setLoading() {
-    handler.postDelayed(showRunnable, SHOW_DELAY_MS)
+    delayHandler.postDelayed(showRunnable, SHOW_DELAY_MS)
   }
 
   fun setDone() {
-    handler.removeCallbacks(showRunnable)
+    delayHandler.removeCallbacks(showRunnable)
     hide()
   }
 }

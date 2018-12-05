@@ -13,27 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.afollestad.nocknock.ui.main
+package com.afollestad.nocknock.data.model
 
-import com.afollestad.nocknock.data.model.Site
-import com.afollestad.nocknock.utilities.ext.ScopeReceiver
-import kotlin.coroutines.CoroutineContext
+import androidx.room.TypeConverter
 
 /** @author Aidan Follestad (@afollestad) */
-interface MainView {
+class Converters {
 
-  fun setLoading()
+  @TypeConverter
+  fun fromStatus(status: Status): Int {
+    return status.value
+  }
 
-  fun setDoneLoading()
+  @TypeConverter
+  fun toStatus(raw: Int): Status {
+    return Status.fromValue(raw)
+  }
 
-  fun setModels(models: List<Site>)
+  @TypeConverter
+  fun fromValidationMode(mode: ValidationMode): Int {
+    return mode.value
+  }
 
-  fun updateModel(model: Site)
-
-  fun onSiteDeleted(model: Site)
-
-  fun scopeWhileAttached(
-    context: CoroutineContext,
-    exec: ScopeReceiver
-  )
+  @TypeConverter
+  fun toValidationMode(raw: Int): ValidationMode {
+    return ValidationMode.fromValue(raw)
+  }
 }

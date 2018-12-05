@@ -19,7 +19,7 @@ import android.app.Application
 import com.afollestad.nocknock.di.AppComponent
 import com.afollestad.nocknock.di.DaggerAppComponent
 import com.afollestad.nocknock.engine.statuscheck.BootReceiver
-import com.afollestad.nocknock.engine.statuscheck.CheckStatusJob
+import com.afollestad.nocknock.engine.statuscheck.ValidationJob
 import com.afollestad.nocknock.notifications.NockNotificationManager
 import com.afollestad.nocknock.ui.addsite.AddSiteActivity
 import com.afollestad.nocknock.ui.main.MainActivity
@@ -82,7 +82,7 @@ class NockNockApp : Application(), Injector {
     is MainActivity -> appComponent.inject(target)
     is ViewSiteActivity -> appComponent.inject(target)
     is AddSiteActivity -> appComponent.inject(target)
-    is CheckStatusJob -> appComponent.inject(target)
+    is ValidationJob -> appComponent.inject(target)
     is BootReceiver -> appComponent.inject(target)
     else -> throw IllegalStateException("Can't inject into $target")
   }

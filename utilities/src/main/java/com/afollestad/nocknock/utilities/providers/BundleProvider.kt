@@ -19,9 +19,9 @@ import android.os.PersistableBundle
 import javax.inject.Inject
 
 interface IBundle {
-  fun putInt(
+  fun putLong(
     key: String,
-    value: Int
+    value: Long
   )
 }
 
@@ -30,7 +30,7 @@ typealias IBundler = IBundle.() -> Unit
 /** @author Aidan Follestad (@afollestad) */
 interface BundleProvider {
 
-  fun createPersistable(builder: IBundle.() -> Unit): PersistableBundle
+  fun createPersistable(bundler: IBundle.() -> Unit): PersistableBundle
 }
 
 /** @author Aidan Follestad (@afollestad) */
@@ -39,10 +39,10 @@ class RealBundleProvider @Inject constructor() : BundleProvider {
   override fun createPersistable(bundler: IBundler): PersistableBundle {
     val realBundle = PersistableBundle()
     bundler(object : IBundle {
-      override fun putInt(
+      override fun putLong(
         key: String,
-        value: Int
-      ) = realBundle.putInt(key, value)
+        value: Long
+      ) = realBundle.putLong(key, value)
     })
     return realBundle
   }
