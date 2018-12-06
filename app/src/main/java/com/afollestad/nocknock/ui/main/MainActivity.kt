@@ -15,12 +15,12 @@
  */
 package com.afollestad.nocknock.ui.main
 
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.DividerItemDecoration.VERTICAL
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,43 +30,58 @@ import com.afollestad.nocknock.R
 import com.afollestad.nocknock.adapter.ServerAdapter
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.dialogs.AboutDialog
-import com.afollestad.nocknock.engine.statuscheck.ValidationJob.Companion.ACTION_STATUS_UPDATE
-import com.afollestad.nocknock.utilities.ext.ScopeReceiver
+import com.afollestad.nocknock.notifications.NockNotificationManager
+import com.afollestad.nocknock.broadcasts.StatusUpdateIntentReceiver
 import com.afollestad.nocknock.utilities.ext.injector
-import com.afollestad.nocknock.utilities.ext.safeRegisterReceiver
-import com.afollestad.nocknock.utilities.ext.safeUnregisterReceiver
-import com.afollestad.nocknock.utilities.ext.scopeWhileAttached
 import com.afollestad.nocknock.viewcomponents.ext.showOrHide
 import kotlinx.android.synthetic.main.activity_main.fab
 import kotlinx.android.synthetic.main.activity_main.list
 import kotlinx.android.synthetic.main.activity_main.loadingProgress
-import kotlinx.android.synthetic.main.activity_main.rootView
 import kotlinx.android.synthetic.main.activity_main.toolbar
 import kotlinx.android.synthetic.main.include_empty_view.emptyText
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 /** @author Aidan Follestad (@afollestad) */
-class MainActivity : AppCompatActivity(), MainView {
+class MainActivity : AppCompatActivity() {
 
-  private val intentReceiver = object : BroadcastReceiver() {
-    override fun onReceive(
-      context: Context,
-      intent: Intent
-    ) = presenter.onBroadcast(intent)
-  }
-
-  @Inject lateinit var presenter: MainPresenter
+  @Inject lateinit var notificationManager: NockNotificationManager
+  @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
 
   private lateinit var adapter: ServerAdapter
 
+  internal val viewModel by lazy {
+    return@lazy ViewModelProviders.of(this, viewModelFactory)
+        .get(MainViewModel::class.java)
+  }
+  private val statusUpdateReceiver =
+    StatusUpdateIntentReceiver(application) {
+      viewModel.postSiteUpdate(it)
+    }
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-
     injector().injectInto(this)
     setContentView(R.layout.activity_main)
-    presenter.takeView(this)
+    setupUi()
 
+    notificationManager.createChannels()
+
+    lifecycle.run {
+      addObserver(viewModel)
+      addObserver(statusUpdateReceiver)
+    }
+
+    viewModel.onSites()
+        .observe(this, Observer {
+          adapter.set(it)
+          emptyText.showOrHide(it.isEmpty())
+        })
+    loadingProgress.observe(this, viewModel.onIsLoading())
+
+    processIntent(intent)
+  }
+
+  private fun setupUi() {
     toolbar.inflateMenu(R.menu.menu_main)
     toolbar.setOnMenuItemClickListener { item ->
       if (item.itemId == R.id.about) {
@@ -82,60 +97,12 @@ class MainActivity : AppCompatActivity(), MainView {
     list.addItemDecoration(DividerItemDecoration(this, VERTICAL))
 
     fab.setOnClickListener { addSite() }
-
-    processIntent(intent)
   }
 
   override fun onNewIntent(intent: Intent?) {
     super.onNewIntent(intent)
     intent?.let(::processIntent)
   }
-
-  override fun onResume() {
-    super.onResume()
-    val filter = IntentFilter().apply {
-      addAction(ACTION_STATUS_UPDATE)
-    }
-    safeRegisterReceiver(intentReceiver, filter)
-    presenter.resume()
-  }
-
-  override fun onPause() {
-    super.onPause()
-    safeUnregisterReceiver(intentReceiver)
-  }
-
-  override fun onDestroy() {
-    presenter.dropView()
-    super.onDestroy()
-  }
-
-  override fun setLoading() = loadingProgress.setLoading()
-
-  override fun setDoneLoading() = loadingProgress.setDone()
-
-  override fun setModels(models: List<Site>) {
-    list.post {
-      adapter.set(models)
-      emptyText.showOrHide(models.isEmpty())
-    }
-  }
-
-  override fun updateModel(model: Site) {
-    list.post { adapter.update(model) }
-  }
-
-  override fun onSiteDeleted(model: Site) {
-    list.post {
-      adapter.remove(model)
-      emptyText.showOrHide(adapter.itemCount == 0)
-    }
-  }
-
-  override fun scopeWhileAttached(
-    context: CoroutineContext,
-    exec: ScopeReceiver
-  ) = rootView.scopeWhileAttached(context, exec)
 
   private fun onSiteSelected(
     model: Site,
@@ -146,7 +113,7 @@ class MainActivity : AppCompatActivity(), MainView {
         title(R.string.options)
         listItems(R.array.site_long_options) { _, i, _ ->
           when (i) {
-            0 -> presenter.refreshSite(model)
+            0 -> viewModel.refreshSite(model)
             1 -> maybeRemoveSite(model)
           }
         }

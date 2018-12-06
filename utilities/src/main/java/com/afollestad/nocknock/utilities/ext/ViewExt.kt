@@ -1,4 +1,4 @@
-/*
+/**
  * Designed and developed by Aidan Follestad (@afollestad)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,19 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.afollestad.nocknock.engine;
+package com.afollestad.nocknock.utilities.ext
 
-import com.afollestad.nocknock.engine.validation.RealValidationManager;
-import com.afollestad.nocknock.engine.validation.ValidationManager;
-import dagger.Binds;
-import dagger.Module;
-import javax.inject.Singleton;
+import android.text.Editable
+import android.text.TextWatcher
+import android.widget.EditText
 
-/** @author Aidan Follestad (@afollestad) */
-@Module
-public abstract class EngineModule {
+fun EditText.onTextChanged(cb: (String) -> Unit) {
+  addTextChangedListener(object : TextWatcher {
+    override fun afterTextChanged(s: Editable?) = Unit
 
-  @Binds
-  @Singleton
-  abstract ValidationManager provideValidationManager(RealValidationManager checkStatusManager);
+    override fun beforeTextChanged(
+      s: CharSequence,
+      start: Int,
+      count: Int,
+      after: Int
+    ) = Unit
+
+    override fun onTextChanged(
+      s: CharSequence,
+      start: Int,
+      before: Int,
+      count: Int
+    ) = cb(s.toString().trim())
+  })
 }

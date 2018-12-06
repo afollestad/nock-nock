@@ -19,21 +19,17 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.data.model.ValidationMode
-import com.afollestad.nocknock.data.model.ValidationMode.JAVASCRIPT
-import com.afollestad.nocknock.data.model.ValidationMode.STATUS_CODE
-import com.afollestad.nocknock.data.model.ValidationMode.TERM_SEARCH
-import com.afollestad.nocknock.data.model.indexToValidationMode
-import com.afollestad.nocknock.utilities.ext.ScopeReceiver
 import com.afollestad.nocknock.utilities.ext.injector
-import com.afollestad.nocknock.utilities.ext.scopeWhileAttached
+import com.afollestad.nocknock.viewcomponents.ext.attachLiveData
 import com.afollestad.nocknock.viewcomponents.ext.conceal
-import com.afollestad.nocknock.viewcomponents.ext.onItemSelected
 import com.afollestad.nocknock.viewcomponents.ext.onLayout
-import com.afollestad.nocknock.viewcomponents.ext.showOrHide
-import com.afollestad.nocknock.viewcomponents.ext.textAsInt
-import com.afollestad.nocknock.viewcomponents.ext.trimmedText
+import com.afollestad.nocknock.viewcomponents.ext.toViewError
+import com.afollestad.nocknock.viewcomponents.ext.toViewText
+import com.afollestad.nocknock.viewcomponents.ext.toViewVisibility
 import kotlinx.android.synthetic.main.activity_addsite.checkIntervalLayout
 import kotlinx.android.synthetic.main.activity_addsite.doneBtn
 import kotlinx.android.synthetic.main.activity_addsite.inputName
@@ -48,7 +44,6 @@ import kotlinx.android.synthetic.main.activity_addsite.textUrlWarning
 import kotlinx.android.synthetic.main.activity_addsite.toolbar
 import kotlinx.android.synthetic.main.activity_addsite.validationModeDescription
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import kotlin.math.max
 import kotlin.properties.Delegates.notNull
 
@@ -57,14 +52,19 @@ const val KEY_FAB_Y = "fab_y"
 const val KEY_FAB_SIZE = "fab_size"
 
 /** @author Aidan Follestad (@afollestad) */
-class AddSiteActivity : AppCompatActivity(), AddSiteView {
+class AddSiteActivity : AppCompatActivity() {
 
-  var isClosing: Boolean = false
   var revealCx by notNull<Int>()
   var revealCy by notNull<Int>()
   var revealRadius by notNull<Float>()
 
-  @Inject lateinit var presenter: AddSitePresenter
+  @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
+
+  internal var isClosing = false
+  private val viewModel by lazy {
+    return@lazy ViewModelProviders.of(this, viewModelFactory)
+        .get(AddSiteViewModel::class.java)
+  }
 
   @SuppressLint("SetTextI18n")
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,8 +72,70 @@ class AddSiteActivity : AppCompatActivity(), AddSiteView {
 
     injector().injectInto(this)
     setContentView(R.layout.activity_addsite)
-    presenter.takeView(this)
+    setupUi(savedInstanceState)
 
+    lifecycle.addObserver(viewModel)
+
+    // Loading
+    loadingProgress.observe(this, viewModel.onIsLoading())
+
+    // Name
+    inputName.attachLiveData(this, viewModel.name)
+    viewModel.onNameError()
+        .toViewError(this, inputName)
+
+    // Url
+    inputUrl.attachLiveData(this, viewModel.url)
+    viewModel.onUrlError()
+        .toViewError(this, inputUrl)
+    viewModel.onUrlWarningVisibility()
+        .toViewVisibility(this, textUrlWarning)
+
+    // Timeout
+    responseTimeoutInput.attachLiveData(this, viewModel.timeout)
+    viewModel.onTimeoutError()
+        .toViewError(this, responseTimeoutInput)
+
+    // Validation mode
+    responseValidationMode.attachLiveData(this, viewModel.validationMode,
+        { ValidationMode.fromIndex(it) },
+        { it.toIndex() }
+    )
+    viewModel.onValidationSearchTermError()
+        .toViewError(this, responseValidationSearchTerm)
+    viewModel.onValidationModeDescription()
+        .toViewText(this, validationModeDescription)
+
+    // Validation search term
+    responseValidationSearchTerm.attachLiveData(this, viewModel.validationSearchTerm)
+    viewModel.onValidationSearchTermVisibility()
+        .toViewVisibility(this, responseValidationSearchTerm)
+
+    // Validation script
+    scriptInputLayout.attach(
+        codeData = viewModel.validationScript,
+        errorData = viewModel.onValidationScriptError(),
+        visibility = viewModel.onValidationScriptVisibility()
+    )
+
+    // Check interval
+    checkIntervalLayout.attach(
+        valueData = viewModel.checkIntervalValue,
+        multiplierData = viewModel.checkIntervalUnit,
+        errorData = viewModel.onCheckIntervalError()
+    )
+
+    // Done button
+    doneBtn.setOnClickListener {
+      viewModel.commit {
+        setResult(RESULT_OK)
+        finish()
+        overridePendingTransition(R.anim.fade_out, R.anim.fade_out)
+      }
+    }
+  }
+
+  private fun setupUi(savedInstanceState: Bundle?) {
     toolbar.setNavigationOnClickListener { closeActivityWithReveal() }
 
     if (savedInstanceState == null) {
@@ -93,115 +155,14 @@ class AddSiteActivity : AppCompatActivity(), AddSiteView {
       }
     }
 
-    inputUrl.setOnFocusChangeListener { _, hasFocus ->
-      presenter.onUrlInputFocusChange(hasFocus, inputUrl.trimmedText())
-    }
-
     val validationOptionsAdapter = ArrayAdapter(
         this,
         R.layout.list_item_spinner,
         resources.getStringArray(R.array.response_validation_options)
     )
     validationOptionsAdapter.setDropDownViewResource(R.layout.list_item_spinner_dropdown)
-
     responseValidationMode.adapter = validationOptionsAdapter
-    responseValidationMode.onItemSelected(presenter::onValidationModeSelected)
-
-    doneBtn.setOnClickListener {
-      val checkInterval = checkIntervalLayout.getSelectedCheckInterval()
-      val validationMode =
-        responseValidationMode.selectedItemPosition.indexToValidationMode()
-      val defaultTimeout = getString(R.string.response_timeout_default).toInt()
-
-      isClosing = true
-      presenter.commit(
-          name = inputName.trimmedText(),
-          url = inputUrl.trimmedText(),
-          checkInterval = checkInterval,
-          validationMode = validationMode,
-          validationArgs = validationMode.validationContent(),
-          networkTimeout = responseTimeoutInput.textAsInt(defaultValue = defaultTimeout)
-      )
-    }
   }
-
-  override fun onDestroy() {
-    presenter.dropView()
-    super.onDestroy()
-  }
-
-  override fun setLoading() = loadingProgress.setLoading()
-
-  override fun setDoneLoading() = loadingProgress.setDone()
-
-  override fun showOrHideUrlSchemeWarning(show: Boolean) {
-    textUrlWarning.showOrHide(show)
-    if (show) {
-      textUrlWarning.setText(R.string.warning_http_url)
-    }
-  }
-
-  override fun showOrHideValidationSearchTerm(show: Boolean) =
-    responseValidationSearchTerm.showOrHide(show)
-
-  override fun showOrHideScriptInput(show: Boolean) = scriptInputLayout.showOrHide(show)
-
-  override fun setValidationModeDescription(res: Int) = validationModeDescription.setText(res)
-
-  override fun setInputErrors(errors: InputErrors) {
-    isClosing = false
-    inputName.error = if (errors.name != null) {
-      getString(errors.name!!)
-    } else {
-      null
-    }
-    inputUrl.error = if (errors.url != null) {
-      getString(errors.url!!)
-    } else {
-      null
-    }
-    checkIntervalLayout.setError(
-        if (errors.checkInterval != null) {
-          getString(errors.checkInterval!!)
-        } else {
-          null
-        }
-    )
-    responseValidationSearchTerm.error = if (errors.termSearch != null) {
-      getString(errors.termSearch!!)
-    } else {
-      null
-    }
-    scriptInputLayout.setError(
-        if (errors.javaScript != null) {
-          getString(errors.javaScript!!)
-        } else {
-          null
-        }
-    )
-    responseTimeoutInput.error = if (errors.networkTimeout != null) {
-      getString(errors.networkTimeout!!)
-    } else {
-      null
-    }
-  }
-
-  override fun onSiteAdded() {
-    setResult(RESULT_OK)
-    finish()
-    overridePendingTransition(R.anim.fade_out, R.anim.fade_out)
-  }
-
-  override fun scopeWhileAttached(
-    context: CoroutineContext,
-    exec: ScopeReceiver
-  ) = rootView.scopeWhileAttached(context, exec)
 
   override fun onBackPressed() = closeActivityWithReveal()
-
-  private fun ValidationMode.validationContent() = when (this) {
-    STATUS_CODE -> null
-    TERM_SEARCH -> responseValidationSearchTerm.trimmedText()
-    JAVASCRIPT -> scriptInputLayout.getCode()
-  }
 }

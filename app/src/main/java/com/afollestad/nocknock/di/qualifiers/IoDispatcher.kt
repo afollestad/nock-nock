@@ -13,27 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.afollestad.nocknock.ui.main
+package com.afollestad.nocknock.di.qualifiers
 
-import com.afollestad.nocknock.data.model.Site
-import com.afollestad.nocknock.utilities.ext.ScopeReceiver
-import kotlin.coroutines.CoroutineContext
+import javax.inject.Qualifier
+import kotlin.annotation.AnnotationRetention.RUNTIME
 
 /** @author Aidan Follestad (@afollestad) */
-interface MainView {
-
-  fun setLoading()
-
-  fun setDoneLoading()
-
-  fun setModels(models: List<Site>)
-
-  fun updateModel(model: Site)
-
-  fun onSiteDeleted(model: Site)
-
-  fun scopeWhileAttached(
-    context: CoroutineContext,
-    exec: ScopeReceiver
-  )
-}
+@Qualifier
+@Retention(RUNTIME)
+annotation class IoDispatcher

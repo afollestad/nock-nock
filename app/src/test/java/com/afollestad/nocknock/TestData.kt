@@ -15,6 +15,7 @@
  */
 package com.afollestad.nocknock
 
+import android.content.Intent
 import com.afollestad.nocknock.data.AppDatabase
 import com.afollestad.nocknock.data.SiteDao
 import com.afollestad.nocknock.data.SiteSettingsDao
@@ -31,6 +32,12 @@ import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.isA
 import com.nhaarman.mockitokotlin2.mock
 import java.lang.System.currentTimeMillis
+
+fun fakeIntent(action: String): Intent {
+  return mock {
+    on { getAction() } doReturn action
+  }
+}
 
 fun fakeSettingsModel(
   id: Long,

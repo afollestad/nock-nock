@@ -22,8 +22,8 @@ import com.afollestad.nocknock.data.model.Status.ERROR
 import com.afollestad.nocknock.data.model.Status.OK
 import com.afollestad.nocknock.data.model.ValidationMode.STATUS_CODE
 import com.afollestad.nocknock.data.legacy.ServerModelStore
-import com.afollestad.nocknock.engine.statuscheck.ValidationJob.Companion.KEY_SITE_ID
-import com.afollestad.nocknock.engine.statuscheck.RealValidationManager
+import com.afollestad.nocknock.engine.validation.ValidationJob.Companion.KEY_SITE_ID
+import com.afollestad.nocknock.engine.validation.RealValidationManager
 import com.afollestad.nocknock.utilities.providers.StringProvider
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any

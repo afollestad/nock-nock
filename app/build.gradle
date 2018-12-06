@@ -28,6 +28,8 @@ dependencies {
   implementation 'androidx.recyclerview:recyclerview:' + versions.androidx
   implementation 'com.google.android.material:material:' + versions.androidx
 
+  kapt 'androidx.lifecycle:lifecycle-compiler:' + versions.lifecycle
+
   implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:' + versions.kotlin
 
   implementation 'com.google.dagger:dagger:' + versions.dagger

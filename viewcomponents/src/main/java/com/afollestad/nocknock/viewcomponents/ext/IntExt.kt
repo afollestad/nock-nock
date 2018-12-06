@@ -13,25 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.afollestad.nocknock.utilities.ext
+package com.afollestad.nocknock.viewcomponents.ext
 
-import android.app.Activity
-import android.content.BroadcastReceiver
-import android.content.IntentFilter
-
-fun Activity.safeRegisterReceiver(
-  broadcastReceiver: BroadcastReceiver,
-  filter: IntentFilter
-) {
-  try {
-    registerReceiver(broadcastReceiver, filter)
-  } catch (_: Exception) {
-  }
-}
-
-fun Activity.safeUnregisterReceiver(broadcastReceiver: BroadcastReceiver) {
-  try {
-    unregisterReceiver(broadcastReceiver)
-  } catch (_: Exception) {
-  }
+fun Int?.isNullOrLessThan(than: Int): Boolean {
+  return this == null || this < than
 }

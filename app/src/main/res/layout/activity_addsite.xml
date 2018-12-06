@@ -87,13 +87,13 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/list_text_spacing"
             android:visibility="gone"
-            tools:text="Warning: this app checks for server availability with HTTP requests. It's recommended that you use an HTTP URL."
+            android:text="@string/warning_http_url"
             style="@style/NockText.Footnote"
             />
 
         <include layout="@layout/include_divider"/>
 
-        <com.afollestad.nocknock.viewcomponents.CheckIntervalLayout
+        <com.afollestad.nocknock.viewcomponents.interval.CheckIntervalLayout
             android:id="@+id/checkIntervalLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -151,7 +151,7 @@
             style="@style/NockText.Body.Light"
             />
 
-        <com.afollestad.nocknock.viewcomponents.JavaScriptInputLayout
+        <com.afollestad.nocknock.viewcomponents.js.JavaScriptInputLayout
             android:id="@+id/scriptInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

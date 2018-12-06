@@ -18,6 +18,7 @@ package com.afollestad.nocknock.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil.calculateDiff
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.data.model.Site
@@ -95,55 +96,18 @@ class SiteViewHolder constructor(
 /** @author Aidan Follestad (@afollestad) */
 class ServerAdapter(private val listener: Listener) : RecyclerView.Adapter<SiteViewHolder>() {
 
-  private val models = mutableListOf<Site>()
+  private var models = mutableListOf<Site>()
 
   internal fun performClick(
     index: Int,
     longClick: Boolean
   ) = listener.invoke(models[index], longClick)
 
-  fun add(model: Site) {
-    models.add(model)
-    notifyItemInserted(models.size - 1)
-  }
-
-  fun update(target: Site) {
-    for ((i, model) in models.withIndex()) {
-      if (model.id == target.id) {
-        update(i, target)
-        break
-      }
-    }
-  }
-
-  private fun update(
-    index: Int,
-    model: Site
-  ) {
-    models[index] = model
-    notifyItemChanged(index)
-  }
-
-  fun remove(index: Int) {
-    models.removeAt(index)
-    notifyItemRemoved(index)
-  }
-
-  fun remove(target: Site) {
-    for ((i, model) in models.withIndex()) {
-      if (model.id == target.id) {
-        remove(i)
-        break
-      }
-    }
-  }
-
   fun set(newModels: List<Site>) {
-    this.models.clear()
-    if (!newModels.isEmpty()) {
-      this.models.addAll(newModels)
-    }
-    notifyDataSetChanged()
+    val formerModels = this.models
+    this.models = newModels.toMutableList()
+    val diffResult = calculateDiff(SiteDiffCallback(formerModels, this.models))
+    diffResult.dispatchUpdatesTo(this)
   }
 
   override fun onCreateViewHolder(

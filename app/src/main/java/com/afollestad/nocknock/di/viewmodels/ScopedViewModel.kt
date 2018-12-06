@@ -13,27 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.afollestad.nocknock.utilities.ext
+package com.afollestad.nocknock.di.viewmodels
 
-import android.view.View
+import androidx.lifecycle.ViewModel
+import com.afollestad.nocknock.di.qualifiers.MainDispatcher
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlin.coroutines.CoroutineContext
+import org.jetbrains.annotations.TestOnly
+import javax.inject.Inject
 
-typealias ScopeReceiver = CoroutineScope.() -> Unit
+abstract class ScopedViewModel : ViewModel() {
 
-fun View.scopeWhileAttached(
-  context: CoroutineContext,
-  exec: ScopeReceiver
-) {
-  val job = Job(context[Job])
+  @Inject
+  @MainDispatcher
+  lateinit var mainDispatcher: CoroutineDispatcher
 
-  addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
-    override fun onViewAttachedToWindow(v: View) = Unit
-    override fun onViewDetachedFromWindow(v: View) {
-      job.cancel()
-    }
-  })
+  private val job = Job()
+  protected val scope = CoroutineScope(job + mainDispatcher)
 
-  exec(CoroutineScope(context + job))
+  override fun onCleared() {
+    super.onCleared()
+    job.cancel()
+  }
+
+  @TestOnly open fun destroy() = job.cancel()
 }

@@ -15,7 +15,7 @@
  */
 package com.afollestad.nocknock.ui.addsite
 
-import android.view.ViewAnimationUtils
+import android.view.ViewAnimationUtils.createCircularReveal
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import com.afollestad.nocknock.utilities.ext.onEnd
@@ -27,7 +27,7 @@ const val REVEAL_DURATION = 300L
 
 internal fun AddSiteActivity.circularRevealActivity() {
   val circularReveal =
-    ViewAnimationUtils.createCircularReveal(rootView, revealCx, revealCy, 0f, revealRadius)
+    createCircularReveal(rootView, revealCx, revealCy, 0f, revealRadius)
         .apply {
           duration = REVEAL_DURATION
           interpolator = DecelerateInterpolator()
@@ -37,9 +37,11 @@ internal fun AddSiteActivity.circularRevealActivity() {
 }
 
 internal fun AddSiteActivity.closeActivityWithReveal() {
-  if (isClosing) return
+  if (isClosing) {
+    return
+  }
   isClosing = true
-  ViewAnimationUtils.createCircularReveal(rootView, revealCx, revealCy, revealRadius, 0f)
+  createCircularReveal(rootView, revealCx, revealCy, revealRadius, 0f)
       .apply {
         duration = REVEAL_DURATION
         interpolator = AccelerateInterpolator()

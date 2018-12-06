@@ -24,7 +24,7 @@ import com.afollestad.nocknock.ui.addsite.AddSiteActivity
 import com.afollestad.nocknock.ui.addsite.KEY_FAB_SIZE
 import com.afollestad.nocknock.ui.addsite.KEY_FAB_X
 import com.afollestad.nocknock.ui.addsite.KEY_FAB_Y
-import com.afollestad.nocknock.ui.viewsite.KEY_VIEW_MODEL
+import com.afollestad.nocknock.ui.viewsite.KEY_SITE
 import com.afollestad.nocknock.ui.viewsite.ViewSiteActivity
 import com.afollestad.nocknock.utilities.providers.RealIntentProvider.Companion.KEY_VIEW_NOTIFICATION_MODEL
 import kotlinx.android.synthetic.main.activity_main.fab
@@ -53,14 +53,14 @@ internal fun MainActivity.viewSite(model: Site) {
 
 private fun MainActivity.intentToView(model: Site) =
   Intent(this, ViewSiteActivity::class.java).apply {
-    putExtra(KEY_VIEW_MODEL, model)
+    putExtra(KEY_SITE, model)
   }
 
 internal fun MainActivity.maybeRemoveSite(model: Site) {
   MaterialDialog(this).show {
     title(R.string.remove_site)
     message(text = context.getString(R.string.remove_site_prompt, model.name).toHtml())
-    positiveButton(R.string.remove) { presenter.removeSite(model) }
+    positiveButton(R.string.remove) { viewModel.removeSite(model) }
     negativeButton(android.R.string.cancel)
   }
 }

@@ -15,42 +15,27 @@
  */
 package com.afollestad.nocknock.di;
 
-import static androidx.room.Room.databaseBuilder;
-
 import android.app.Application;
 import com.afollestad.nocknock.R;
 import com.afollestad.nocknock.data.AppDatabase;
-import com.afollestad.nocknock.ui.addsite.AddSitePresenter;
-import com.afollestad.nocknock.ui.addsite.RealAddSitePresenter;
 import com.afollestad.nocknock.ui.main.MainActivity;
-import com.afollestad.nocknock.ui.main.MainPresenter;
-import com.afollestad.nocknock.ui.main.RealMainPresenter;
-import com.afollestad.nocknock.ui.viewsite.RealViewSitePresenter;
-import com.afollestad.nocknock.ui.viewsite.ViewSitePresenter;
 import com.afollestad.nocknock.utilities.qualifiers.AppIconRes;
+import com.afollestad.nocknock.di.qualifiers.IoDispatcher;
 import com.afollestad.nocknock.utilities.qualifiers.MainActivityClass;
-import dagger.Binds;
+import com.afollestad.nocknock.di.qualifiers.MainDispatcher;
 import dagger.Module;
 import dagger.Provides;
 import javax.inject.Singleton;
+import kotlinx.coroutines.CoroutineDispatcher;
+import kotlinx.coroutines.Dispatchers;
+
+import static androidx.room.Room.databaseBuilder;
 
 /** @author Aidan Follestad (@afollestad) */
 @Module
 abstract class MainModule {
   @SuppressWarnings("FieldCanBeLocal")
   private static String DATABASE_NAME = "NockNock.db";
-
-  @Binds
-  @Singleton
-  abstract MainPresenter provideMainPresenter(RealMainPresenter presenter);
-
-  @Binds
-  @Singleton
-  abstract AddSitePresenter provideAddSitePresenter(RealAddSitePresenter presenter);
-
-  @Binds
-  @Singleton
-  abstract ViewSitePresenter provideViewSitePresenter(RealViewSitePresenter presenter);
 
   @Provides
   @Singleton
@@ -70,5 +55,19 @@ abstract class MainModule {
   @Singleton
   static AppDatabase provideAppDatabase(Application app) {
     return databaseBuilder(app, AppDatabase.class, DATABASE_NAME).build();
+  }
+
+  @Provides
+  @Singleton
+  @MainDispatcher
+  static CoroutineDispatcher provideMainDispatcher() {
+    return Dispatchers.getMain();
+  }
+
+  @Provides
+  @Singleton
+  @IoDispatcher
+  static CoroutineDispatcher provideIoDispatcher() {
+    return Dispatchers.getIO();
   }
 }

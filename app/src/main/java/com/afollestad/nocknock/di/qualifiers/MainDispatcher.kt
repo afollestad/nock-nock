@@ -13,33 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.afollestad.nocknock.ui.addsite
+package com.afollestad.nocknock.di.qualifiers
 
-import androidx.annotation.StringRes
-import com.afollestad.nocknock.utilities.ext.ScopeReceiver
-import kotlin.coroutines.CoroutineContext
+import javax.inject.Qualifier
+import kotlin.annotation.AnnotationRetention.RUNTIME
 
 /** @author Aidan Follestad (@afollestad) */
-interface AddSiteView {
-
-  fun setLoading()
-
-  fun setDoneLoading()
-
-  fun showOrHideUrlSchemeWarning(show: Boolean)
-
-  fun showOrHideValidationSearchTerm(show: Boolean)
-
-  fun showOrHideScriptInput(show: Boolean)
-
-  fun setValidationModeDescription(@StringRes res: Int)
-
-  fun setInputErrors(errors: InputErrors)
-
-  fun onSiteAdded()
-
-  fun scopeWhileAttached(
-    context: CoroutineContext,
-    exec: ScopeReceiver
-  )
-}
+@Qualifier
+@Retention(RUNTIME)
+annotation class MainDispatcher

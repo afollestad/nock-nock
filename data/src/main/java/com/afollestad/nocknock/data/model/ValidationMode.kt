@@ -29,6 +29,12 @@ enum class ValidationMode(val value: Int) {
   /** The site is running normally if a block of given JavaScript executes successfully. */
   JAVASCRIPT(3);
 
+  fun toIndex() = when (this) {
+    STATUS_CODE -> 0
+    TERM_SEARCH -> 1
+    JAVASCRIPT -> 2
+  }
+
   companion object {
 
     fun fromValue(value: Int) = when (value) {
@@ -46,9 +52,3 @@ enum class ValidationMode(val value: Int) {
     }
   }
 }
-
-fun Int.toValidationMode() =
-  ValidationMode.fromValue(this)
-
-fun Int.indexToValidationMode() =
-  ValidationMode.fromIndex(this)

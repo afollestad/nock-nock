@@ -19,9 +19,10 @@ import android.app.Application;
 import android.app.NotificationManager;
 import android.app.job.JobScheduler;
 import com.afollestad.nocknock.NockNockApp;
+import com.afollestad.nocknock.di.viewmodels.ViewModelModule;
 import com.afollestad.nocknock.engine.EngineModule;
-import com.afollestad.nocknock.engine.statuscheck.BootReceiver;
-import com.afollestad.nocknock.engine.statuscheck.ValidationJob;
+import com.afollestad.nocknock.engine.validation.BootReceiver;
+import com.afollestad.nocknock.engine.validation.ValidationJob;
 import com.afollestad.nocknock.notifications.NotificationsModule;
 import com.afollestad.nocknock.ui.addsite.AddSiteActivity;
 import com.afollestad.nocknock.ui.main.MainActivity;
@@ -35,7 +36,13 @@ import okhttp3.OkHttpClient;
 /** @author Aidan Follestad (@afollestad) */
 @Singleton
 @Component(
-  modules = {MainModule.class, EngineModule.class, NotificationsModule.class, UtilitiesModule.class}
+    modules = {
+        MainModule.class,
+        ViewModelModule.class,
+        EngineModule.class,
+        NotificationsModule.class,
+        UtilitiesModule.class
+    }
 )
 public interface AppComponent {
 
@@ -51,8 +58,7 @@ public interface AppComponent {
 
   void inject(BootReceiver bootReceiver);
 
-  @Component.Builder
-  interface Builder {
+  @Component.Builder interface Builder {
 
     @BindsInstance
     Builder application(Application application);

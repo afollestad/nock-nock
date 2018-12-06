@@ -42,11 +42,11 @@
         android:windowSoftInputMode="stateHidden"/>
 
     <service
-        android:name=".engine.statuscheck.ValidationJob"
+        android:name=".engine.validation.ValidationJob"
         android:label="@string/check_service_name"
         android:permission="android.permission.BIND_JOB_SERVICE"/>
 
-    <receiver android:name=".engine.statuscheck.BootReceiver">
+    <receiver android:name=".engine.validation.BootReceiver">
       <intent-filter>
         <action android:name="android.intent.action.BOOT_COMPLETED"/>
       </intent-filter>

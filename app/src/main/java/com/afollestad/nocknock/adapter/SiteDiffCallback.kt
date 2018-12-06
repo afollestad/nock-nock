@@ -13,36 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.afollestad.nocknock.ui.viewsite
+package com.afollestad.nocknock.adapter
 
-import androidx.annotation.StringRes
+import androidx.recyclerview.widget.DiffUtil
 import com.afollestad.nocknock.data.model.Site
-import com.afollestad.nocknock.utilities.ext.ScopeReceiver
-import kotlin.coroutines.CoroutineContext
 
 /** @author Aidan Follestad (@afollestad) */
-interface ViewSiteView {
+class SiteDiffCallback(
+  private val oldItems: List<Site>,
+  private val newItems: List<Site>
+) : DiffUtil.Callback() {
 
-  fun setLoading()
+  override fun getOldListSize() = oldItems.size
 
-  fun setDoneLoading()
+  override fun getNewListSize() = newItems.size
 
-  fun displayModel(model: Site)
+  override fun areItemsTheSame(
+    oldItemPosition: Int,
+    newItemPosition: Int
+  ) = oldItems[oldItemPosition].id == oldItems[newItemPosition].id
 
-  fun showOrHideUrlSchemeWarning(show: Boolean)
-
-  fun showOrHideValidationSearchTerm(show: Boolean)
-
-  fun showOrHideScriptInput(show: Boolean)
-
-  fun setValidationModeDescription(@StringRes res: Int)
-
-  fun setInputErrors(errors: InputErrors)
-
-  fun scopeWhileAttached(
-    context: CoroutineContext,
-    exec: ScopeReceiver
-  )
-
-  fun finish()
+  override fun areContentsTheSame(
+    oldItemPosition: Int,
+    newItemPosition: Int
+  ) = oldItems[oldItemPosition] == oldItems[newItemPosition]
 }

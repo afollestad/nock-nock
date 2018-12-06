@@ -18,39 +18,42 @@ package com.afollestad.nocknock.ui.viewsite
 import android.widget.ImageView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.nocknock.R
-import com.afollestad.nocknock.data.model.Site
+import com.afollestad.nocknock.data.model.Status
 import com.afollestad.nocknock.data.model.isPending
 import com.afollestad.nocknock.toHtml
 import com.afollestad.nocknock.utilities.ext.animateRotation
 import kotlinx.android.synthetic.main.activity_viewsite.toolbar
 
+const val KEY_SITE = "site_model"
+
 internal fun ViewSiteActivity.maybeRemoveSite() {
-  val model = presenter.currentModel()
+  val model = viewModel.site
   MaterialDialog(this).show {
     title(R.string.remove_site)
     message(text = context.getString(R.string.remove_site_prompt, model.name).toHtml())
-    positiveButton(R.string.remove) { presenter.removeSite() }
+    positiveButton(R.string.remove) {
+      viewModel.removeSite { finish() }
+    }
     negativeButton(android.R.string.cancel)
   }
 }
 
 internal fun ViewSiteActivity.maybeDisableChecks() {
-  val model = presenter.currentModel()
+  val model = viewModel.site
   MaterialDialog(this).show {
     title(R.string.disable_automatic_checks)
     message(
         text = context.getString(R.string.disable_automatic_checks_prompt, model.name).toHtml()
     )
-    positiveButton(R.string.disable) { presenter.disableChecks() }
+    positiveButton(R.string.disable) { viewModel.disable() }
     negativeButton(android.R.string.cancel)
   }
 }
 
-internal fun ViewSiteActivity.invalidateMenuForStatus(model: Site) {
+internal fun ViewSiteActivity.invalidateMenuForStatus(status: Status) {
   val refreshIcon = toolbar.menu.findItem(R.id.refresh)
       .actionView as ImageView
-
-  if (model.lastResult?.status.isPending()) {
+  if (status.isPending()) {
     refreshIcon.animateRotation()
   } else {
     refreshIcon.run {

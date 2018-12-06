@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.afollestad.nocknock.engine.statuscheck
+package com.afollestad.nocknock.engine.validation
 
 import android.app.job.JobScheduler
 import android.app.job.JobScheduler.RESULT_SUCCESS
@@ -23,7 +23,7 @@ import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.Status.ERROR
 import com.afollestad.nocknock.data.model.Status.OK
 import com.afollestad.nocknock.engine.R
-import com.afollestad.nocknock.engine.statuscheck.ValidationJob.Companion.KEY_SITE_ID
+import com.afollestad.nocknock.engine.validation.ValidationJob.Companion.KEY_SITE_ID
 import com.afollestad.nocknock.utilities.providers.BundleProvider
 import com.afollestad.nocknock.utilities.providers.JobInfoProvider
 import com.afollestad.nocknock.utilities.providers.StringProvider

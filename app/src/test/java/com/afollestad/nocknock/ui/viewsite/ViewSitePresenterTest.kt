@@ -1,4 +1,4 @@
-/*
+/**
  * Designed and developed by Aidan Follestad (@afollestad)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,19 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.afollestad.nocknock.engine;
+package com.afollestad.nocknock.ui.viewsite
 
-import com.afollestad.nocknock.engine.validation.RealValidationManager;
-import com.afollestad.nocknock.engine.validation.ValidationManager;
-import dagger.Binds;
-import dagger.Module;
-import javax.inject.Singleton;
+class ViewSitePresenterTest {
 
-/** @author Aidan Follestad (@afollestad) */
-@Module
-public abstract class EngineModule {
-
-  @Binds
-  @Singleton
-  abstract ValidationManager provideValidationManager(RealValidationManager checkStatusManager);
 }

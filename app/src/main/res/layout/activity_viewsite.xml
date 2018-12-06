@@ -115,7 +115,7 @@
             android:layout_marginTop="@dimen/content_inset_less"
             />
 
-        <com.afollestad.nocknock.viewcomponents.CheckIntervalLayout
+        <com.afollestad.nocknock.viewcomponents.interval.CheckIntervalLayout
             android:id="@+id/checkIntervalLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -181,7 +181,7 @@
             style="@style/NockText.Body.Light"
             />
 
-        <com.afollestad.nocknock.viewcomponents.JavaScriptInputLayout
+        <com.afollestad.nocknock.viewcomponents.js.JavaScriptInputLayout
             android:id="@+id/scriptInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

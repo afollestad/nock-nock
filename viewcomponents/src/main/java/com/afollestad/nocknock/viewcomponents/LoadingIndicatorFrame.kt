@@ -20,6 +20,9 @@ import android.os.Handler
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import com.afollestad.nocknock.viewcomponents.ext.hide
 import com.afollestad.nocknock.viewcomponents.ext.show
 
@@ -43,12 +46,19 @@ class LoadingIndicatorFrame(
     isFocusable = true
   }
 
-  fun setLoading() {
-    delayHandler.postDelayed(showRunnable, SHOW_DELAY_MS)
+  fun setIsLoading(isLoading: Boolean) {
+    delayHandler.removeCallbacks(showRunnable)
+    if (isLoading) {
+      delayHandler.postDelayed(showRunnable, SHOW_DELAY_MS)
+    } else {
+      hide()
+    }
   }
 
-  fun setDone() {
-    delayHandler.removeCallbacks(showRunnable)
-    hide()
-  }
+  fun observe(
+    owner: LifecycleOwner,
+    data: LiveData<Boolean>
+  ) = data.observe(owner, Observer {
+    setIsLoading(it)
+  })
 }

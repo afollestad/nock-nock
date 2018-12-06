@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.afollestad.nocknock.engine.statuscheck
+package com.afollestad.nocknock.engine.validation
 
 import android.app.job.JobParameters
 import android.app.job.JobService

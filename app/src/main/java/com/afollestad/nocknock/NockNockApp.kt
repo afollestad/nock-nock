@@ -18,8 +18,8 @@ package com.afollestad.nocknock
 import android.app.Application
 import com.afollestad.nocknock.di.AppComponent
 import com.afollestad.nocknock.di.DaggerAppComponent
-import com.afollestad.nocknock.engine.statuscheck.BootReceiver
-import com.afollestad.nocknock.engine.statuscheck.ValidationJob
+import com.afollestad.nocknock.engine.validation.BootReceiver
+import com.afollestad.nocknock.engine.validation.ValidationJob
 import com.afollestad.nocknock.notifications.NockNotificationManager
 import com.afollestad.nocknock.ui.addsite.AddSiteActivity
 import com.afollestad.nocknock.ui.main.MainActivity
