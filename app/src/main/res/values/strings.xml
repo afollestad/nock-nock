@@ -49,7 +49,7 @@
   <string name="disable">Disable</string>
   <string name="renable_and_save_changes">Enable Auto Validation &amp; Save Changes</string>
 
-  <string name="response_timeout">Network Response Timeout</string>
+  <string name="response_timeout">Network Response Timeout (ms)</string>
   <string name="response_timeout_default">10000</string>
 
   <string name="refresh_status">Refresh Status</string>
