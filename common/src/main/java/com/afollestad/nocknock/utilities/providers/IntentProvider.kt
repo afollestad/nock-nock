@@ -19,20 +19,23 @@ import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_CANCEL_CURRENT
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import java.io.Serializable
 
 /** @author Aidan Follestad (@afollestad) */
 interface CanNotifyModel : Serializable {
 
-  fun notiId(): Int
+  fun notifyId(): Int
 
-  fun notiName(): String
+  fun notifyName(): String
 
-  fun notiTag(): String
+  fun notifyTag(): String
 }
 
 /** @author Aidan Follestad (@afollestad) */
 interface IntentProvider {
+
+  fun createFilter(vararg actions: String): IntentFilter
 
   fun getPendingIntentForViewSite(
     model: CanNotifyModel
@@ -50,11 +53,15 @@ class RealIntentProvider(
     const val KEY_VIEW_NOTIFICATION_MODEL = "model"
   }
 
+  override fun createFilter(vararg actions: String) = IntentFilter().apply {
+    actions.forEach { addAction(it) }
+  }
+
   override fun getPendingIntentForViewSite(model: CanNotifyModel): PendingIntent {
     val openIntent = getIntentForViewSite(model)
     return PendingIntent.getActivity(
         context,
-        BASE_NOTIFICATION_REQUEST_CODE + model.notiId(),
+        BASE_NOTIFICATION_REQUEST_CODE + model.notifyId(),
         openIntent,
         FLAG_CANCEL_CURRENT
     )

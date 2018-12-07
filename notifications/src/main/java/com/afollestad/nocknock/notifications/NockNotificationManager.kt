@@ -66,29 +66,29 @@ class RealNockNotificationManager(
   override fun postStatusNotification(model: CanNotifyModel) {
     if (isAppOpen) {
       // Don't show notifications while the app is open
-      log("App is open, status notification for site ${model.notiId()} won't be posted.")
+      log("App is open, status notification for site ${model.notifyId()} won't be posted.")
       return
     }
 
-    log("Posting status notification for site ${model.notiId()}...")
+    log("Posting status notification for site ${model.notifyId()}...")
     val intent = intentProvider.getPendingIntentForViewSite(model)
 
     val newNotification = notificationProvider.create(
         channelId = CheckFailures.id,
-        title = model.notiName(),
+        title = model.notifyName(),
         content = stringProvider.get(R.string.something_wrong),
         intent = intent,
         smallIcon = R.drawable.ic_notification,
         largeIcon = bitmapProvider.get(appIconRes)
     )
 
-    stockManager.notify(model.notiTag(), model.notificationId(), newNotification)
+    stockManager.notify(model.notifyTag(), model.notificationId(), newNotification)
     log("Posted status notification for site ${model.notificationId()}.")
   }
 
   override fun cancelStatusNotification(model: CanNotifyModel) {
     stockManager.cancel(model.notificationId())
-    log("Cancelled status notification for site ${model.notiId()}.")
+    log("Cancelled status notification for site ${model.notifyId()}.")
   }
 
   override fun cancelStatusNotifications() = stockManager.cancelAll()
@@ -105,5 +105,5 @@ class RealNockNotificationManager(
     log("Created notification channel ${channel.id}")
   }
 
-  private fun CanNotifyModel.notificationId() = BASE_NOTIFICATION_REQUEST_CODE + this.notiId()
+  private fun CanNotifyModel.notificationId() = BASE_NOTIFICATION_REQUEST_CODE + this.notifyId()
 }

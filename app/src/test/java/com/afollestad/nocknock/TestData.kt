@@ -15,7 +15,9 @@
  */
 package com.afollestad.nocknock
 
+import android.app.PendingIntent
 import android.content.Intent
+import android.content.IntentFilter
 import com.afollestad.nocknock.data.AppDatabase
 import com.afollestad.nocknock.data.SiteDao
 import com.afollestad.nocknock.data.SiteSettingsDao
@@ -27,6 +29,9 @@ import com.afollestad.nocknock.data.model.Status.OK
 import com.afollestad.nocknock.data.model.ValidationMode
 import com.afollestad.nocknock.data.model.ValidationMode.STATUS_CODE
 import com.afollestad.nocknock.data.model.ValidationResult
+import com.afollestad.nocknock.utilities.providers.CanNotifyModel
+import com.afollestad.nocknock.utilities.providers.IntentProvider
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doAnswer
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.isA
@@ -128,5 +133,23 @@ fun mockDatabase(): AppDatabase {
     on { siteDao() } doReturn siteDao
     on { siteSettingsDao() } doReturn settingsDao
     on { validationResultsDao() } doReturn resultsDao
+  }
+}
+
+fun mockIntentProvider() = object : IntentProvider {
+  override fun createFilter(vararg actions: String): IntentFilter {
+    return mock {
+      on { this.getAction(any()) } doAnswer { inv ->
+        val index = inv.getArgument<Int>(0)
+        return@doAnswer actions[index]
+      }
+      on { this.actionsIterator() } doReturn actions.iterator()
+      on { this.countActions() } doReturn actions.size
+    }
+  }
+
+  override fun getPendingIntentForViewSite(model: CanNotifyModel): PendingIntent {
+    // basically no-op right now
+    return mock()
   }
 }

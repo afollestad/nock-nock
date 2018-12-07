@@ -30,6 +30,7 @@ import com.afollestad.nocknock.broadcasts.StatusUpdateIntentReceiver
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.dialogs.AboutDialog
 import com.afollestad.nocknock.notifications.NockNotificationManager
+import com.afollestad.nocknock.utilities.providers.IntentProvider
 import com.afollestad.nocknock.viewcomponents.ext.showOrHide
 import kotlinx.android.synthetic.main.activity_main.fab
 import kotlinx.android.synthetic.main.activity_main.list
@@ -43,12 +44,14 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class MainActivity : AppCompatActivity() {
 
   private val notificationManager by inject<NockNotificationManager>()
+  private val intentProvider by inject<IntentProvider>()
+
   internal val viewModel by viewModel<MainViewModel>()
 
   private lateinit var adapter: ServerAdapter
 
   private val statusUpdateReceiver =
-    StatusUpdateIntentReceiver(application) {
+    StatusUpdateIntentReceiver(application, intentProvider) {
       viewModel.postSiteUpdate(it)
     }
 

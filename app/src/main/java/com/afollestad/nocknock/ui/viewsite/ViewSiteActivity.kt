@@ -25,6 +25,7 @@ import com.afollestad.nocknock.R
 import com.afollestad.nocknock.broadcasts.StatusUpdateIntentReceiver
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.ValidationMode
+import com.afollestad.nocknock.utilities.providers.IntentProvider
 import com.afollestad.nocknock.viewcomponents.ext.attachLiveData
 import com.afollestad.nocknock.viewcomponents.ext.dimenFloat
 import com.afollestad.nocknock.viewcomponents.ext.onScroll
@@ -48,6 +49,7 @@ import kotlinx.android.synthetic.main.activity_viewsite.textNextCheck
 import kotlinx.android.synthetic.main.activity_viewsite.textUrlWarning
 import kotlinx.android.synthetic.main.activity_viewsite.toolbar
 import kotlinx.android.synthetic.main.activity_viewsite.validationModeDescription
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /** @author Aidan Follestad (@afollestad) */
@@ -55,8 +57,9 @@ class ViewSiteActivity : AppCompatActivity() {
 
   internal val viewModel by viewModel<ViewSiteViewModel>()
 
+  private val intentProvider by inject<IntentProvider>()
   private val statusUpdateReceiver =
-    StatusUpdateIntentReceiver(application) {
+    StatusUpdateIntentReceiver(application, intentProvider) {
       viewModel.setModel(it)
     }
 

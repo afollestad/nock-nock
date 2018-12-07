@@ -41,11 +41,11 @@ data class Site(
 
   constructor() : this(0, "", "", null, null)
 
-  override fun notiId(): Int = id.toInt()
+  override fun notifyId(): Int = id.toInt()
 
-  override fun notiName(): String = name
+  override fun notifyName(): String = name
 
-  override fun notiTag(): String = url
+  override fun notifyTag(): String = url
 
   fun intervalText(): String {
     requireNotNull(settings) { "Settings not queried." }

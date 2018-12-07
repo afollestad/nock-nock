@@ -15,11 +15,10 @@
  */
 package com.afollestad.nocknock.broadcasts
 
-import android.app.Application
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
+import androidx.lifecycle.Lifecycle.Event.ON_DESTROY
 import androidx.lifecycle.Lifecycle.Event.ON_PAUSE
 import androidx.lifecycle.Lifecycle.Event.ON_RESUME
 import androidx.lifecycle.LifecycleObserver
@@ -27,13 +26,15 @@ import androidx.lifecycle.OnLifecycleEvent
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.engine.validation.ValidationJob.Companion.ACTION_STATUS_UPDATE
 import com.afollestad.nocknock.engine.validation.ValidationJob.Companion.KEY_UPDATE_MODEL
+import com.afollestad.nocknock.utilities.providers.IntentProvider
 
 typealias SiteCallback = (Site) -> Unit
 
 /** @author Aidan Follestad (@afollestad) */
 class StatusUpdateIntentReceiver(
-  private val app: Application,
-  private val callback: SiteCallback
+  private val context: Context,
+  private val intentProvider: IntentProvider,
+  private var callback: SiteCallback?
 ) : LifecycleObserver {
 
   internal val intentReceiver = object : BroadcastReceiver() {
@@ -44,19 +45,24 @@ class StatusUpdateIntentReceiver(
       if (intent.action == ACTION_STATUS_UPDATE) {
         val model = intent.getSerializableExtra(KEY_UPDATE_MODEL) as? Site
             ?: return
-        callback(model)
+        callback?.invoke(model)
       }
     }
   }
 
   @OnLifecycleEvent(ON_RESUME)
   fun onResume() {
-    val filter = IntentFilter().apply {
-      addAction(ACTION_STATUS_UPDATE)
-    }
-    app.registerReceiver(intentReceiver, filter)
+    val filter = intentProvider.createFilter(ACTION_STATUS_UPDATE)
+    context.registerReceiver(intentReceiver, filter)
   }
 
   @OnLifecycleEvent(ON_PAUSE)
-  fun onPause() = app.unregisterReceiver(intentReceiver)
+  fun onPause() {
+    context.unregisterReceiver(intentReceiver)
+  }
+
+  @OnLifecycleEvent(ON_DESTROY)
+  fun onDestroy() {
+    callback = null
+  }
 }

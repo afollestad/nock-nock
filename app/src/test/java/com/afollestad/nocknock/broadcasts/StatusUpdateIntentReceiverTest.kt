@@ -21,9 +21,11 @@ import com.afollestad.nocknock.MOCK_MODEL_2
 import com.afollestad.nocknock.engine.validation.ValidationJob.Companion.ACTION_STATUS_UPDATE
 import com.afollestad.nocknock.engine.validation.ValidationJob.Companion.KEY_UPDATE_MODEL
 import com.afollestad.nocknock.fakeIntent
+import com.afollestad.nocknock.mockIntentProvider
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
@@ -34,9 +36,10 @@ import org.junit.Test
 class StatusUpdateIntentReceiverTest {
 
   private val app = mock<Application>()
+  private val intentProvider = mockIntentProvider()
   private val callback = mock<SiteCallback>()
 
-  private val receiver = StatusUpdateIntentReceiver(app, callback)
+  private val receiver = StatusUpdateIntentReceiver(app, intentProvider, callback)
 
   @Test fun onReceive() {
     val badIntent = fakeIntent("Hello World")
@@ -54,7 +57,7 @@ class StatusUpdateIntentReceiverTest {
     receiver.onResume()
 
     val filterCaptor = argumentCaptor<IntentFilter>()
-    verify(app).registerReceiver(receiver.intentReceiver, filterCaptor.capture())
+    verify(app).registerReceiver(eq(receiver.intentReceiver), filterCaptor.capture())
 
     val actionIterator = filterCaptor.firstValue.actionsIterator()
     assertThat(actionIterator.hasNext()).isTrue()
