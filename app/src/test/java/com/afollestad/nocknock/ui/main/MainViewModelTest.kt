@@ -27,12 +27,14 @@ import com.afollestad.nocknock.test
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 
 /** @author Aidan Follestad (@afollestad) */
+@ExperimentalCoroutinesApi
 class MainViewModelTest {
 
   private val database = mockDatabase()

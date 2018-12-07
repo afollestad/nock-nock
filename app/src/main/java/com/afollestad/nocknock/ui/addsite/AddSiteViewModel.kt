@@ -16,6 +16,8 @@
 package com.afollestad.nocknock.ui.addsite
 
 import androidx.annotation.CheckResult
+import androidx.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting.PRIVATE
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -74,10 +76,7 @@ class AddSiteViewModel(
   @CheckResult fun onUrlWarningVisibility(): LiveData<Boolean> {
     return url.map {
       val parsed = HttpUrl.parse(it)
-      return@map it.isNotEmpty() &&
-          parsed != null &&
-          parsed.scheme() != "http" &&
-          parsed.scheme() != "https"
+      return@map it.isNotEmpty() && parsed == null
     }
   }
 
@@ -85,11 +84,10 @@ class AddSiteViewModel(
 
   @CheckResult fun onValidationModeDescription(): LiveData<Int> {
     return validationMode.map {
-      when (it) {
+      when (it!!) {
         STATUS_CODE -> R.string.validation_mode_status_desc
         TERM_SEARCH -> R.string.validation_mode_term_desc
         JAVASCRIPT -> R.string.validation_mode_javascript_desc
-        else -> throw IllegalStateException("Unknown validation mode: $it")
       }
     }
   }
@@ -127,13 +125,15 @@ class AddSiteViewModel(
   }
 
   // Utilities
-  private fun getCheckIntervalMs(): Long {
+  @VisibleForTesting(otherwise = PRIVATE)
+  fun getCheckIntervalMs(): Long {
     val value = checkIntervalValue.value ?: return 0
     val unit = checkIntervalUnit.value ?: return 0
     return value * unit
   }
 
-  private fun getValidationArgs(): String? {
+  @VisibleForTesting(otherwise = PRIVATE)
+  fun getValidationArgs(): String? {
     return when (validationMode.value) {
       TERM_SEARCH -> validationSearchTerm.value
       JAVASCRIPT -> validationScript.value
@@ -184,13 +184,13 @@ class AddSiteViewModel(
     }
 
     // Validate arguments
-    if (validationMode == TERM_SEARCH &&
+    if (validationMode.value == TERM_SEARCH &&
         validationSearchTerm.value.isNullOrEmpty()
     ) {
       errorCount++
       validationSearchTermError.value = R.string.please_enter_search_term
       validationScriptError.value = null
-    } else if (validationMode == JAVASCRIPT &&
+    } else if (validationMode.value == JAVASCRIPT &&
         validationScript.value.isNullOrEmpty()
     ) {
       errorCount++

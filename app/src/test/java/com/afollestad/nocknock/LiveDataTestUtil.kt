@@ -25,7 +25,9 @@ import com.google.common.truth.Truth.assertWithMessage
 class TestLiveData<T>(data: LiveData<T>) {
 
   private val receivedValues = mutableListOf<T>()
-  private val observer = Observer<T> { receivedValues.add(it) }
+  private val observer = Observer<T> { emission ->
+    emission?.let { receivedValues.add(it) }
+  }
 
   init {
     data.observeForever(observer)
