@@ -31,10 +31,10 @@ class SiteDiffCallback(
   override fun areItemsTheSame(
     oldItemPosition: Int,
     newItemPosition: Int
-  ) = oldItems[oldItemPosition].id == oldItems[newItemPosition].id
+  ) = oldItems[oldItemPosition].id == newItems[newItemPosition].id
 
   override fun areContentsTheSame(
     oldItemPosition: Int,
     newItemPosition: Int
-  ) = oldItems[oldItemPosition] == oldItems[newItemPosition]
+  ) = oldItems[oldItemPosition] == newItems[newItemPosition]
 }

@@ -47,7 +47,7 @@ inline fun <reified T> EditText.attachLiveData(
     if (data.value != null) {
       this.setText(data.value.toString())
     } else {
-      data.value = this.text.trim().toString().toInt() as T
+      data.value = (this.text.trim().toString().toIntOrNull() ?: 0) as T
     }
   }
   // Out
