@@ -228,7 +228,7 @@ class ViewSiteViewModelTest {
     text.assertValues(TEXT_CHECKS_DISABLED)
 
     viewModel.disabled.value = false
-    text.assertValues("December 6, 8:35AM")
+    text.assertValues("December 6, 8:35 AM")
   }
 
   @Test fun getCheckIntervalMs() {

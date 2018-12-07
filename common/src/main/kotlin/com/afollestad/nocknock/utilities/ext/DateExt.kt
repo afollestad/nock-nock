@@ -23,6 +23,6 @@ fun Long.formatDate(): String {
   if (this <= 0) {
     return "(None)"
   }
-  val df = SimpleDateFormat("MMMM d, h:mma", Locale.getDefault())
+  val df = SimpleDateFormat("MMMM d, h:mm a", Locale.getDefault())
   return df.format(Date(this))
 }

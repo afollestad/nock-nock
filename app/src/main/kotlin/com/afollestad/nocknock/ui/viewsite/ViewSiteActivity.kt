@@ -75,6 +75,10 @@ class ViewSiteActivity : AppCompatActivity() {
       addObserver(statusUpdateReceiver)
     }
 
+    // Populate view model with initial data
+    val model = intent.getSerializableExtra(KEY_SITE) as Site
+    viewModel.setModel(model)
+
     // Loading
     loadingProgress.observe(this, viewModel.onIsLoading())
 
@@ -149,10 +153,6 @@ class ViewSiteActivity : AppCompatActivity() {
     doneBtn.setOnClickListener {
       viewModel.commit { finish() }
     }
-
-    // Populate view model with initial data
-    val model = intent.getSerializableExtra(KEY_SITE) as Site
-    viewModel.setModel(model)
   }
 
   private fun setupUi() {

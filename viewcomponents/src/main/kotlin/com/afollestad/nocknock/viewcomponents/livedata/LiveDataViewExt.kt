@@ -38,7 +38,17 @@ inline fun <reified T> EditText.attachLiveData(
 ) {
   // Initial value
   if (T::class == String::class) {
-    data.value = this.text.trim().toString() as T
+    if (data.value != null) {
+      this.setText(data.value as? String)
+    } else {
+      data.value = this.text.trim().toString() as T
+    }
+  } else if (T::class == Int::class) {
+    if (data.value != null) {
+      this.setText(data.value.toString())
+    } else {
+      data.value = this.text.trim().toString().toInt() as T
+    }
   }
   // Out
   if (pushOutChanges) {
