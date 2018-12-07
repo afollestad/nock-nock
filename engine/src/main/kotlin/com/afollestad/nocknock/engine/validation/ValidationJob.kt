@@ -152,7 +152,7 @@ class ValidationJob : JobService() {
   }
 
   override fun onStopJob(params: JobParameters): Boolean {
-    val siteId = params.extras.getInt(KEY_SITE_ID)
+    val siteId = params.extras.getLong(KEY_SITE_ID)
     log("Check job for site $siteId is done")
     return true
   }
