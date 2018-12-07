@@ -50,10 +50,11 @@ class MainActivity : AppCompatActivity() {
 
   private lateinit var adapter: ServerAdapter
 
-  private val statusUpdateReceiver =
+  private val statusUpdateReceiver by lazy {
     StatusUpdateIntentReceiver(application, intentProvider) {
       viewModel.postSiteUpdate(it)
     }
+  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)

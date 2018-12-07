@@ -58,10 +58,11 @@ class ViewSiteActivity : AppCompatActivity() {
   internal val viewModel by viewModel<ViewSiteViewModel>()
 
   private val intentProvider by inject<IntentProvider>()
-  private val statusUpdateReceiver =
+  private val statusUpdateReceiver by lazy {
     StatusUpdateIntentReceiver(application, intentProvider) {
       viewModel.setModel(it)
     }
+  }
 
   @SuppressLint("SetTextI18n")
   override fun onCreate(savedInstanceState: Bundle?) {

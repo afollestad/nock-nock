@@ -21,23 +21,19 @@ import android.app.job.JobScheduler
 import android.content.Context.JOB_SCHEDULER_SERVICE
 import android.content.Context.NOTIFICATION_SERVICE
 import androidx.room.Room.databaseBuilder
-import com.afollestad.nocknock.R
 import com.afollestad.nocknock.data.AppDatabase
-import com.afollestad.nocknock.notifications.Qualifiers.APP_ICON_RES
+import com.afollestad.nocknock.notifications.Qualifiers.MAIN_ACTIVITY_CLASS
 import com.afollestad.nocknock.ui.main.MainActivity
-import com.afollestad.nocknock.utilities.Qualifiers.MAIN_ACTIVITY_CLASS
 import com.afollestad.nocknock.utilities.ext.systemService
 import okhttp3.OkHttpClient
 import org.koin.dsl.module.module
 
-const val MAIN_MODULE = "main"
+val mainActivityCls = MainActivity::class.java
 
 /** @author Aidan Follestad (@afollestad) */
-val mainModule = module(MAIN_MODULE) {
+val mainModule = module {
 
-  single(name = APP_ICON_RES) { R.mipmap.ic_launcher }
-
-  single(name = MAIN_ACTIVITY_CLASS) { MainActivity::class.java }
+  single(name = MAIN_ACTIVITY_CLASS) { mainActivityCls }
 
   single { databaseBuilder(get(), AppDatabase::class.java, "NockNock.db").build() }
 

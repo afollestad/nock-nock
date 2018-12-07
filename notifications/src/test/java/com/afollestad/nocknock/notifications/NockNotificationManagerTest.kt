@@ -19,11 +19,8 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.graphics.Bitmap
-import com.afollestad.nocknock.data.legacy.ServerModel
-import com.afollestad.nocknock.data.model.ValidationMode.STATUS_CODE
 import com.afollestad.nocknock.notifications.Channel.CheckFailures
-import com.afollestad.nocknock.utilities.providers.BitmapProvider
+import com.afollestad.nocknock.utilities.providers.CanNotifyModel
 import com.afollestad.nocknock.utilities.providers.IntentProvider
 import com.afollestad.nocknock.utilities.providers.NotificationChannelProvider
 import com.afollestad.nocknock.utilities.providers.NotificationProvider
@@ -48,10 +45,6 @@ class NockNotificationManagerTest {
   private val somethingWentWrong = "something went wrong"
 
   private val stockManager = mock<NotificationManager>()
-  private val appIcon = mock<Bitmap>()
-  private val bitmapProvider = mock<BitmapProvider> {
-    on { get(appIconRes) } doReturn appIcon
-  }
   private val stringProvider = mock<StringProvider> {
     on { get(R.string.something_wrong) } doReturn somethingWentWrong
   }
@@ -60,9 +53,7 @@ class NockNotificationManagerTest {
   private val notificationProvider = mock<NotificationProvider>()
 
   private val manager = RealNockNotificationManager(
-      appIconRes,
       stockManager,
-      bitmapProvider,
       stringProvider,
       intentProvider,
       channelProvider,
@@ -121,19 +112,18 @@ class NockNotificationManagerTest {
     whenever(
         notificationProvider.create(
             CheckFailures.id,
-            model.name,
+            "Testing",
             somethingWentWrong,
             pendingIntent,
-            R.drawable.ic_notification,
-            appIcon
+            R.drawable.ic_notification
         )
     ).doReturn(notification)
 
     manager.postStatusNotification(model)
 
     verify(stockManager).notify(
-        model.url,
-        BASE_NOTIFICATION_REQUEST_CODE + model.id,
+        "https://hello.com",
+        BASE_NOTIFICATION_REQUEST_CODE + 1,
         notification
     )
     verifyNoMoreInteractions(stockManager)
@@ -142,7 +132,7 @@ class NockNotificationManagerTest {
   @Test fun cancelStatusNotification() {
     val model = fakeModel()
     manager.cancelStatusNotification(model)
-    verify(stockManager).cancel(BASE_NOTIFICATION_REQUEST_CODE + model.id)
+    verify(stockManager).cancel(BASE_NOTIFICATION_REQUEST_CODE + 1)
     verifyNoMoreInteractions(stockManager)
   }
 
@@ -152,10 +142,11 @@ class NockNotificationManagerTest {
     verifyNoMoreInteractions(stockManager)
   }
 
-  private fun fakeModel() = ServerModel(
-      id = 1,
-      url = "https://hello.com",
-      name = "Testing",
-      validationMode = STATUS_CODE
-  )
+  private fun fakeModel() = object : CanNotifyModel {
+    override fun notifyId() = 1
+
+    override fun notifyName() = "Testing"
+
+    override fun notifyTag() = "https://hello.com"
+  }
 }

@@ -31,7 +31,7 @@ interface NotificationProvider {
     content: String,
     intent: PendingIntent,
     smallIcon: Int,
-    largeIcon: Bitmap
+    largeIcon: Bitmap? = null
   ): Notification
 }
 
@@ -46,7 +46,7 @@ class RealNotificationProvider(
     content: String,
     intent: PendingIntent,
     smallIcon: Int,
-    largeIcon: Bitmap
+    largeIcon: Bitmap?
   ): Notification {
     return NotificationCompat.Builder(context, channelId)
         .setContentTitle(title)

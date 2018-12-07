@@ -13,46 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.afollestad.nocknock.koin
+package com.afollestad.nocknock.utilities
 
-import com.afollestad.nocknock.ui.addsite.AddSiteViewModel
-import com.afollestad.nocknock.ui.main.MainViewModel
-import com.afollestad.nocknock.ui.viewsite.ViewSiteViewModel
 import com.afollestad.nocknock.utilities.Qualifiers.IO_DISPATCHER
 import com.afollestad.nocknock.utilities.Qualifiers.MAIN_DISPATCHER
-import org.koin.androidx.viewmodel.ext.koin.viewModel
+import com.afollestad.nocknock.utilities.providers.RealStringProvider
+import com.afollestad.nocknock.utilities.providers.StringProvider
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import org.koin.dsl.module.module
 
+object Qualifiers {
+  const val MAIN_DISPATCHER = "main_dispatcher"
+  const val IO_DISPATCHER = "io_dispatcher"
+}
+
 /** @author Aidan Follestad (@afollestad) */
-val viewModelModule = module {
+val commonModule = module {
 
-  viewModel {
-    MainViewModel(
-        get(),
-        get(),
-        get(),
-        get(name = MAIN_DISPATCHER),
-        get(name = IO_DISPATCHER)
-    )
-  }
+  factory<CoroutineDispatcher>(name = MAIN_DISPATCHER) { Dispatchers.Main }
 
-  viewModel {
-    AddSiteViewModel(
-        get(),
-        get(),
-        get(name = MAIN_DISPATCHER),
-        get(name = IO_DISPATCHER)
-    )
-  }
+  factory(name = IO_DISPATCHER) { Dispatchers.IO }
 
-  viewModel {
-    ViewSiteViewModel(
-        get(),
-        get(),
-        get(),
-        get(),
-        get(name = MAIN_DISPATCHER),
-        get(name = IO_DISPATCHER)
-    )
-  }
+  factory { RealStringProvider(get()) } bind StringProvider::class
 }

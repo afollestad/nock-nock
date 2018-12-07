@@ -19,10 +19,8 @@ import com.afollestad.nocknock.engine.validation.RealValidationManager
 import com.afollestad.nocknock.engine.validation.ValidationManager
 import org.koin.dsl.module.module
 
-const val ENGINE_MODULE = "engine"
-
 /** @author Aidan Follestad (@afollestad) */
-val engineModule = module(ENGINE_MODULE) {
+val engineModule = module {
 
   single {
     RealValidationManager(get(), get(), get(), get(), get(), get())

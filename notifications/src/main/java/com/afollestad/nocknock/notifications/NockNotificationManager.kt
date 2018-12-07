@@ -19,7 +19,6 @@ import android.annotation.TargetApi
 import android.app.NotificationManager
 import android.os.Build.VERSION_CODES
 import com.afollestad.nocknock.notifications.Channel.CheckFailures
-import com.afollestad.nocknock.utilities.providers.BitmapProvider
 import com.afollestad.nocknock.utilities.providers.CanNotifyModel
 import com.afollestad.nocknock.utilities.providers.IntentProvider
 import com.afollestad.nocknock.utilities.providers.NotificationChannelProvider
@@ -44,9 +43,7 @@ interface NockNotificationManager {
 
 /** @author Aidan Follestad (@afollestad) */
 class RealNockNotificationManager(
-  private val appIconRes: Int,
   private val stockManager: NotificationManager,
-  private val bitmapProvider: BitmapProvider,
   private val stringProvider: StringProvider,
   private val intentProvider: IntentProvider,
   private val channelProvider: NotificationChannelProvider,
@@ -78,8 +75,7 @@ class RealNockNotificationManager(
         title = model.notifyName(),
         content = stringProvider.get(R.string.something_wrong),
         intent = intent,
-        smallIcon = R.drawable.ic_notification,
-        largeIcon = bitmapProvider.get(appIconRes)
+        smallIcon = R.drawable.ic_notification
     )
 
     stockManager.notify(model.notifyTag(), model.notificationId(), newNotification)

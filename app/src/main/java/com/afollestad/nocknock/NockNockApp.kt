@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("unused")
+
 package com.afollestad.nocknock
 
 import android.app.Application
@@ -21,7 +23,7 @@ import com.afollestad.nocknock.koin.mainModule
 import com.afollestad.nocknock.koin.viewModelModule
 import com.afollestad.nocknock.notifications.NockNotificationManager
 import com.afollestad.nocknock.notifications.notificationsModule
-import com.afollestad.nocknock.utilities.utilitiesModule
+import com.afollestad.nocknock.utilities.commonModule
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.android.startKoin
 import timber.log.Timber
@@ -42,7 +44,7 @@ class NockNockApp : Application() {
     val modules = listOf(
         mainModule,
         engineModule,
-        utilitiesModule,
+        commonModule,
         notificationsModule,
         viewModelModule
     )
