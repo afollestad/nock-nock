@@ -18,9 +18,11 @@ package com.afollestad.nocknock.ui.addsite
 import androidx.annotation.CheckResult
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.VisibleForTesting.PRIVATE
+import androidx.lifecycle.Lifecycle.Event.ON_START
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.OnLifecycleEvent
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.data.AppDatabase
 import com.afollestad.nocknock.data.model.Site
@@ -32,6 +34,7 @@ import com.afollestad.nocknock.data.model.ValidationMode.TERM_SEARCH
 import com.afollestad.nocknock.data.putSite
 import com.afollestad.nocknock.engine.validation.ValidationManager
 import com.afollestad.nocknock.ui.ScopedViewModel
+import com.afollestad.nocknock.utilities.ext.MINUTE
 import com.afollestad.nocknock.utilities.livedata.map
 import com.afollestad.nocknock.viewcomponents.ext.isNullOrLessThan
 import kotlinx.coroutines.CoroutineDispatcher
@@ -50,14 +53,20 @@ class AddSiteViewModel(
   // Public properties
   val name = MutableLiveData<String>()
   val url = MutableLiveData<String>()
-  val timeout = MutableLiveData<Int>().apply {
-    this.value = 10000
-  }
+  val timeout = MutableLiveData<Int>()
   val validationMode = MutableLiveData<ValidationMode>()
   val validationSearchTerm = MutableLiveData<String>()
   val validationScript = MutableLiveData<String>()
   val checkIntervalValue = MutableLiveData<Int>()
   val checkIntervalUnit = MutableLiveData<Long>()
+
+  @OnLifecycleEvent(ON_START)
+  fun setDefaults() {
+    timeout.value = 10000
+    validationMode.value = STATUS_CODE
+    checkIntervalValue.value = 0
+    checkIntervalUnit.value = MINUTE
+  }
 
   // Private properties
   private val isLoading = MutableLiveData<Boolean>()

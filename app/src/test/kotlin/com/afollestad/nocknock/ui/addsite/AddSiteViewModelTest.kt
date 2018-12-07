@@ -24,6 +24,7 @@ import com.afollestad.nocknock.data.model.ValidationMode.STATUS_CODE
 import com.afollestad.nocknock.data.model.ValidationMode.TERM_SEARCH
 import com.afollestad.nocknock.engine.validation.ValidationManager
 import com.afollestad.nocknock.mockDatabase
+import com.afollestad.nocknock.utilities.ext.MINUTE
 import com.afollestad.nocknock.utilities.livedata.test
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
@@ -55,6 +56,19 @@ class AddSiteViewModelTest {
   )
 
   @After fun tearDown() = viewModel.destroy()
+
+  @Test fun setDefaults() {
+    viewModel.setDefaults()
+
+    assertThat(viewModel.name.value).isNull()
+    assertThat(viewModel.url.value).isNull()
+    assertThat(viewModel.timeout.value).isEqualTo(10000)
+    assertThat(viewModel.validationMode.value).isEqualTo(STATUS_CODE)
+    assertThat(viewModel.validationSearchTerm.value).isNull()
+    assertThat(viewModel.validationScript.value).isNull()
+    assertThat(viewModel.checkIntervalValue.value).isEqualTo(0)
+    assertThat(viewModel.checkIntervalUnit.value).isEqualTo(MINUTE)
+  }
 
   @Test fun onUrlWarningVisibility() {
     val urlWarningVisibility = viewModel.onUrlWarningVisibility()
