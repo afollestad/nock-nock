@@ -20,7 +20,7 @@ android {
 
 dependencies {
   implementation 'androidx.annotation:annotation:' + versions.androidx
-  implementation 'androidx.appcompat:appcompat:' + versions.androidx
+  api 'androidx.lifecycle:lifecycle-extensions:' + versions.lifecycle
 
   implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:' + versions.kotlin
   api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:' + versions.coroutines
@@ -30,9 +30,8 @@ dependencies {
   implementation 'org.mozilla:rhino:' + versions.rhino
 
   testImplementation 'junit:junit:' + versions.junit
-  testImplementation 'org.mockito:mockito-core:' + versions.mockito
-  testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:' + versions.mockitoKotlin
   testImplementation 'com.google.truth:truth:' + versions.truth
+  testImplementation 'androidx.arch.core:core-testing:' + versions.archTesting
 }
 
 apply from: '../spotless.gradle'
