@@ -11,22 +11,23 @@ android {
     versionCode versions.publishVersionCode
     versionName versions.publishVersion
   }
+
+  // For Mozilla Rhino
+  lintOptions {
+    abortOnError false
+  }
 }
 
 dependencies {
-  implementation project(':common')
-  implementation project(':data')
-  implementation project(':notifications')
+  implementation 'androidx.annotation:annotation:' + versions.androidx
+  implementation 'androidx.appcompat:appcompat:' + versions.androidx
 
   implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:' + versions.kotlin
   api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:' + versions.coroutines
   api 'org.jetbrains.kotlinx:kotlinx-coroutines-android:' + versions.coroutines
 
   implementation 'org.koin:koin-android:' + versions.koin
-
-  api 'com.squareup.okhttp3:okhttp:' + versions.okHttp
-
-  implementation 'com.jakewharton.timber:timber:' + versions.timber
+  implementation 'org.mozilla:rhino:' + versions.rhino
 
   testImplementation 'junit:junit:' + versions.junit
   testImplementation 'org.mockito:mockito-core:' + versions.mockito

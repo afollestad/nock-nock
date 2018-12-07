@@ -19,8 +19,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.DividerItemDecoration.VERTICAL
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,31 +26,27 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItems
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.adapter.ServerAdapter
+import com.afollestad.nocknock.broadcasts.StatusUpdateIntentReceiver
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.dialogs.AboutDialog
 import com.afollestad.nocknock.notifications.NockNotificationManager
-import com.afollestad.nocknock.broadcasts.StatusUpdateIntentReceiver
-import com.afollestad.nocknock.utilities.ext.injector
 import com.afollestad.nocknock.viewcomponents.ext.showOrHide
 import kotlinx.android.synthetic.main.activity_main.fab
 import kotlinx.android.synthetic.main.activity_main.list
 import kotlinx.android.synthetic.main.activity_main.loadingProgress
 import kotlinx.android.synthetic.main.activity_main.toolbar
 import kotlinx.android.synthetic.main.include_empty_view.emptyText
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /** @author Aidan Follestad (@afollestad) */
 class MainActivity : AppCompatActivity() {
 
-  @Inject lateinit var notificationManager: NockNotificationManager
-  @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
+  private val notificationManager by inject<NockNotificationManager>()
+  internal val viewModel by viewModel<MainViewModel>()
 
   private lateinit var adapter: ServerAdapter
 
-  internal val viewModel by lazy {
-    return@lazy ViewModelProviders.of(this, viewModelFactory)
-        .get(MainViewModel::class.java)
-  }
   private val statusUpdateReceiver =
     StatusUpdateIntentReceiver(application) {
       viewModel.postSiteUpdate(it)
@@ -60,7 +54,6 @@ class MainActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    injector().injectInto(this)
     setContentView(R.layout.activity_main)
     setupUi()
 

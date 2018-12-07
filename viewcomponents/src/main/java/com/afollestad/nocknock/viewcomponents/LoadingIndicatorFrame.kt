@@ -46,7 +46,14 @@ class LoadingIndicatorFrame(
     isFocusable = true
   }
 
-  fun setIsLoading(isLoading: Boolean) {
+  fun observe(
+    owner: LifecycleOwner,
+    data: LiveData<Boolean>
+  ) = data.observe(owner, Observer {
+    setIsLoading(it)
+  })
+
+  private fun setIsLoading(isLoading: Boolean) {
     delayHandler.removeCallbacks(showRunnable)
     if (isLoading) {
       delayHandler.postDelayed(showRunnable, SHOW_DELAY_MS)
@@ -54,11 +61,4 @@ class LoadingIndicatorFrame(
       hide()
     }
   }
-
-  fun observe(
-    owner: LifecycleOwner,
-    data: LiveData<Boolean>
-  ) = data.observe(owner, Observer {
-    setIsLoading(it)
-  })
 }

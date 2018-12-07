@@ -33,7 +33,6 @@ import okhttp3.Response
 import org.jetbrains.annotations.TestOnly
 import java.net.SocketTimeoutException
 import java.util.concurrent.TimeUnit.MILLISECONDS
-import javax.inject.Inject
 import timber.log.Timber.d as log
 
 /** @author Aidan Follestad (@afollestad) */
@@ -61,7 +60,7 @@ interface ValidationManager {
   suspend fun performCheck(site: Site): CheckResult
 }
 
-class RealValidationManager @Inject constructor(
+class RealValidationManager(
   private val jobScheduler: JobScheduler,
   private val okHttpClient: OkHttpClient,
   private val stringProvider: StringProvider,

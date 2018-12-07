@@ -1,1 +1,1 @@
-include ':app', ':engine', ':notifications', ':data', ':utilities', ':viewcomponents'
+include ':app', ':engine', ':notifications', ':data', ':common', ':viewcomponents'

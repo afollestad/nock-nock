@@ -19,11 +19,8 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.data.model.ValidationMode
-import com.afollestad.nocknock.utilities.ext.injector
 import com.afollestad.nocknock.viewcomponents.ext.attachLiveData
 import com.afollestad.nocknock.viewcomponents.ext.conceal
 import com.afollestad.nocknock.viewcomponents.ext.onLayout
@@ -43,7 +40,7 @@ import kotlinx.android.synthetic.main.activity_addsite.scriptInputLayout
 import kotlinx.android.synthetic.main.activity_addsite.textUrlWarning
 import kotlinx.android.synthetic.main.activity_addsite.toolbar
 import kotlinx.android.synthetic.main.activity_addsite.validationModeDescription
-import javax.inject.Inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.math.max
 import kotlin.properties.Delegates.notNull
 
@@ -58,19 +55,13 @@ class AddSiteActivity : AppCompatActivity() {
   var revealCy by notNull<Int>()
   var revealRadius by notNull<Float>()
 
-  @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
-
   internal var isClosing = false
-  private val viewModel by lazy {
-    return@lazy ViewModelProviders.of(this, viewModelFactory)
-        .get(AddSiteViewModel::class.java)
-  }
+
+  private val viewModel by viewModel<AddSiteViewModel>()
 
   @SuppressLint("SetTextI18n")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-
-    injector().injectInto(this)
     setContentView(R.layout.activity_addsite)
     setupUi(savedInstanceState)
 

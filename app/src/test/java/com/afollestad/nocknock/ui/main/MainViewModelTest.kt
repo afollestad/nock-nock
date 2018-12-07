@@ -15,6 +15,7 @@
  */
 package com.afollestad.nocknock.ui.main
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.afollestad.nocknock.ALL_MOCK_MODELS
 import com.afollestad.nocknock.MOCK_MODEL_1
 import com.afollestad.nocknock.MOCK_MODEL_2
@@ -28,22 +29,25 @@ import com.nhaarman.mockitokotlin2.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Rule
 import org.junit.Test
 
+/** @author Aidan Follestad (@afollestad) */
 class MainViewModelTest {
 
   private val database = mockDatabase()
   private val notificationManager = mock<NockNotificationManager>()
   private val validationManager = mock<ValidationManager>()
 
+  @Rule @JvmField val rule = InstantTaskExecutorRule()
+
   private val viewModel = MainViewModel(
       database,
       notificationManager,
       validationManager,
-      Dispatchers.Default
-  ).apply {
-    this.mainDispatcher = Dispatchers.Default
-  }
+      Dispatchers.Unconfined,
+      Dispatchers.Unconfined
+  )
 
   @After fun tearDown() = viewModel.destroy()
 
@@ -92,7 +96,6 @@ class MainViewModelTest {
     viewModel.postSiteUpdate(updatedModel2)
 
     sites.assertValues(updatedSites)
-
   }
 
   @Test fun refreshSite() {
@@ -116,6 +119,7 @@ class MainViewModelTest {
         listOf(),
         ALL_MOCK_MODELS
     )
+    isLoading.assertValues(true, false)
 
     val modifiedModel = MOCK_MODEL_1.copy(id = 11111)
     viewModel.removeSite(modifiedModel)
@@ -140,6 +144,7 @@ class MainViewModelTest {
         listOf(),
         ALL_MOCK_MODELS
     )
+    isLoading.assertValues(true, false)
 
     val modelsWithout1 = ALL_MOCK_MODELS.toMutableList()
         .apply {

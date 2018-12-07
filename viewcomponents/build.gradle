@@ -15,16 +15,13 @@ android {
 }
 
 dependencies {
-  implementation project(':utilities')
+  implementation project(':common')
   implementation project(':data')
 
   implementation 'androidx.appcompat:appcompat:' + versions.androidx
   api 'androidx.lifecycle:lifecycle-extensions:' + versions.lifecycle
 
   api 'com.squareup.okhttp3:okhttp:' + versions.okHttp
-
-  implementation 'com.google.dagger:dagger:' + versions.dagger
-  kapt 'com.google.dagger:dagger-compiler:' + versions.dagger
 }
 
 apply from: '../spotless.gradle'

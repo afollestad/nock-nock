@@ -15,7 +15,6 @@
  */
 package com.afollestad.nocknock.ui.viewsite
 
-import android.app.Application
 import androidx.annotation.CheckResult
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LiveData
@@ -33,11 +32,11 @@ import com.afollestad.nocknock.data.model.ValidationMode.TERM_SEARCH
 import com.afollestad.nocknock.data.model.ValidationResult
 import com.afollestad.nocknock.data.model.textRes
 import com.afollestad.nocknock.data.updateSite
-import com.afollestad.nocknock.di.viewmodels.ScopedViewModel
 import com.afollestad.nocknock.engine.validation.ValidationManager
 import com.afollestad.nocknock.notifications.NockNotificationManager
+import com.afollestad.nocknock.ui.ScopedViewModel
 import com.afollestad.nocknock.utilities.ext.formatDate
-import com.afollestad.nocknock.di.qualifiers.IoDispatcher
+import com.afollestad.nocknock.utilities.providers.StringProvider
 import com.afollestad.nocknock.viewcomponents.ext.isNullOrLessThan
 import com.afollestad.nocknock.viewcomponents.ext.map
 import com.afollestad.nocknock.viewcomponents.ext.zip
@@ -46,16 +45,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
 import java.lang.System.currentTimeMillis
-import javax.inject.Inject
 
 /** @author Aidan Follestad (@afollestad) */
-class ViewSiteViewModel @Inject constructor(
-  private val app: Application,
+class ViewSiteViewModel(
+  private val stringProvider: StringProvider,
   private val database: AppDatabase,
   private val notificationManager: NockNotificationManager,
   private val validationManager: ValidationManager,
-  @field:IoDispatcher private val ioDispatcher: CoroutineDispatcher
-) : ScopedViewModel(), LifecycleObserver {
+  mainDispatcher: CoroutineDispatcher,
+  private val ioDispatcher: CoroutineDispatcher
+) : ScopedViewModel(mainDispatcher), LifecycleObserver {
 
   lateinit var site: Site
 
@@ -134,13 +133,13 @@ class ViewSiteViewModel @Inject constructor(
 
   @CheckResult fun onLastCheckResultText(): LiveData<String> = lastResult.map {
     if (it == null) {
-      app.getString(R.string.none)
+      stringProvider.get(R.string.none)
     } else {
       val statusText = it.status.textRes()
       if (statusText == 0) {
         it.reason
       } else {
-        app.getString(statusText)
+        stringProvider.get(statusText)
       }
     }
   }
@@ -151,7 +150,7 @@ class ViewSiteViewModel @Inject constructor(
           val disabled = it.first
           val lastResult = it.second
           if (disabled) {
-            app.getString(R.string.auto_checks_disabled)
+            stringProvider.get(R.string.auto_checks_disabled)
           } else {
             val lastCheck = lastResult?.timestampMs ?: currentTimeMillis()
             (lastCheck + getCheckIntervalMs()).formatDate()

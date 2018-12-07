@@ -28,23 +28,22 @@ import com.afollestad.nocknock.data.model.ValidationMode.JAVASCRIPT
 import com.afollestad.nocknock.data.model.ValidationMode.STATUS_CODE
 import com.afollestad.nocknock.data.model.ValidationMode.TERM_SEARCH
 import com.afollestad.nocknock.data.putSite
-import com.afollestad.nocknock.di.viewmodels.ScopedViewModel
 import com.afollestad.nocknock.engine.validation.ValidationManager
-import com.afollestad.nocknock.di.qualifiers.IoDispatcher
+import com.afollestad.nocknock.ui.ScopedViewModel
 import com.afollestad.nocknock.viewcomponents.ext.isNullOrLessThan
 import com.afollestad.nocknock.viewcomponents.ext.map
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
-import javax.inject.Inject
 
 /** @author Aidan Follestad (@afollestad) */
-class AddSiteViewModel @Inject constructor(
+class AddSiteViewModel(
   private val database: AppDatabase,
   private val validationManager: ValidationManager,
-  @field:IoDispatcher private val ioDispatcher: CoroutineDispatcher
-) : ScopedViewModel(), LifecycleObserver {
+  mainDispatcher: CoroutineDispatcher,
+  private val ioDispatcher: CoroutineDispatcher
+) : ScopedViewModel(mainDispatcher), LifecycleObserver {
 
   // Public properties
   val name = MutableLiveData<String>()

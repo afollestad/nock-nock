@@ -26,8 +26,6 @@ import com.afollestad.nocknock.utilities.providers.NotificationChannelProvider
 import com.afollestad.nocknock.utilities.providers.NotificationProvider
 import com.afollestad.nocknock.utilities.providers.RealIntentProvider.Companion.BASE_NOTIFICATION_REQUEST_CODE
 import com.afollestad.nocknock.utilities.providers.StringProvider
-import com.afollestad.nocknock.utilities.qualifiers.AppIconRes
-import javax.inject.Inject
 import timber.log.Timber.d as log
 
 /** @author Aidan Follestad (@afollestad) */
@@ -45,8 +43,8 @@ interface NockNotificationManager {
 }
 
 /** @author Aidan Follestad (@afollestad) */
-class RealNockNotificationManager @Inject constructor(
-  @AppIconRes private val appIconRes: Int,
+class RealNockNotificationManager(
+  private val appIconRes: Int,
   private val stockManager: NotificationManager,
   private val bitmapProvider: BitmapProvider,
   private val stringProvider: StringProvider,

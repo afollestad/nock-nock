@@ -18,7 +18,7 @@ android {
 }
 
 dependencies {
-  implementation project(':utilities')
+  implementation project(':common')
   implementation project(':engine')
   implementation project(':data')
   implementation project(':notifications')
@@ -32,16 +32,22 @@ dependencies {
 
   implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:' + versions.kotlin
 
-  implementation 'com.google.dagger:dagger:' + versions.dagger
-  kapt 'com.google.dagger:dagger-compiler:' + versions.dagger
+  implementation 'org.koin:koin-android:' + versions.koin
+  implementation 'org.koin:koin-androidx-scope:' + versions.koin
+  implementation 'org.koin:koin-androidx-viewmodel:' + versions.koin
 
   implementation 'com.afollestad.material-dialogs:core:' + versions.materialDialogs
 
   implementation 'com.jakewharton.timber:timber:' + versions.timber
+
   testImplementation 'junit:junit:' + versions.junit
   testImplementation 'org.mockito:mockito-core:' + versions.mockito
   testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:' + versions.mockitoKotlin
   testImplementation 'com.google.truth:truth:' + versions.truth
+  testImplementation 'androidx.arch.core:core-testing:' + versions.archTesting
+
+  androidTestImplementation 'androidx.test:runner:' + versions.androidxTestRunner
+  androidTestImplementation 'androidx.test:rules:' + versions.androidxTestRunner
 }
 
 apply from: '../spotless.gradle'

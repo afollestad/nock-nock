@@ -3,11 +3,11 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
       <module fileurl="file://$PROJECT_DIR$/data/data.iml" filepath="$PROJECT_DIR$/data/data.iml" />
       <module fileurl="file://$PROJECT_DIR$/engine/engine.iml" filepath="$PROJECT_DIR$/engine/engine.iml" />
       <module fileurl="file://$PROJECT_DIR$/nock-nock.iml" filepath="$PROJECT_DIR$/nock-nock.iml" />
       <module fileurl="file://$PROJECT_DIR$/notifications/notifications.iml" filepath="$PROJECT_DIR$/notifications/notifications.iml" />
-      <module fileurl="file://$PROJECT_DIR$/utilities/utilities.iml" filepath="$PROJECT_DIR$/utilities/utilities.iml" />
       <module fileurl="file://$PROJECT_DIR$/viewcomponents/viewcomponents.iml" filepath="$PROJECT_DIR$/viewcomponents/viewcomponents.iml" />
     </modules>
   </component>

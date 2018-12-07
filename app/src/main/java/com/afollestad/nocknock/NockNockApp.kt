@@ -16,55 +16,42 @@
 package com.afollestad.nocknock
 
 import android.app.Application
-import com.afollestad.nocknock.di.AppComponent
-import com.afollestad.nocknock.di.DaggerAppComponent
-import com.afollestad.nocknock.engine.validation.BootReceiver
-import com.afollestad.nocknock.engine.validation.ValidationJob
+import com.afollestad.nocknock.engine.engineModule
+import com.afollestad.nocknock.koin.mainModule
+import com.afollestad.nocknock.koin.viewModelModule
 import com.afollestad.nocknock.notifications.NockNotificationManager
-import com.afollestad.nocknock.ui.addsite.AddSiteActivity
-import com.afollestad.nocknock.ui.main.MainActivity
-import com.afollestad.nocknock.ui.viewsite.ViewSiteActivity
-import com.afollestad.nocknock.utilities.Injector
-import com.afollestad.nocknock.utilities.ext.systemService
-import okhttp3.OkHttpClient
+import com.afollestad.nocknock.notifications.notificationsModule
+import com.afollestad.nocknock.utilities.utilitiesModule
+import org.koin.android.ext.android.inject
+import org.koin.android.ext.android.startKoin
 import timber.log.Timber
 import timber.log.Timber.DebugTree
-import javax.inject.Inject
 import timber.log.Timber.d as log
 
 /** @author Aidan Follestad (@afollestad) */
-class NockNockApp : Application(), Injector {
-
-  private lateinit var appComponent: AppComponent
-  @Inject lateinit var nockNotificationManager: NockNotificationManager
+class NockNockApp : Application() {
 
   private var resumedActivities: Int = 0
 
   override fun onCreate() {
     super.onCreate()
-
     if (BuildConfig.DEBUG) {
       Timber.plant(DebugTree())
     }
 
-    val okHttpClient = OkHttpClient.Builder()
-        .addNetworkInterceptor { chain ->
-          val request = chain.request()
-              .newBuilder()
-              .addHeader("User-Agent", "com.afollestad.nocknock")
-              .build()
-          chain.proceed(request)
-        }
-        .build()
+    val modules = listOf(
+        mainModule,
+        engineModule,
+        utilitiesModule,
+        notificationsModule,
+        viewModelModule
+    )
+    startKoin(
+        androidContext = this,
+        modules = modules
+    )
 
-    appComponent = DaggerAppComponent.builder()
-        .application(this)
-        .okHttpClient(okHttpClient)
-        .jobScheduler(systemService(JOB_SCHEDULER_SERVICE))
-        .notificationManager(systemService(NOTIFICATION_SERVICE))
-        .build()
-    appComponent.inject(this)
-
+    val nockNotificationManager by inject<NockNotificationManager>()
     onActivityLifeChange { activity, resumed ->
       if (resumed) {
         resumedActivities++
@@ -76,14 +63,5 @@ class NockNockApp : Application(), Injector {
       check(resumedActivities >= 0) { "resumedActivities can't go below 0." }
       nockNotificationManager.setIsAppOpen(resumedActivities > 0)
     }
-  }
-
-  override fun injectInto(target: Any) = when (target) {
-    is MainActivity -> appComponent.inject(target)
-    is ViewSiteActivity -> appComponent.inject(target)
-    is AddSiteActivity -> appComponent.inject(target)
-    is ValidationJob -> appComponent.inject(target)
-    is BootReceiver -> appComponent.inject(target)
-    else -> throw IllegalStateException("Can't inject into $target")
   }
 }

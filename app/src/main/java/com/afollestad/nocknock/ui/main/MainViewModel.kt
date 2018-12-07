@@ -25,22 +25,21 @@ import com.afollestad.nocknock.data.AppDatabase
 import com.afollestad.nocknock.data.allSites
 import com.afollestad.nocknock.data.deleteSite
 import com.afollestad.nocknock.data.model.Site
-import com.afollestad.nocknock.di.viewmodels.ScopedViewModel
 import com.afollestad.nocknock.engine.validation.ValidationManager
 import com.afollestad.nocknock.notifications.NockNotificationManager
-import com.afollestad.nocknock.di.qualifiers.IoDispatcher
+import com.afollestad.nocknock.ui.ScopedViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 /** @author Aidan Follestad (@afollestad) */
-class MainViewModel @Inject constructor(
+class MainViewModel(
   private val database: AppDatabase,
   private val notificationManager: NockNotificationManager,
   private val validationManager: ValidationManager,
-  @field:IoDispatcher private val ioDispatcher: CoroutineDispatcher
-) : ScopedViewModel(), LifecycleObserver {
+  mainDispatcher: CoroutineDispatcher,
+  private val ioDispatcher: CoroutineDispatcher
+) : ScopedViewModel(mainDispatcher), LifecycleObserver {
 
   private val sites = MutableLiveData<List<Site>>()
   private val isLoading = MutableLiveData<Boolean>()

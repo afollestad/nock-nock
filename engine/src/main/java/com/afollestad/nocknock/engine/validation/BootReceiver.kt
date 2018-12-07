@@ -19,19 +19,22 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_BOOT_COMPLETED
-import com.afollestad.nocknock.utilities.ext.injector
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
+import com.afollestad.nocknock.utilities.Qualifiers.IO_DISPATCHER
+import com.afollestad.nocknock.utilities.Qualifiers.MAIN_DISPATCHER
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import kotlinx.coroutines.withContext
+import org.koin.standalone.KoinComponent
+import org.koin.standalone.inject
 import timber.log.Timber.d as log
 
 /** @author Aidan Follestad (@afollestad) */
-class BootReceiver : BroadcastReceiver() {
+class BootReceiver : BroadcastReceiver(), KoinComponent {
 
-  @Inject lateinit var checkStatusManager: ValidationManager
+  private val validationManager by inject<ValidationManager>()
+  private val mainDispatcher by inject<CoroutineDispatcher>(name = MAIN_DISPATCHER)
+  private val ioDispatcher by inject<CoroutineDispatcher>(name = IO_DISPATCHER)
 
   override fun onReceive(
     context: Context,
@@ -42,12 +45,10 @@ class BootReceiver : BroadcastReceiver() {
     }
 
     log("Received boot event! Let's go.")
-    context.injector()
-        .injectInto(this)
 
     val pendingResult = goAsync()
-    GlobalScope.launch(Main) {
-      async(IO) { checkStatusManager.ensureScheduledChecks() }.await()
+    GlobalScope.launch(mainDispatcher) {
+      withContext(ioDispatcher) { validationManager.ensureScheduledChecks() }
       pendingResult.resultCode = 0
       pendingResult.finish()
     }

@@ -19,6 +19,7 @@ import android.app.job.JobParameters
 import android.app.job.JobService
 import android.content.Intent
 import com.afollestad.nocknock.data.AppDatabase
+import com.afollestad.nocknock.data.getSite
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.Status
 import com.afollestad.nocknock.data.model.Status.CHECKING
@@ -29,11 +30,9 @@ import com.afollestad.nocknock.data.model.ValidationMode.JAVASCRIPT
 import com.afollestad.nocknock.data.model.ValidationMode.STATUS_CODE
 import com.afollestad.nocknock.data.model.ValidationMode.TERM_SEARCH
 import com.afollestad.nocknock.data.model.isPending
-import com.afollestad.nocknock.data.getSite
 import com.afollestad.nocknock.data.updateSite
 import com.afollestad.nocknock.engine.BuildConfig.APPLICATION_ID
 import com.afollestad.nocknock.notifications.NockNotificationManager
-import com.afollestad.nocknock.utilities.ext.injector
 import com.afollestad.nocknock.utilities.js.JavaScript
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -41,8 +40,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
 import java.lang.System.currentTimeMillis
-import javax.inject.Inject
 import timber.log.Timber.d as log
 
 /**
@@ -59,12 +58,11 @@ class ValidationJob : JobService() {
     const val KEY_SITE_ID = "site.id"
   }
 
-  @Inject lateinit var database: AppDatabase
-  @Inject lateinit var checkStatusManager: ValidationManager
-  @Inject lateinit var notificationManager: NockNotificationManager
+  private val database by inject<AppDatabase>()
+  private val validaitonManager by inject<ValidationManager>()
+  private val notificationManager by inject<NockNotificationManager>()
 
   override fun onStartJob(params: JobParameters): Boolean {
-    injector().injectInto(this)
     val siteId = params.extras.getLong(KEY_SITE_ID)
 
     GlobalScope.launch(Main) {
@@ -84,7 +82,7 @@ class ValidationJob : JobService() {
 
       val jobResult = async(IO) {
         updateStatus(site, CHECKING)
-        val checkResult = checkStatusManager.performCheck(site)
+        val checkResult = validaitonManager.performCheck(site)
         val resultModel = checkResult.model
         val resultResponse = checkResult.response
         val result = resultModel.lastResult!!
@@ -144,7 +142,7 @@ class ValidationJob : JobService() {
         notificationManager.postStatusNotification(jobResult)
       }
 
-      checkStatusManager.scheduleCheck(
+      validaitonManager.scheduleCheck(
           site = jobResult,
           fromFinishingJob = true
       )

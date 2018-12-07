@@ -14,7 +14,7 @@ android {
 }
 
 dependencies {
-  implementation project(':utilities')
+  implementation project(':common')
 
   api 'androidx.appcompat:appcompat:' + versions.androidx
 
@@ -22,10 +22,10 @@ dependencies {
   api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:' + versions.coroutines
   api 'org.jetbrains.kotlinx:kotlinx-coroutines-android:' + versions.coroutines
 
-  implementation 'com.google.dagger:dagger:' + versions.dagger
-  kapt 'com.google.dagger:dagger-compiler:' + versions.dagger
+  implementation 'org.koin:koin-android:' + versions.koin
 
   implementation 'com.jakewharton.timber:timber:' + versions.timber
+
   testImplementation 'junit:junit:' + versions.junit
   testImplementation 'org.mockito:mockito-core:' + versions.mockito
   testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:' + versions.mockitoKotlin

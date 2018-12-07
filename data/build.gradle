@@ -17,12 +17,9 @@ android {
 }
 
 dependencies {
-  implementation project(':utilities')
+  implementation project(':common')
 
   implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:' + versions.kotlin
-
-  implementation 'com.google.dagger:dagger:' + versions.dagger
-  annotationProcessor 'com.google.dagger:dagger-compiler:' + versions.dagger
 
   api 'androidx.room:room-runtime:' + versions.room
   kapt 'androidx.room:room-compiler:' + versions.room
