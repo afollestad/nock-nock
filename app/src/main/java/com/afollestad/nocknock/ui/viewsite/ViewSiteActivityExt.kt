@@ -45,7 +45,7 @@ internal fun ViewSiteActivity.maybeDisableChecks() {
     message(
         text = context.getString(R.string.disable_automatic_checks_prompt, model.name).toHtml()
     )
-    positiveButton(R.string.disable) { viewModel.disable() }
+    positiveButton(R.string.disable) { viewModel.disableSite() }
     negativeButton(android.R.string.cancel)
   }
 }
