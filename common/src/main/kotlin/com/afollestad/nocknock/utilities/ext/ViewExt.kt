@@ -38,7 +38,9 @@ fun EditText.onTextChanged(
 ) {
   addTextChangedListener(object : TextWatcher {
     val callbackRunner = Runnable {
-      cb(text.trim().toString())
+      if(text.trim().toString()!="") {
+        cb(text.trim().toString())
+      }
     }
 
     override fun afterTextChanged(s: Editable?) = Unit
