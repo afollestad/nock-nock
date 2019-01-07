@@ -26,6 +26,8 @@ import androidx.lifecycle.Observer
 import com.afollestad.nocknock.utilities.ext.onTextChanged
 import com.afollestad.nocknock.utilities.ext.setTextAndMaintainSelection
 import com.afollestad.nocknock.utilities.livedata.distinct
+import com.afollestad.nocknock.viewcomponents.ext.asSafeInt
+import com.afollestad.nocknock.viewcomponents.ext.asSafeLong
 import com.afollestad.nocknock.viewcomponents.ext.onItemSelected
 import com.afollestad.nocknock.viewcomponents.ext.showOrHide
 
@@ -54,10 +56,10 @@ inline fun <reified T> EditText.attachLiveData(
   if (pushOutChanges) {
     when {
       T::class == Int::class -> {
-        onTextChanged(debounce) { data.postValue(it.trim().toInt() as T) }
+        onTextChanged(debounce) { data.postValue(it.asSafeInt() as T) }
       }
       T::class == Long::class -> {
-        onTextChanged(debounce) { data.postValue(it.trim().toLong() as T) }
+        onTextChanged(debounce) { data.postValue(it.asSafeLong() as T) }
       }
       T::class == String::class -> {
         onTextChanged(debounce) { data.postValue(it as T) }
