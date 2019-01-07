@@ -16,7 +16,7 @@ android {
 dependencies {
   implementation project(':common')
 
-  api 'androidx.appcompat:appcompat:' + versions.androidx
+  api 'androidx.appcompat:appcompat:' + versions.androidxCore
 
   implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:' + versions.kotlin
   api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:' + versions.coroutines

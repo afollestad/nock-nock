@@ -24,9 +24,9 @@ dependencies {
   implementation project(':notifications')
   implementation project(':viewcomponents')
 
-  implementation 'androidx.appcompat:appcompat:' + versions.androidx
-  implementation 'androidx.recyclerview:recyclerview:' + versions.androidx
-  implementation 'com.google.android.material:material:' + versions.androidx
+  implementation 'androidx.appcompat:appcompat:' + versions.androidxCore
+  implementation 'androidx.recyclerview:recyclerview:' + versions.androidxRecyclerView
+  implementation 'com.google.android.material:material:' + versions.googleMaterial
 
   kapt 'androidx.lifecycle:lifecycle-compiler:' + versions.lifecycle
 
