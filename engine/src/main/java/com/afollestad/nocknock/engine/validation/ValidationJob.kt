@@ -59,7 +59,7 @@ class ValidationJob : JobService() {
   }
 
   private val database by inject<AppDatabase>()
-  private val validaitonManager by inject<ValidationManager>()
+  private val validationManager by inject<ValidationManager>()
   private val notificationManager by inject<NockNotificationManager>()
 
   override fun onStartJob(params: JobParameters): Boolean {
@@ -82,7 +82,7 @@ class ValidationJob : JobService() {
 
       val jobResult = async(IO) {
         updateStatus(site, CHECKING)
-        val checkResult = validaitonManager.performCheck(site)
+        val checkResult = validationManager.performCheck(site)
         val resultModel = checkResult.model
         val resultResponse = checkResult.response
         val result = resultModel.lastResult!!
@@ -142,7 +142,7 @@ class ValidationJob : JobService() {
         notificationManager.postStatusNotification(jobResult)
       }
 
-      validaitonManager.scheduleCheck(
+      validationManager.scheduleCheck(
           site = jobResult,
           fromFinishingJob = true
       )
