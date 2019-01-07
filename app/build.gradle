@@ -4,6 +4,18 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 
+apply plugin: 'io.fabric'
+
+def getFabricApiKey() {
+  def propsFile = project.rootProject.file('local.properties')
+  if (!propsFile.exists()) {
+    return ""
+  }
+  Properties properties = new Properties()
+  properties.load(propsFile.newDataInputStream())
+  return properties.getProperty("fabric.apikey") ?: ""
+}
+
 android {
   compileSdkVersion versions.compileSdk
   buildToolsVersion versions.buildTools
@@ -14,6 +26,16 @@ android {
     targetSdkVersion versions.compileSdk
     versionCode versions.publishVersionCode
     versionName versions.publishVersion
+    manifestPlaceholders = [fabricKey:getFabricApiKey()]
+  }
+
+  buildTypes {
+    debug {
+      buildConfigField "String", "FABRIC_API_KEY", "\"\""
+    }
+    release {
+      buildConfigField "String", "FABRIC_API_KEY", "\"${getFabricApiKey()}\""
+    }
   }
 }
 
@@ -24,29 +46,40 @@ dependencies {
   implementation project(':notifications')
   implementation project(':viewcomponents')
 
+  // Google/AppCompat
   implementation 'androidx.appcompat:appcompat:' + versions.androidxCore
   implementation 'androidx.recyclerview:recyclerview:' + versions.androidxRecyclerView
   implementation 'com.google.android.material:material:' + versions.googleMaterial
   implementation 'androidx.browser:browser:' + versions.androidxBrowser
 
+  // Lifecycle
   kapt 'androidx.lifecycle:lifecycle-compiler:' + versions.lifecycle
 
+  // Kotlin
   implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:' + versions.kotlin
 
+  // JOIN
   implementation 'org.koin:koin-android:' + versions.koin
   implementation 'org.koin:koin-androidx-scope:' + versions.koin
   implementation 'org.koin:koin-androidx-viewmodel:' + versions.koin
 
+  // afollestad
   implementation 'com.afollestad.material-dialogs:core:' + versions.materialDialogs
 
+  // Debugging
   implementation 'com.jakewharton.timber:timber:' + versions.timber
+  implementation("com.crashlytics.sdk.android:crashlytics:${versions.fabric}") {
+    transitive = true
+  }
 
+  // Testing
   testImplementation 'junit:junit:' + versions.junit
   testImplementation 'org.mockito:mockito-core:' + versions.mockito
   testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:' + versions.mockitoKotlin
   testImplementation 'com.google.truth:truth:' + versions.truth
   testImplementation 'androidx.arch.core:core-testing:' + versions.archTesting
 
+  // UI testing
   androidTestImplementation 'androidx.test:runner:' + versions.androidxTestRunner
   androidTestImplementation 'androidx.test:rules:' + versions.androidxTestRunner
 }

@@ -18,13 +18,17 @@
 package com.afollestad.nocknock
 
 import android.app.Application
+import com.afollestad.nocknock.BuildConfig.DEBUG
 import com.afollestad.nocknock.engine.engineModule
 import com.afollestad.nocknock.koin.mainModule
 import com.afollestad.nocknock.koin.prefModule
 import com.afollestad.nocknock.koin.viewModelModule
+import com.afollestad.nocknock.logging.FabricTree
 import com.afollestad.nocknock.notifications.NockNotificationManager
 import com.afollestad.nocknock.notifications.notificationsModule
 import com.afollestad.nocknock.utilities.commonModule
+import com.crashlytics.android.Crashlytics
+import io.fabric.sdk.android.Fabric
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.android.startKoin
 import timber.log.Timber
@@ -38,8 +42,14 @@ class NockNockApp : Application() {
 
   override fun onCreate() {
     super.onCreate()
-    if (BuildConfig.DEBUG) {
+
+    if (DEBUG) {
       Timber.plant(DebugTree())
+    }
+
+    if (BuildConfig.FABRIC_API_KEY.isNotEmpty()) {
+      Timber.plant(FabricTree())
+      Fabric.with(this, Crashlytics())
     }
 
     val modules = listOf(

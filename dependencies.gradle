@@ -10,6 +10,7 @@ ext.versions = [
     gradlePlugin        : '3.2.1',
     spotlessPlugin      : '3.17.0',
     versionPlugin       : '0.20.0',
+    fabricPlugin        : '1.+',
 
     // Misc
     okHttp              : '3.12.1',
@@ -38,6 +39,7 @@ ext.versions = [
 
     // Debugging
     timber              : '4.7.1',
+    fabric              : '2.9.8@aar',
 
     // Unit testing
     junit               : '4.12',
