@@ -1,0 +1,48 @@
+<resources>
+
+  <style name="AppThemeParent" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <item name="colorPrimary">@color/colorPrimary_lightTheme</item>
+    <item name="colorPrimaryDark">@color/colorPrimaryDark_lightTheme</item>
+    <item name="colorAccent">@color/colorAccent</item>
+    <item name="colorButtonNormal">@color/inkColorDark</item>
+
+    <item name="toolbarTitleColor">#000000</item>
+    <item name="dividerColor">#1f000000</item>
+    <item name="iconColor">#000000</item>
+
+    <item name="android:windowBackground">@color/colorPrimary_lightTheme</item>
+    <item name="android:listDivider">@drawable/divider</item>
+
+    <item name="android:statusBarColor">#E5E5E5</item>
+
+    <item name="md_corner_radius">16dp</item>
+    <item name="md_font_title">@font/lato_bold</item>
+    <item name="md_font_body">@font/lato</item>
+    <item name="md_font_button">@font/lato_bold</item>
+  </style>
+
+  <style name="AppThemeParent.Dark" parent="Theme.MaterialComponents.NoActionBar">
+    <item name="colorPrimary">@color/colorPrimary_darkTheme</item>
+    <item name="colorPrimaryDark">@color/colorPrimaryDark_darkTheme</item>
+    <item name="colorAccent">@color/colorAccent</item>
+    <item name="colorButtonNormal">@color/inkColorDark</item>
+
+    <item name="toolbarTitleColor">#ffffff</item>
+    <item name="dividerColor">#1fffffff</item>
+    <item name="iconColor">#FFFFFF</item>
+
+    <item name="android:windowBackground">@color/colorPrimary_darkTheme</item>
+    <item name="android:listDivider">@drawable/divider</item>
+
+    <item name="android:statusBarColor">@color/colorPrimary_darkTheme</item>
+    <item name="android:navigationBarColor">@color/colorPrimaryDark_darkTheme</item>
+
+    <item name="md_corner_radius">16dp</item>
+    <item name="md_font_title">@font/lato_bold</item>
+    <item name="md_font_body">@font/lato</item>
+    <item name="md_font_button">@font/lato_bold</item>
+  </style>
+
+  <style name="AppThemeParent.Ink" parent="AppThemeParent.Dark"/>
+
+</resources>

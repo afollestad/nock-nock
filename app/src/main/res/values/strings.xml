@@ -13,7 +13,8 @@
         <a href=\'https://www.linkedin.com/in/afollestad\'>LinkedIn</a>
         <br/><br/><i>Nock Nock is open source! Check out the <a href=\'https://github.com/afollestad/nock-nock\'>GitHub page</a>!</i>
         <br/>Icon by <a href=\'https://plus.google.com/+KevinAguilarC\'>Kevin Aguilar</a> of <b>221 Pixels</b>.
-    ]]></string>
+  ]]></string>
+  <string name="dark_mode">Dark Mode</string>
 
   <string name="dismiss">Dismiss</string>
   <string name="add_site">Add Site</string>
@@ -73,5 +74,16 @@
     JavaScript function above. If the function returns true, the site passes validation. Throw an
     exception to pass custom error messages to Nock Nock.
   </string>
+
+  <string name="support_me">Donate</string>
+  <string name="support_me_message"><![CDATA[
+      <b>MNML</b> was created and is maintained by one person. Donations are <b>much</b>
+      appreciated and encourage continued support.
+  ]]></string>
+  <string name="thank_you">Thank you very much!</string>
+  <string name="next">Next</string>
+
+  <string name="install_video_viewer">Please install a video viewer app, such as Google Photos.</string>
+  <string name="install_web_browser">Please install a web browser app, such as Google Chrome.</string>
 
 </resources>

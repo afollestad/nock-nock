@@ -15,13 +15,7 @@
       android:orientation="vertical"
       >
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/MainToolbarTheme"
-        style="@style/MainToolbarStyle"
-        />
+    <include layout="@layout/include_app_bar"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list"
@@ -34,18 +28,23 @@
 
   <include layout="@layout/include_empty_view"/>
 
-  <com.google.android.material.floatingactionbutton.FloatingActionButton
+  <com.google.android.material.button.MaterialButton
       android:id="@+id/fab"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_gravity="end|bottom"
-      android:layout_margin="@dimen/content_inset"
-      android:src="@drawable/ic_add"
-      app:backgroundTint="?colorAccent"
-      app:elevation="@dimen/fab_elevation"
-      app:fabSize="normal"
-      app:pressedTranslationZ="@dimen/fab_elevation_pressed"
-      app:rippleColor="#40ffffff"
+      android:layout_marginBottom="@dimen/content_inset"
+      android:layout_marginEnd="@dimen/content_inset_more"
+      android:minHeight="64dp"
+      android:paddingBottom="@dimen/content_inset_half"
+      android:paddingEnd="@dimen/content_inset"
+      android:paddingStart="@dimen/content_inset"
+      android:paddingTop="@dimen/content_inset_half"
+      android:text="@string/add_site"
+      app:cornerRadius="32dp"
+      app:icon="@drawable/ic_add"
+      app:iconTint="#fff"
+      style="@style/Widget.MaterialComponents.Button.Icon"
       />
 
   <com.afollestad.nocknock.viewcomponents.LoadingIndicatorFrame

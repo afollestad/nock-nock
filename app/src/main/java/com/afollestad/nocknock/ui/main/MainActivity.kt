@@ -17,38 +17,45 @@ package com.afollestad.nocknock.ui.main
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.DividerItemDecoration.VERTICAL
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItems
+import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.afollestad.nocknock.R
-import com.afollestad.nocknock.adapter.ServerAdapter
+import com.afollestad.nocknock.adapter.SiteAdapter
 import com.afollestad.nocknock.broadcasts.StatusUpdateIntentReceiver
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.dialogs.AboutDialog
+import com.afollestad.nocknock.koin.PREF_DARK_MODE
 import com.afollestad.nocknock.notifications.NockNotificationManager
+import com.afollestad.nocknock.ui.DarkModeSwitchActivity
 import com.afollestad.nocknock.utilities.providers.IntentProvider
+import com.afollestad.nocknock.utilities.ui.toast
+import com.afollestad.nocknock.viewUrl
+import com.afollestad.nocknock.viewUrlWithApp
 import com.afollestad.nocknock.viewcomponents.ext.showOrHide
+import com.afollestad.rxkprefs.Pref
 import kotlinx.android.synthetic.main.activity_main.fab
 import kotlinx.android.synthetic.main.activity_main.list
 import kotlinx.android.synthetic.main.activity_main.loadingProgress
-import kotlinx.android.synthetic.main.activity_main.toolbar
+import kotlinx.android.synthetic.main.include_app_bar.toolbar
 import kotlinx.android.synthetic.main.include_empty_view.emptyText
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /** @author Aidan Follestad (@afollestad) */
-class MainActivity : AppCompatActivity() {
+class MainActivity : DarkModeSwitchActivity() {
 
   private val notificationManager by inject<NockNotificationManager>()
   private val intentProvider by inject<IntentProvider>()
+  private val darkModePref by inject<Pref<Boolean>>(name = PREF_DARK_MODE)
 
   internal val viewModel by viewModel<MainViewModel>()
 
-  private lateinit var adapter: ServerAdapter
+  private lateinit var siteAdapter: SiteAdapter
 
   private val statusUpdateReceiver by lazy {
     StatusUpdateIntentReceiver(application, intentProvider) {
@@ -70,7 +77,7 @@ class MainActivity : AppCompatActivity() {
 
     viewModel.onSites()
         .observe(this, Observer {
-          adapter.set(it)
+          siteAdapter.set(it)
           emptyText.showOrHide(it.isEmpty())
         })
     loadingProgress.observe(this, viewModel.onIsLoading())
@@ -79,20 +86,27 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun setupUi() {
-    toolbar.inflateMenu(R.menu.menu_main)
-    toolbar.setOnMenuItemClickListener { item ->
-      if (item.itemId == R.id.about) {
-        AboutDialog.show(this)
+    toolbar.run {
+      inflateMenu(R.menu.menu_main)
+      menu.findItem(R.id.dark_mode)
+          .isChecked = darkModePref.get()
+      setOnMenuItemClickListener { item ->
+        when (item.itemId) {
+          R.id.about -> AboutDialog.show(this@MainActivity)
+          R.id.dark_mode -> darkModePref.set(!darkModePref.get())
+          R.id.support_me -> supportMe()
+        }
+        return@setOnMenuItemClickListener true
       }
-      return@setOnMenuItemClickListener true
     }
 
-    adapter = ServerAdapter(this::onSiteSelected)
+    siteAdapter = SiteAdapter(this::onSiteSelected)
 
-    list.layoutManager = LinearLayoutManager(this)
-    list.adapter = adapter
-    list.addItemDecoration(DividerItemDecoration(this, VERTICAL))
-
+    list.run {
+      layoutManager = LinearLayoutManager(this@MainActivity)
+      adapter = siteAdapter
+      addItemDecoration(DividerItemDecoration(this@MainActivity, VERTICAL))
+    }
     fab.setOnClickListener { addSite() }
   }
 
@@ -117,6 +131,22 @@ class MainActivity : AppCompatActivity() {
       }
     } else {
       viewSite(model)
+    }
+  }
+
+  private fun supportMe() {
+    MaterialDialog(this).show {
+      title(R.string.support_me)
+      message(R.string.support_me_message, html = true, lineHeightMultiplier = 1.4f)
+      listItemsSingleChoice(R.array.donation_options) { _, index, _ ->
+        when (index) {
+          0 -> viewUrl("https://paypal.me/AidanFollestad")
+          1 -> viewUrlWithApp("https://cash.me/\$afollestad", pkg = "com.squareup.cash")
+          2 -> viewUrlWithApp("https://venmo.com/afollestad", pkg = "com.venmo")
+        }
+        toast(R.string.thank_you)
+      }
+      positiveButton(R.string.next)
     }
   }
 }

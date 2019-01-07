@@ -21,6 +21,7 @@ import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.data.model.ValidationMode
+import com.afollestad.nocknock.setStatusBarColor
 import com.afollestad.nocknock.viewcomponents.ext.conceal
 import com.afollestad.nocknock.viewcomponents.ext.onLayout
 import com.afollestad.nocknock.viewcomponents.livedata.attachLiveData
@@ -38,11 +39,12 @@ import kotlinx.android.synthetic.main.activity_addsite.responseValidationSearchT
 import kotlinx.android.synthetic.main.activity_addsite.rootView
 import kotlinx.android.synthetic.main.activity_addsite.scriptInputLayout
 import kotlinx.android.synthetic.main.activity_addsite.textUrlWarning
-import kotlinx.android.synthetic.main.activity_addsite.toolbar
 import kotlinx.android.synthetic.main.activity_addsite.validationModeDescription
+import kotlinx.android.synthetic.main.include_app_bar.toolbar
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.math.max
 import kotlin.properties.Delegates.notNull
+import kotlinx.android.synthetic.main.include_app_bar.toolbar_title as toolbarTitle
 
 const val KEY_FAB_X = "fab_x"
 const val KEY_FAB_Y = "fab_y"
@@ -62,6 +64,7 @@ class AddSiteActivity : AppCompatActivity() {
   @SuppressLint("SetTextI18n")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    setStatusBarColor(res = R.color.inkColorDark)
     setContentView(R.layout.activity_addsite)
     setupUi(savedInstanceState)
 
@@ -133,7 +136,11 @@ class AddSiteActivity : AppCompatActivity() {
   }
 
   private fun setupUi(savedInstanceState: Bundle?) {
-    toolbar.setNavigationOnClickListener { closeActivityWithReveal() }
+    toolbarTitle.setText(R.string.add_site)
+    toolbar.run {
+      setNavigationIcon(R.drawable.ic_action_close)
+      setNavigationOnClickListener { closeActivityWithReveal() }
+    }
 
     if (savedInstanceState == null) {
       rootView.conceal()

@@ -27,6 +27,7 @@ dependencies {
   implementation 'androidx.appcompat:appcompat:' + versions.androidxCore
   implementation 'androidx.recyclerview:recyclerview:' + versions.androidxRecyclerView
   implementation 'com.google.android.material:material:' + versions.googleMaterial
+  implementation 'androidx.browser:browser:' + versions.androidxBrowser
 
   kapt 'androidx.lifecycle:lifecycle-compiler:' + versions.lifecycle
 

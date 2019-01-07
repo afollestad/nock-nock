@@ -20,6 +20,7 @@ package com.afollestad.nocknock
 import android.app.Application
 import com.afollestad.nocknock.engine.engineModule
 import com.afollestad.nocknock.koin.mainModule
+import com.afollestad.nocknock.koin.prefModule
 import com.afollestad.nocknock.koin.viewModelModule
 import com.afollestad.nocknock.notifications.NockNotificationManager
 import com.afollestad.nocknock.notifications.notificationsModule
@@ -42,6 +43,7 @@ class NockNockApp : Application() {
     }
 
     val modules = listOf(
+        prefModule,
         mainModule,
         engineModule,
         commonModule,

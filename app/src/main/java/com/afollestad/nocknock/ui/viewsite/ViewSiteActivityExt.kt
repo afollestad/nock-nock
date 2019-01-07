@@ -22,7 +22,7 @@ import com.afollestad.nocknock.data.model.Status
 import com.afollestad.nocknock.data.model.isPending
 import com.afollestad.nocknock.toHtml
 import com.afollestad.nocknock.utilities.ext.animateRotation
-import kotlinx.android.synthetic.main.activity_viewsite.toolbar
+import kotlinx.android.synthetic.main.include_app_bar.toolbar
 
 const val KEY_SITE = "site_model"
 

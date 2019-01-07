@@ -25,10 +25,11 @@ import com.afollestad.nocknock.R
 import com.afollestad.nocknock.broadcasts.StatusUpdateIntentReceiver
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.ValidationMode
+import com.afollestad.nocknock.setStatusBarColor
 import com.afollestad.nocknock.utilities.providers.IntentProvider
-import com.afollestad.nocknock.viewcomponents.livedata.attachLiveData
 import com.afollestad.nocknock.viewcomponents.ext.dimenFloat
 import com.afollestad.nocknock.viewcomponents.ext.onScroll
+import com.afollestad.nocknock.viewcomponents.livedata.attachLiveData
 import com.afollestad.nocknock.viewcomponents.livedata.toViewError
 import com.afollestad.nocknock.viewcomponents.livedata.toViewText
 import com.afollestad.nocknock.viewcomponents.livedata.toViewVisibility
@@ -47,10 +48,11 @@ import kotlinx.android.synthetic.main.activity_viewsite.scrollView
 import kotlinx.android.synthetic.main.activity_viewsite.textLastCheckResult
 import kotlinx.android.synthetic.main.activity_viewsite.textNextCheck
 import kotlinx.android.synthetic.main.activity_viewsite.textUrlWarning
-import kotlinx.android.synthetic.main.activity_viewsite.toolbar
 import kotlinx.android.synthetic.main.activity_viewsite.validationModeDescription
+import kotlinx.android.synthetic.main.include_app_bar.toolbar
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlinx.android.synthetic.main.include_app_bar.toolbar_title as toolbarTitle
 
 /** @author Aidan Follestad (@afollestad) */
 class ViewSiteActivity : AppCompatActivity() {
@@ -67,6 +69,7 @@ class ViewSiteActivity : AppCompatActivity() {
   @SuppressLint("SetTextI18n")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    setStatusBarColor(res = R.color.inkColorDark)
     setContentView(R.layout.activity_viewsite)
     setupUi()
 
@@ -156,7 +159,9 @@ class ViewSiteActivity : AppCompatActivity() {
   }
 
   private fun setupUi() {
+    toolbarTitle.setText(R.string.add_site)
     toolbar.run {
+      setNavigationIcon(R.drawable.ic_action_close)
       setNavigationOnClickListener { finish() }
       inflateMenu(R.menu.menu_viewsite)
       menu.findItem(R.id.refresh)

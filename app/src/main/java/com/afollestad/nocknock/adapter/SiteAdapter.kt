@@ -37,7 +37,7 @@ typealias Listener = (model: Site, longClick: Boolean) -> Unit
 /** @author Aidan Follestad (@afollestad) */
 class SiteViewHolder constructor(
   itemView: View,
-  private val adapter: ServerAdapter
+  private val adapter: SiteAdapter
 ) : RecyclerView.ViewHolder(itemView), View.OnLongClickListener {
 
   init {
@@ -94,7 +94,7 @@ class SiteViewHolder constructor(
 }
 
 /** @author Aidan Follestad (@afollestad) */
-class ServerAdapter(private val listener: Listener) : RecyclerView.Adapter<SiteViewHolder>() {
+class SiteAdapter(private val listener: Listener) : RecyclerView.Adapter<SiteViewHolder>() {
 
   private var models = mutableListOf<Site>()
 

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -15,15 +14,7 @@
       android:orientation="vertical"
       >
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/FlatToolbarTheme"
-        app:navigationIcon="@drawable/ic_action_close"
-        app:title="@string/add_site"
-        app:titleTextColor="#FFFFFF"
-        />
+    <include layout="@layout/include_app_bar"/>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -86,8 +77,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/list_text_spacing"
-            android:visibility="gone"
             android:text="@string/warning_http_url"
+            android:visibility="gone"
             style="@style/NockText.Footnote"
             />
 
@@ -157,7 +148,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/content_inset"
             android:layout_marginTop="@dimen/content_inset_half"
-            android:background="@color/colorPrimaryDark"
+            android:background="@color/inkColorDark"
             />
 
         <TextView

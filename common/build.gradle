@@ -29,6 +29,8 @@ dependencies {
   implementation 'org.koin:koin-android:' + versions.koin
   implementation 'org.mozilla:rhino:' + versions.rhino
 
+  api 'com.afollestad:rxkprefs:' + versions.rxkPrefs
+
   testImplementation 'junit:junit:' + versions.junit
   testImplementation 'com.google.truth:truth:' + versions.truth
   testImplementation 'androidx.arch.core:core-testing:' + versions.archTesting

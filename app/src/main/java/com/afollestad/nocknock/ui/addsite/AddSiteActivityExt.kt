@@ -18,6 +18,8 @@ package com.afollestad.nocknock.ui.addsite
 import android.view.ViewAnimationUtils.createCircularReveal
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
+import com.afollestad.nocknock.R
+import com.afollestad.nocknock.setStatusBarColor
 import com.afollestad.nocknock.utilities.ext.onEnd
 import com.afollestad.nocknock.viewcomponents.ext.conceal
 import com.afollestad.nocknock.viewcomponents.ext.show
@@ -40,6 +42,7 @@ internal fun AddSiteActivity.closeActivityWithReveal() {
   if (isClosing) {
     return
   }
+  setStatusBarColor(attr = R.attr.colorPrimary)
   isClosing = true
   createCircularReveal(rootView, revealCx, revealCy, revealRadius, 0f)
       .apply {

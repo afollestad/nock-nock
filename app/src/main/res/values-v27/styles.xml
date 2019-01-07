@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <style name="AppTheme" parent="AppThemeParent">
+    <item name="android:statusBarColor">@color/colorPrimary_lightTheme</item>
+    <item name="android:windowLightStatusBar">true</item>
+
+    <item name="android:navigationBarColor">@color/colorPrimaryDark_lightTheme</item>
+    <item name="android:windowLightNavigationBar">true</item>
+  </style>
+
+  <style name="AppTheme.Dark" parent="AppThemeParent.Dark">
+    <item name="android:statusBarColor">@color/colorPrimary_darkTheme</item>
+    <item name="android:windowLightStatusBar">false</item>
+
+    <item name="android:navigationBarColor">@color/colorPrimaryDark_darkTheme</item>
+    <item name="android:windowLightNavigationBar">false</item>
+  </style>
+
+</resources>

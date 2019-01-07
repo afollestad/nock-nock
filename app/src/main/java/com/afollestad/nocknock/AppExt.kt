@@ -18,9 +18,18 @@ package com.afollestad.nocknock
 import android.app.Activity
 import android.app.Application
 import android.app.Application.ActivityLifecycleCallbacks
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorRes
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.HtmlCompat.fromHtml
+import com.afollestad.materialdialogs.utils.MDUtil.resolveColor
+import com.afollestad.nocknock.utilities.ui.toast
 
 typealias ActivityLifeChange = (activity: Activity, resumed: Boolean) -> Unit
 
@@ -50,3 +59,53 @@ fun Application.onActivityLifeChange(cb: ActivityLifeChange) {
 }
 
 fun String.toHtml() = fromHtml(this, FROM_HTML_MODE_LEGACY)
+
+fun String.toUri() = Uri.parse(this)!!
+
+fun Activity.setStatusBarColor(
+  @ColorRes res: Int? = null,
+  @AttrRes attr: Int? = null
+) {
+  require(res != null || attr != null) { "Must specify at least one arg." }
+  if (res != null) {
+    val color = ContextCompat.getColor(this, res)
+    window.statusBarColor = color
+  } else if (attr != null) {
+    val color = resolveColor(this, attr = attr)
+    window.statusBarColor = color
+  }
+}
+
+fun Activity.viewUrl(url: String) {
+  val customTabsIntent = CustomTabsIntent.Builder()
+      .apply {
+        setToolbarColor(resolveColor(this@viewUrl, attr = R.attr.colorPrimary))
+      }
+      .build()
+  try {
+    customTabsIntent.launchUrl(this, url.toUri())
+  } catch (_: ActivityNotFoundException) {
+    toast(R.string.install_web_browser)
+  }
+}
+
+fun Activity.viewUrlWithApp(
+  url: String,
+  pkg: String
+) {
+  val intent = Intent(Intent.ACTION_VIEW).apply {
+    data = url.toUri()
+  }
+  val resInfo = packageManager.queryIntentActivities(intent, 0)
+  for (info in resInfo) {
+    if (info.activityInfo.packageName.toLowerCase().contains(pkg) ||
+        info.activityInfo.name.toLowerCase().contains(pkg)
+    ) {
+      startActivity(intent.apply {
+        setPackage(info.activityInfo.packageName)
+      })
+      return
+    }
+  }
+  viewUrl(url)
+}
