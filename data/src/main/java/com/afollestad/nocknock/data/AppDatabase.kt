@@ -26,11 +26,12 @@ import com.afollestad.nocknock.data.model.ValidationResult
 /** @author Aidan Follestad (@afollestad) */
 @Database(
     entities = [
+      RetryPolicy::class,
       ValidationResult::class,
       SiteSettings::class,
       Site::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -41,6 +42,8 @@ abstract class AppDatabase : RoomDatabase() {
   abstract fun siteSettingsDao(): SiteSettingsDao
 
   abstract fun validationResultsDao(): ValidationResultsDao
+
+  abstract fun retryPolicyDao(): RetryPolicyDao
 }
 
 /**
@@ -55,9 +58,12 @@ fun AppDatabase.allSites(): List<Site> {
             .single()
         val lastResult = validationResultsDao().forSite(it.id)
             .singleOrNull()
+        val retryPolicy = retryPolicyDao().forSite(it.id)
+            .singleOrNull()
         return@map it.copy(
             settings = settings,
-            lastResult = lastResult
+            lastResult = lastResult,
+            retryPolicy = retryPolicy
         )
       }
 }
@@ -74,9 +80,12 @@ fun AppDatabase.getSite(id: Long): Site? {
       .single()
   val lastResult = validationResultsDao().forSite(id)
       .singleOrNull()
+  val retryPolicy = retryPolicyDao().forSite(id)
+      .singleOrNull()
   return result.copy(
       settings = settings,
-      lastResult = lastResult
+      lastResult = lastResult,
+      retryPolicy = retryPolicy
   )
 }
 
@@ -86,14 +95,14 @@ fun AppDatabase.getSite(id: Long): Site? {
  * @author Aidan Follestad (@afollestad)
  */
 fun AppDatabase.putSite(site: Site): Site {
-  requireNotNull(site.settings) { "Settings must be populated." }
+  val settings = site.settings ?: throw IllegalArgumentException("Settings cannot be null.")
   val newId = siteDao().insert(site)
-  val settingsWithSiteId =
-    site.settings!!.copy(
-        siteId = newId
-    )
+  val settingsWithSiteId = settings.copy(siteId = newId)
   siteSettingsDao().insert(settingsWithSiteId)
+
   site.lastResult?.let { validationResultsDao().insert(it) }
+  site.retryPolicy?.let { retryPolicyDao().insert(it) }
+
   return site.copy(
       id = newId,
       settings = settingsWithSiteId
@@ -107,26 +116,37 @@ fun AppDatabase.putSite(site: Site): Site {
  */
 fun AppDatabase.updateSite(site: Site) {
   siteDao().update(site)
-  if (site.settings != null) {
+
+  val settings = site.settings?.copy(siteId = site.id)
+  if (settings != null) {
     val existing = siteSettingsDao().forSite(site.id)
         .singleOrNull()
     if (existing != null) {
-      siteSettingsDao().update(site.settings!!)
+      siteSettingsDao().update(settings)
     } else {
-      siteSettingsDao().insert(
-          site.settings!!.copy(
-              siteId = site.id
-          )
-      )
+      siteSettingsDao().insert(settings)
     }
   }
-  if (site.lastResult != null) {
+
+  val lastResult = site.lastResult?.copy(siteId = site.id)
+  if (lastResult != null) {
     val existing = validationResultsDao().forSite(site.id)
         .singleOrNull()
     if (existing != null) {
-      validationResultsDao().update(site.lastResult!!)
+      validationResultsDao().update(lastResult)
     } else {
-      validationResultsDao().insert(site.lastResult!!)
+      validationResultsDao().insert(lastResult)
+    }
+  }
+
+  val retryPolicy = site.retryPolicy?.copy(siteId = site.id)
+  if (retryPolicy != null) {
+    val existing = retryPolicyDao().forSite(site.id)
+        .singleOrNull()
+    if (existing != null) {
+      retryPolicyDao().update(retryPolicy)
+    } else {
+      retryPolicyDao().insert(retryPolicy)
     }
   }
 }
@@ -137,11 +157,8 @@ fun AppDatabase.updateSite(site: Site) {
  * @author Aidan Follestad (@afollestad)
  */
 fun AppDatabase.deleteSite(site: Site) {
-  if (site.settings != null) {
-    siteSettingsDao().delete(site.settings!!)
-  }
-  if (site.lastResult != null) {
-    validationResultsDao().delete(site.lastResult!!)
-  }
+  site.settings?.let { siteSettingsDao().delete(it) }
+  site.lastResult?.let { validationResultsDao().delete(it) }
+  site.retryPolicy?.let { retryPolicyDao().delete(it) }
   siteDao().delete(site)
 }

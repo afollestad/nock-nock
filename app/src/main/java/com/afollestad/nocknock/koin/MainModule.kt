@@ -22,6 +22,7 @@ import android.content.Context.JOB_SCHEDULER_SERVICE
 import android.content.Context.NOTIFICATION_SERVICE
 import androidx.room.Room.databaseBuilder
 import com.afollestad.nocknock.data.AppDatabase
+import com.afollestad.nocknock.data.Database1to2Migration
 import com.afollestad.nocknock.notifications.Qualifiers.MAIN_ACTIVITY_CLASS
 import com.afollestad.nocknock.ui.main.MainActivity
 import com.afollestad.nocknock.utilities.ext.systemService
@@ -35,7 +36,11 @@ val mainModule = module {
 
   single(name = MAIN_ACTIVITY_CLASS) { mainActivityCls }
 
-  single { databaseBuilder(get(), AppDatabase::class.java, "NockNock.db").build() }
+  single {
+    databaseBuilder(get(), AppDatabase::class.java, "NockNock.db")
+        .addMigrations(Database1to2Migration())
+        .build()
+  }
 
   single {
     OkHttpClient.Builder()

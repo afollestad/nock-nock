@@ -33,6 +33,7 @@ import kotlinx.android.synthetic.main.activity_addsite.loadingProgress
 import kotlinx.android.synthetic.main.activity_addsite.responseTimeoutInput
 import kotlinx.android.synthetic.main.activity_addsite.responseValidationMode
 import kotlinx.android.synthetic.main.activity_addsite.responseValidationSearchTerm
+import kotlinx.android.synthetic.main.activity_addsite.retryPolicyLayout
 import kotlinx.android.synthetic.main.activity_addsite.scriptInputLayout
 import kotlinx.android.synthetic.main.activity_addsite.textUrlWarning
 import kotlinx.android.synthetic.main.activity_addsite.validationModeDescription
@@ -106,6 +107,12 @@ class AddSiteActivity : DarkModeSwitchActivity() {
         valueData = viewModel.checkIntervalValue,
         multiplierData = viewModel.checkIntervalUnit,
         errorData = viewModel.onCheckIntervalError()
+    )
+
+    // Retry Policy
+    retryPolicyLayout.attach(
+        timesData = viewModel.retryPolicyTimes,
+        minutesData = viewModel.retryPolicyMinutes
     )
 
     // Done button

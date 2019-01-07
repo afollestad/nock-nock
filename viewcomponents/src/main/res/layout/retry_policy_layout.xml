@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:parentTag="android.widget.LinearLayout"
+    >
+
+  <TextView
+      android:id="@+id/label"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/retry_policy"
+      style="@style/NockText.SectionHeader"
+      />
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/content_inset_quarter"
+      android:gravity="center"
+      android:orientation="horizontal"
+      >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/content_inset"
+        android:text="@string/retry_policy_retry"
+        style="@style/NockText.Body"
+        />
+
+    <EditText
+        android:id="@+id/times"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:hint="0"
+        android:inputType="number"
+        android:maxLength="4"
+        android:nextFocusDown="@+id/minutes"
+        android:nextFocusRight="@+id/minutes"
+        tools:ignore="Autofill,HardcodedText,LabelFor"
+        style="@style/NockText.Body"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/content_inset"
+        android:layout_marginStart="@dimen/content_inset"
+        android:text="@string/retry_policy_times_in"
+        style="@style/NockText.Body"
+        />
+
+    <EditText
+        android:id="@+id/minutes"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:hint="0"
+        android:inputType="number"
+        android:maxLength="4"
+        android:nextFocusLeft="@+id/times"
+        android:nextFocusUp="@+id/times"
+        tools:ignore="Autofill,HardcodedText,LabelFor"
+        style="@style/NockText.Body"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/content_inset"
+        android:text="@string/retry_policy_minutes"
+        style="@style/NockText.Body"
+        />
+
+  </LinearLayout>
+
+</merge>

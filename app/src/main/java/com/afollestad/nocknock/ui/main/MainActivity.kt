@@ -35,7 +35,7 @@ import com.afollestad.nocknock.utilities.providers.IntentProvider
 import com.afollestad.nocknock.utilities.ui.toast
 import com.afollestad.nocknock.viewUrl
 import com.afollestad.nocknock.viewUrlWithApp
-import com.afollestad.nocknock.viewcomponents.ext.showOrHide
+import com.afollestad.nocknock.viewcomponents.livedata.toViewVisibility
 import kotlinx.android.synthetic.main.activity_main.fab
 import kotlinx.android.synthetic.main.activity_main.list
 import kotlinx.android.synthetic.main.activity_main.loadingProgress
@@ -73,10 +73,9 @@ class MainActivity : DarkModeSwitchActivity() {
     }
 
     viewModel.onSites()
-        .observe(this, Observer {
-          siteAdapter.set(it)
-          emptyText.showOrHide(it.isEmpty())
-        })
+        .observe(this, Observer { siteAdapter.set(it) })
+    viewModel.onEmptyTextVisibility()
+        .toViewVisibility(this, emptyText)
     loadingProgress.observe(this, viewModel.onIsLoading())
 
     processIntent(intent)

@@ -43,10 +43,13 @@ class MainViewModel(
 
   private val sites = MutableLiveData<List<Site>>()
   private val isLoading = MutableLiveData<Boolean>()
+  private val emptyTextVisibility = MutableLiveData<Boolean>()
 
   @CheckResult fun onSites(): LiveData<List<Site>> = sites
 
   @CheckResult fun onIsLoading(): LiveData<Boolean> = isLoading
+
+  @CheckResult fun onEmptyTextVisibility(): LiveData<Boolean> = emptyTextVisibility
 
   @OnLifecycleEvent(ON_RESUME)
   fun onResume() = loadSites()
@@ -76,15 +79,18 @@ class MainViewModel(
     scope.launch {
       isLoading.value = true
       withContext(ioDispatcher) { database.deleteSite(model) }
+
       val currentSites = sites.value ?: return@launch
       val index = currentSites.indexOfFirst { it.id == model.id }
       isLoading.value = false
       if (index == -1) return@launch
 
-      sites.value = currentSites.toMutableList()
+      val newSitesList = currentSites.toMutableList()
           .apply {
             removeAt(index)
           }
+      sites.value = newSitesList
+      emptyTextVisibility.value = newSitesList.isEmpty()
     }
   }
 
@@ -92,6 +98,7 @@ class MainViewModel(
     scope.launch {
       notificationManager.cancelStatusNotifications()
       sites.value = listOf()
+      emptyTextVisibility.value = false
       isLoading.value = true
 
       val result = withContext(ioDispatcher) {
@@ -101,6 +108,7 @@ class MainViewModel(
       sites.value = result
       ensureCheckJobs()
       isLoading.value = false
+      emptyTextVisibility.value = result.isEmpty()
     }
   }
 

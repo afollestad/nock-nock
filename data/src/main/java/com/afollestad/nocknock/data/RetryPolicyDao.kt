@@ -13,24 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.afollestad.nocknock.ui
+package com.afollestad.nocknock.data
 
-import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import org.jetbrains.annotations.TestOnly
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy.FAIL
+import androidx.room.Query
+import androidx.room.Update
 
 /** @author Aidan Follestad (@afollestad) */
-abstract class ScopedViewModel(mainDispatcher: CoroutineDispatcher) : ViewModel() {
+@Dao
+interface RetryPolicyDao {
 
-  private val job = Job()
-  protected val scope = CoroutineScope(job + mainDispatcher)
+  @Query("SELECT * FROM retry_policies ORDER BY siteId ASC")
+  fun all(): List<RetryPolicy>
 
-  override fun onCleared() {
-    super.onCleared()
-    job.cancel()
-  }
+  @Query("SELECT * FROM retry_policies WHERE siteId = :siteId LIMIT 1")
+  fun forSite(siteId: Long): List<RetryPolicy>
 
-  @TestOnly open fun destroy() = job.cancel()
+  @Insert(onConflict = FAIL)
+  fun insert(policy: RetryPolicy): Long
+
+  @Update(onConflict = FAIL)
+  fun update(policy: RetryPolicy): Int
+
+  @Delete
+  fun delete(policy: RetryPolicy): Int
 }

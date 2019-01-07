@@ -15,6 +15,7 @@
  */
 package com.afollestad.nocknock.ui.viewsite
 
+import com.afollestad.nocknock.data.RetryPolicy
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.Status.WAITING
 import com.afollestad.nocknock.data.model.ValidationMode.JAVASCRIPT
@@ -26,11 +27,8 @@ import com.afollestad.nocknock.utilities.ext.WEEK
 import kotlin.math.ceil
 
 fun ViewSiteViewModel.setModel(site: Site) {
-  requireNotNull(site.settings) {
-    "Settings must be populated!"
-  }
+  val settings = site.settings ?: throw IllegalArgumentException("Settings must be populated!")
   this.site = site
-  val settings = site.settings!!
 
   status.value = site.lastResult?.status ?: WAITING
   name.value = site.name
@@ -54,6 +52,7 @@ fun ViewSiteViewModel.setModel(site: Site) {
   }
 
   setCheckInterval(settings.validationIntervalMs)
+  setRetryPolicy(site.retryPolicy)
 
   this.disabled.value = settings.disabled
   this.lastResult.value = site.lastResult
@@ -86,6 +85,12 @@ private fun ViewSiteViewModel.setCheckInterval(interval: Long) {
       checkIntervalUnit.value = MINUTE
     }
   }
+}
+
+private fun ViewSiteViewModel.setRetryPolicy(policy: RetryPolicy?) {
+  if (policy == null) return
+  retryPolicyTimes.value = policy.count
+  retryPolicyMinutes.value = policy.minutes
 }
 
 private fun getIntervalFromUnit(

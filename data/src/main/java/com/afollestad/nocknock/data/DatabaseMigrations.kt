@@ -13,24 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.afollestad.nocknock.ui
+package com.afollestad.nocknock.data
 
-import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import org.jetbrains.annotations.TestOnly
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
-/** @author Aidan Follestad (@afollestad) */
-abstract class ScopedViewModel(mainDispatcher: CoroutineDispatcher) : ViewModel() {
+/**
+ * Migrates the database from version 1 to 2.
+ *
+ * @author Aidan Follestad (@afollestad)
+ */
+class Database1to2Migration : Migration(1, 2) {
 
-  private val job = Job()
-  protected val scope = CoroutineScope(job + mainDispatcher)
-
-  override fun onCleared() {
-    super.onCleared()
-    job.cancel()
+  override fun migrate(database: SupportSQLiteDatabase) {
+    database.execSQL(
+        "CREATE TABLE `retry_policies` (siteId INTEGER PRIMARY KEY NOT NULL, count INTEGER NOT NULL, minutes INTEGER NOT NULL)"
+    )
   }
-
-  @TestOnly open fun destroy() = job.cancel()
 }

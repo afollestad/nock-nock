@@ -25,6 +25,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.OnLifecycleEvent
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.data.AppDatabase
+import com.afollestad.nocknock.data.RetryPolicy
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.SiteSettings
 import com.afollestad.nocknock.data.model.ValidationMode
@@ -59,6 +60,8 @@ class AddSiteViewModel(
   val validationScript = MutableLiveData<String>()
   val checkIntervalValue = MutableLiveData<Int>()
   val checkIntervalUnit = MutableLiveData<Long>()
+  val retryPolicyTimes = MutableLiveData<Int>()
+  val retryPolicyMinutes = MutableLiveData<Int>()
 
   @OnLifecycleEvent(ON_START)
   fun setDefaults() {
@@ -66,6 +69,8 @@ class AddSiteViewModel(
     validationMode.value = STATUS_CODE
     checkIntervalValue.value = 0
     checkIntervalUnit.value = MINUTE
+    retryPolicyMinutes.value = 0
+    retryPolicyMinutes.value = 0
   }
 
   // Private properties
@@ -223,12 +228,22 @@ class AddSiteViewModel(
         networkTimeout = timeout.value!!,
         disabled = false
     )
+
+    val retryPolicyTimes = retryPolicyTimes.value ?: 0
+    val retryPolicyMinutes = retryPolicyMinutes.value ?: 0
+    val retryPolicy: RetryPolicy? = if (retryPolicyTimes > 0 && retryPolicyMinutes > 0) {
+      RetryPolicy(count = retryPolicyTimes, minutes = retryPolicyMinutes)
+    } else {
+      null
+    }
+
     return Site(
         id = 0,
         name = name.value!!.trim(),
         url = url.value!!.trim(),
         settings = newSettings,
-        lastResult = null
+        lastResult = null,
+        retryPolicy = retryPolicy
     )
   }
 }

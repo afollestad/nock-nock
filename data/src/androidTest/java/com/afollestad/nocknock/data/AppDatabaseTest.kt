@@ -45,6 +45,7 @@ class AppDatabaseTest() {
   private lateinit var sitesDao: SiteDao
   private lateinit var settingsDao: SiteSettingsDao
   private lateinit var resultsDao: ValidationResultsDao
+  private lateinit var retryDao: RetryPolicyDao
 
   @Before fun setup() {
     val context = getApplicationContext<Context>()
@@ -52,6 +53,7 @@ class AppDatabaseTest() {
     sitesDao = db.siteDao()
     settingsDao = db.siteSettingsDao()
     resultsDao = db.validationResultsDao()
+    retryDao = db.retryPolicyDao()
   }
 
   @After
@@ -67,7 +69,8 @@ class AppDatabaseTest() {
         name = "Test 1",
         url = "https://test1.com",
         settings = null,
-        lastResult = null
+        lastResult = null,
+        retryPolicy = null
     )
     val newId1 = sitesDao.insert(model1)
     assertThat(newId1).isGreaterThan(0)
@@ -76,7 +79,8 @@ class AppDatabaseTest() {
         name = "Test 2",
         url = "https://test2.com",
         settings = null,
-        lastResult = null
+        lastResult = null,
+        retryPolicy = null
     )
     val newId2 = sitesDao.insert(model2)
     assertThat(newId2).isGreaterThan(newId1)
@@ -92,7 +96,8 @@ class AppDatabaseTest() {
         name = "Test",
         url = "https://test.com",
         settings = null,
-        lastResult = null
+        lastResult = null,
+        retryPolicy = null
     )
     val newId = sitesDao.insert(model)
     assertThat(newId).isGreaterThan(0)
@@ -106,7 +111,8 @@ class AppDatabaseTest() {
         name = "Test 1",
         url = "https://test1.com",
         settings = null,
-        lastResult = null
+        lastResult = null,
+        retryPolicy = null
     )
     val newId = sitesDao.insert(initialModel)
     assertThat(newId).isGreaterThan(0)
@@ -129,7 +135,8 @@ class AppDatabaseTest() {
         name = "Test 1",
         url = "https://test1.com",
         settings = null,
-        lastResult = null
+        lastResult = null,
+        retryPolicy = null
     )
     val newId1 = sitesDao.insert(model1)
     assertThat(newId1).isGreaterThan(0)
@@ -138,7 +145,8 @@ class AppDatabaseTest() {
         name = "Test 2",
         url = "https://test2.com",
         settings = null,
-        lastResult = null
+        lastResult = null,
+        retryPolicy = null
     )
     val newId2 = sitesDao.insert(model2)
     assertThat(newId2).isGreaterThan(newId1)
@@ -272,6 +280,59 @@ class AppDatabaseTest() {
     assertThat(resultsDao.forSite(1)).isEmpty()
   }
 
+  // RetryPolicyDao
+
+  @Test fun retryPolicy_insert_and_forSite() {
+    val model = RetryPolicy(
+        siteId = 1,
+        count = 3,
+        minutes = 6
+    )
+    val newId = retryDao.insert(model)
+    assertThat(newId).isEqualTo(1)
+
+    val finalModel = resultsDao.forSite(newId)
+        .single()
+    assertThat(finalModel).isEqualTo(model.copy(siteId = newId))
+  }
+
+  @Test fun retryPolicy_update() {
+    retryDao.insert(
+        RetryPolicy(
+            siteId = 1,
+            count = 3,
+            minutes = 6
+        )
+    )
+
+    val insertedModel = retryDao.forSite(1)
+        .single()
+    val updatedModel = insertedModel.copy(
+        count = 4,
+        minutes = 8
+    )
+    assertThat(retryDao.update(updatedModel)).isEqualTo(1)
+
+    val finalModel = retryDao.forSite(1)
+        .single()
+    assertThat(finalModel).isEqualTo(updatedModel)
+  }
+
+  @Test fun retryPolicy_delete() {
+    retryDao.insert(
+        RetryPolicy(
+            siteId = 1,
+            count = 3,
+            minutes = 6
+        )
+    )
+
+    val insertedModel = retryDao.forSite(1)
+        .single()
+    retryDao.delete(insertedModel)
+    assertThat(retryDao.forSite(1)).isEmpty()
+  }
+
   // Extension Methods
 
   @Test fun extension_put_and_allSites() {
@@ -314,11 +375,16 @@ class AppDatabaseTest() {
         status = ERROR,
         reason = "Oh no"
     )
+    val updatedRetryPolicy = modelToUpdate.retryPolicy!!.copy(
+        count = 4,
+        minutes = 8
+    )
     val updatedModel = modelToUpdate.copy(
         name = "Oijrfouhef",
         url = "https://iojfdfsdk.io",
         settings = updatedSettings,
-        lastResult = updatedValidationResult
+        lastResult = updatedValidationResult,
+        retryPolicy = updatedRetryPolicy
     )
 
     db.updateSite(updatedModel)
@@ -326,6 +392,7 @@ class AppDatabaseTest() {
     val finalSite = db.getSite(modelToUpdate.id)!!
     assertThat(finalSite.settings).isEqualTo(updatedSettings)
     assertThat(finalSite.lastResult).isEqualTo(updatedValidationResult)
+    assertThat(finalSite.retryPolicy).isEqualTo(updatedRetryPolicy)
     assertThat(finalSite).isEqualTo(updatedModel)
   }
 
@@ -346,5 +413,10 @@ class AppDatabaseTest() {
     assertThat(remainingResults.size).isEqualTo(2)
     assertThat(remainingResults[0]).isEqualTo(allSites[0].lastResult!!)
     assertThat(remainingResults[1]).isEqualTo(allSites[2].lastResult!!)
+
+    val remainingRetryPolicies = retryDao.all()
+    assertThat(remainingRetryPolicies.size).isEqualTo(2)
+    assertThat(remainingRetryPolicies[0]).isEqualTo(allSites[0].retryPolicy!!)
+    assertThat(remainingRetryPolicies[1]).isEqualTo(allSites[2].retryPolicy!!)
   }
 }

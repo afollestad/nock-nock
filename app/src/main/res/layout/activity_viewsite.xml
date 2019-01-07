@@ -125,9 +125,17 @@
             android:layout_marginStart="-4dp"
             android:hint="@string/response_timeout_default"
             android:inputType="number"
+            android:layout_marginTop="@dimen/content_inset_quarter"
             android:maxLength="8"
             tools:ignore="Autofill,HardcodedText,LabelFor"
             style="@style/NockText.Body"
+            />
+
+        <com.afollestad.nocknock.viewcomponents.retrypolicy.RetryPolicyLayout
+            android:id="@+id/retryPolicyLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/content_inset"
             />
 
         <View
@@ -234,7 +242,7 @@
             android:id="@+id/disableChecksButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/content_inset_half_quarter"
+            android:layout_marginTop="@dimen/content_inset_quarter"
             android:text="@string/disable_automatic_checks"
             style="@style/PrimaryDarkButton"
             />

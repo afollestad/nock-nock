@@ -56,6 +56,8 @@ class MainViewModelTest {
   @Test fun onResume() = runBlocking {
     val isLoading = viewModel.onIsLoading()
         .test()
+    val emptyTextVisibility = viewModel.onEmptyTextVisibility()
+        .test()
     val sites = viewModel.onSites()
         .test()
 
@@ -69,6 +71,7 @@ class MainViewModelTest {
         ALL_MOCK_MODELS
     )
     isLoading.assertValues(true, false)
+    emptyTextVisibility.assertValues(false, false)
   }
 
   @Test fun postSiteUpdate_notFound() {
@@ -138,6 +141,8 @@ class MainViewModelTest {
   @Test fun removeSite() {
     val sites = viewModel.onSites()
         .test()
+    val emptyTextVisibility = viewModel.onEmptyTextVisibility()
+        .test()
     val isLoading = viewModel.onIsLoading()
         .test()
 
@@ -156,6 +161,7 @@ class MainViewModelTest {
 
     sites.assertValues(modelsWithout1)
     isLoading.assertValues(true, false)
+    emptyTextVisibility.assertValues(false, false, false)
 
     verify(validationManager).cancelCheck(MOCK_MODEL_1)
     verify(notificationManager).cancelStatusNotification(MOCK_MODEL_1)

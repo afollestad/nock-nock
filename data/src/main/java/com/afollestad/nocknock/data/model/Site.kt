@@ -18,6 +18,7 @@ package com.afollestad.nocknock.data.model
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import com.afollestad.nocknock.data.RetryPolicy
 import com.afollestad.nocknock.data.model.Status.WAITING
 import com.afollestad.nocknock.utilities.ext.timeString
 import com.afollestad.nocknock.utilities.providers.CanNotifyModel
@@ -36,10 +37,12 @@ data class Site(
   /** Settings for the site. */
   @Ignore var settings: SiteSettings?,
   /** The last validation attempt result for the site, if any. */
-  @Ignore var lastResult: ValidationResult?
+  @Ignore var lastResult: ValidationResult?,
+  /** The site's retry policy, if any. */
+  @Ignore var retryPolicy: RetryPolicy?
 ) : CanNotifyModel {
 
-  constructor() : this(0, "", "", null, null)
+  constructor() : this(0, "", "", null, null, null)
 
   override fun notifyId(): Int = id.toInt()
 

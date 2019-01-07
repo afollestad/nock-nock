@@ -47,12 +47,23 @@ fun fakeResultModel(
     timestampMs = currentTimeMillis()
 )
 
+fun fakeRetryPolicy(
+  id: Long,
+  count: Int = 3,
+  minutes: Int = 6
+) = RetryPolicy(
+    siteId = id,
+    count = count,
+    minutes = minutes
+)
+
 fun fakeModel(id: Long) = Site(
     id = id,
     name = "Test",
     url = "https://test.com",
     settings = fakeSettingsModel(id),
-    lastResult = fakeResultModel(id)
+    lastResult = fakeResultModel(id),
+    retryPolicy = fakeRetryPolicy(id)
 )
 
 val MOCK_MODEL_1 = fakeModel(1)

@@ -19,6 +19,8 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.content.IntentFilter
 import com.afollestad.nocknock.data.AppDatabase
+import com.afollestad.nocknock.data.RetryPolicy
+import com.afollestad.nocknock.data.RetryPolicyDao
 import com.afollestad.nocknock.data.SiteDao
 import com.afollestad.nocknock.data.SiteSettingsDao
 import com.afollestad.nocknock.data.ValidationResultsDao
@@ -67,12 +69,23 @@ fun fakeResultModel(
     timestampMs = currentTimeMillis()
 )
 
+fun fakeRetryPolicy(
+  id: Long,
+  count: Int = 3,
+  minutes: Int = 6
+) = RetryPolicy(
+    siteId = id,
+    count = count,
+    minutes = minutes
+)
+
 fun fakeModel(id: Long) = Site(
     id = id,
     name = "Test",
     url = "https://test.com",
     settings = fakeSettingsModel(id),
-    lastResult = fakeResultModel(id)
+    lastResult = fakeResultModel(id),
+    retryPolicy = fakeRetryPolicy(id)
 )
 
 val MOCK_MODEL_1 = fakeModel(1)
@@ -128,11 +141,26 @@ fun mockDatabase(): AppDatabase {
     on { update(isA()) } doReturn 1
     on { delete(isA()) } doReturn 1
   }
+  val retryDao = mock<RetryPolicyDao> {
+    on { insert(isA()) } doReturn 1L
+    on { forSite(isA()) } doAnswer { inv ->
+      val id = inv.getArgument<Long>(0)
+      return@doAnswer when (id) {
+        1L -> listOf(MOCK_MODEL_1.retryPolicy!!)
+        2L -> listOf(MOCK_MODEL_2.retryPolicy!!)
+        3L -> listOf(MOCK_MODEL_3.retryPolicy!!)
+        else -> listOf()
+      }
+    }
+    on { update(isA()) } doReturn 1
+    on { delete(isA()) } doReturn 1
+  }
 
   return mock {
     on { siteDao() } doReturn siteDao
     on { siteSettingsDao() } doReturn settingsDao
     on { validationResultsDao() } doReturn resultsDao
+    on { retryPolicyDao() } doReturn retryDao
   }
 }
 

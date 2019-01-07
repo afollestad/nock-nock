@@ -37,7 +37,7 @@ class StatusUpdateIntentReceiver(
   private var callback: SiteCallback?
 ) : LifecycleObserver {
 
-  private val intentReceiver = object : BroadcastReceiver() {
+  internal val intentReceiver = object : BroadcastReceiver() {
     override fun onReceive(
       context: Context,
       intent: Intent

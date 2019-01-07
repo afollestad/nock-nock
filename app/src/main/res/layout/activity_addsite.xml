@@ -102,6 +102,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="-4dp"
             android:layout_marginStart="-4dp"
+            android:layout_marginTop="@dimen/content_inset_quarter"
             android:hint="@string/response_timeout_default"
             android:inputType="number"
             android:maxLength="8"
@@ -109,11 +110,18 @@
             style="@style/NockText.Body"
             />
 
+        <com.afollestad.nocknock.viewcomponents.retrypolicy.RetryPolicyLayout
+            android:id="@+id/retryPolicyLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/content_inset_more"
+            />
+
         <TextView
             android:id="@+id/responseValidationLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/content_inset"
+            android:layout_marginTop="@dimen/content_inset_more"
             android:text="@string/response_validation_mode"
             style="@style/NockText.SectionHeader"
             />

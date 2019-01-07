@@ -42,6 +42,7 @@ import kotlinx.android.synthetic.main.activity_viewsite.loadingProgress
 import kotlinx.android.synthetic.main.activity_viewsite.responseTimeoutInput
 import kotlinx.android.synthetic.main.activity_viewsite.responseValidationMode
 import kotlinx.android.synthetic.main.activity_viewsite.responseValidationSearchTerm
+import kotlinx.android.synthetic.main.activity_viewsite.retryPolicyLayout
 import kotlinx.android.synthetic.main.activity_viewsite.scriptInputLayout
 import kotlinx.android.synthetic.main.activity_viewsite.scrollView
 import kotlinx.android.synthetic.main.activity_viewsite.textLastCheckResult
@@ -135,6 +136,12 @@ class ViewSiteActivity : DarkModeSwitchActivity() {
         valueData = viewModel.checkIntervalValue,
         multiplierData = viewModel.checkIntervalUnit,
         errorData = viewModel.onCheckIntervalError()
+    )
+
+    // Retry Policy
+    retryPolicyLayout.attach(
+        timesData = viewModel.retryPolicyTimes,
+        minutesData = viewModel.retryPolicyMinutes
     )
 
     // Last/next check

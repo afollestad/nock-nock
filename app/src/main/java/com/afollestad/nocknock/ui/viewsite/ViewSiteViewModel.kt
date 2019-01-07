@@ -23,6 +23,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.data.AppDatabase
+import com.afollestad.nocknock.data.RetryPolicy
 import com.afollestad.nocknock.data.deleteSite
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.Status
@@ -70,6 +71,8 @@ class ViewSiteViewModel(
   val validationScript = MutableLiveData<String>()
   val checkIntervalValue = MutableLiveData<Int>()
   val checkIntervalUnit = MutableLiveData<Long>()
+  val retryPolicyTimes = MutableLiveData<Int>()
+  val retryPolicyMinutes = MutableLiveData<Int>()
   internal val disabled = MutableLiveData<Boolean>()
   internal val lastResult = MutableLiveData<ValidationResult?>()
 
@@ -309,10 +312,27 @@ class ViewSiteViewModel(
         networkTimeout = timeout.value!!,
         disabled = false
     )
+
+    val retryPolicyTimes = retryPolicyTimes.value ?: 0
+    val retryPolicyMinutes = retryPolicyMinutes.value ?: 0
+    val retryPolicy: RetryPolicy? = if (retryPolicyTimes > 0 && retryPolicyMinutes > 0) {
+      if (site.retryPolicy != null) {
+        // Have existing policy, update it
+        site.retryPolicy!!.copy(count = retryPolicyTimes, minutes = retryPolicyMinutes)
+      } else {
+        // Create new policy
+        RetryPolicy(count = retryPolicyTimes, minutes = retryPolicyMinutes)
+      }
+    } else {
+      // No policy
+      null
+    }
+
     return site.copy(
         name = name.value!!.trim(),
         url = url.value!!.trim(),
-        settings = newSettings
+        settings = newSettings,
+        retryPolicy = retryPolicy
     )
         .withStatus(status = WAITING)
   }
