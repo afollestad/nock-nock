@@ -44,10 +44,6 @@ abstract class DarkModeSwitchActivity : AppCompatActivity() {
         .attachLifecycle(this)
   }
 
-  override fun onResume() {
-    super.onResume()
-  }
-
   private fun themeRes() = if (darkModePref.get()) {
     R.style.AppTheme_Dark
   } else {

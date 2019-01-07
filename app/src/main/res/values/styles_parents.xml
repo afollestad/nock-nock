@@ -43,6 +43,8 @@
     <item name="md_font_button">@font/lato_bold</item>
   </style>
 
-  <style name="AppThemeParent.Ink" parent="AppThemeParent.Dark"/>
+  <style name="AppThemeParent.Ink" parent="AppThemeParent.Dark">
+    <item name="android:navigationBarColor">@color/inkColorDark</item>
+  </style>
 
 </resources>

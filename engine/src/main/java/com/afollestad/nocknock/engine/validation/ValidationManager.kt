@@ -30,7 +30,6 @@ import com.afollestad.nocknock.utilities.providers.StringProvider
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import org.jetbrains.annotations.TestOnly
 import java.net.SocketTimeoutException
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import timber.log.Timber.d as log
@@ -193,7 +192,7 @@ class RealValidationManager(
     jobScheduler.allPendingJobs
         .firstOrNull { job -> job.id == site.id.toInt() }
 
-  @TestOnly fun setClientTimeoutChanger(changer: ClientTimeoutChanger) {
-    this.clientTimeoutChanger = changer
-  }
+//  @TestOnly fun setClientTimeoutChanger(changer: ClientTimeoutChanger) {
+//    this.clientTimeoutChanger = changer
+//  }
 }

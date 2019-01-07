@@ -63,8 +63,6 @@ class JavaScriptInputLayout(
     visibility.toViewVisibility(lifecycleOwner(), this)
   }
 
-  fun clear() = userInput.setText("")
-
   private fun setError(error: String?) {
     error_text.showOrHide(error != null)
     error_text.text = error

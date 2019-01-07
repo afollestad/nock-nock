@@ -55,5 +55,3 @@ fun Status.textRes() = when (this) {
 }
 
 fun Status?.isPending() = this == WAITING || this == CHECKING
-
-fun Int.toSiteStatus() = Status.fromValue(this)

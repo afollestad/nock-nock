@@ -21,5 +21,5 @@ import androidx.lifecycle.Transformations
 fun <X, Y> LiveData<X>.map(mapper: (X) -> Y) =
   Transformations.map(this, mapper)!!
 
-fun <X, Y> LiveData<X>.switchMap(mapper: (X) -> LiveData<Y>) =
-  Transformations.switchMap(this, mapper)!!
+//fun <X, Y> LiveData<X>.switchMap(mapper: (X) -> LiveData<Y>) =
+//  Transformations.switchMap(this, mapper)!!

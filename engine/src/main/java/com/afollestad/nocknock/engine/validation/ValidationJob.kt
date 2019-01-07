@@ -66,7 +66,7 @@ class ValidationJob : JobService() {
     val siteId = params.extras.getLong(KEY_SITE_ID)
 
     GlobalScope.launch(Main) {
-      val site = async(IO) { database.getSite(siteId) }.await()
+      val site = withContext(IO) { database.getSite(siteId) }
       if (site == null) {
         log("Unable to find a site for ID $siteId, this job will not be rescheduled.")
         return@launch jobFinished(params, false)

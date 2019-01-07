@@ -38,7 +38,6 @@
   <string name="next_check">Next Validation</string>
   <string name="next_check_x">Next Validation: %1$s</string>
   <string name="now">Now</string>
-  <string name="none_turned_off">None (turned off)</string>
   <string name="none">None</string>
 
   <string name="disable_automatic_checks">Disable Automatic Validation</string>
@@ -83,7 +82,6 @@
   <string name="thank_you">Thank you very much!</string>
   <string name="next">Next</string>
 
-  <string name="install_video_viewer">Please install a video viewer app, such as Google Photos.</string>
   <string name="install_web_browser">Please install a web browser app, such as Google Chrome.</string>
 
 </resources>

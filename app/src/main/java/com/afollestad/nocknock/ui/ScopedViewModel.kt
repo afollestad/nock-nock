@@ -19,7 +19,6 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import org.jetbrains.annotations.TestOnly
 
 /** @author Aidan Follestad (@afollestad) */
 abstract class ScopedViewModel(mainDispatcher: CoroutineDispatcher) : ViewModel() {
@@ -32,5 +31,5 @@ abstract class ScopedViewModel(mainDispatcher: CoroutineDispatcher) : ViewModel(
     job.cancel()
   }
 
-  @TestOnly open fun destroy() = job.cancel()
+  //@TestOnly open fun destroy() = job.cancel()
 }
