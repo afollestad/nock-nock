@@ -39,7 +39,11 @@ data class RetryPolicy(
    * In what amount of time (in minutes) we want
    * to perform those retries.
    */
-  var minutes: Int = 0
+  var minutes: Int = 0,
+  /** The timestamp in milliseconds of the last attempt. */
+  var lastTryTimestamp: Long = 0,
+  /** How many retries we have left before considering the site to have problem. */
+  var triesLeft: Int = -1
 ) : Serializable {
 
   constructor() : this(0, 0, 0)
@@ -49,6 +53,9 @@ data class RetryPolicy(
   // 30 seconds = 30 * 1000 or 30,000 milliseconds.
   // 60,000 / 2 = 30,000.
   fun interval(): Long {
+    if (count == 0 || minutes == 0) {
+      return -1
+    }
     val timesPerMinute = count.toFloat() / minutes.toFloat()
     return MINUTE / timesPerMinute.toInt()
   }

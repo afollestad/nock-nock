@@ -19,6 +19,7 @@ import android.app.job.JobParameters
 import android.app.job.JobService
 import android.content.Intent
 import com.afollestad.nocknock.data.AppDatabase
+import com.afollestad.nocknock.data.RetryPolicy
 import com.afollestad.nocknock.data.getSite
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.Status
@@ -139,6 +140,33 @@ class ValidationJob : JobService() {
       if (jobResult.lastResult!!.status == OK) {
         notificationManager.cancelStatusNotification(jobResult)
       } else {
+        val retryPolicy = site.retryPolicy
+        if (retryPolicy != null) {
+          log("Check for site ${site.id} was unsuccessful. BUT we have a retryPolicy.")
+
+          if (retryPolicy.triesLeft == -1 || retryPolicy.triesLeft > 0) {
+            if (retryPolicy.triesLeft == -1) {
+              retryPolicy.triesLeft = retryPolicy.count
+            } else {
+              retryPolicy.triesLeft -= 1
+            }
+            updateTriesLeft(retryPolicy, retryPolicy.triesLeft)
+
+            val interval = retryPolicy.interval()
+            validationManager.scheduleCheck(
+                site = jobResult,
+                fromFinishingJob = true,
+                overrideDelay = interval
+            )
+            log("Scheduling retry in $interval milliseconds.")
+
+            return@launch
+          } else {
+            updateTriesLeft(retryPolicy, -1)
+            log("No tries left, continuing to error notification.")
+          }
+        }
+
         notificationManager.postStatusNotification(jobResult)
       }
 
@@ -170,6 +198,13 @@ class ValidationJob : JobService() {
       if (status == OK) null
       else site.lastResult?.reason ?: "Unknown"
 
+    if (site.retryPolicy != null && status == OK) {
+      site.retryPolicy = site.retryPolicy!!.copy(
+          triesLeft = -1,
+          lastTryTimestamp = 0
+      )
+    }
+
     val updatedModel = site.withStatus(
         status = status,
         timestamp = lastCheckTime,
@@ -183,5 +218,17 @@ class ValidationJob : JobService() {
       })
     }
     return updatedModel
+  }
+
+  private suspend fun updateTriesLeft(
+    retryPolicy: RetryPolicy,
+    triesLeft: Int
+  ) {
+    retryPolicy.triesLeft = triesLeft
+    withContext(IO) {
+      database.retryPolicyDao()
+          .update(retryPolicy)
+    }
+    log("Tries left for site ${retryPolicy.siteId}: $triesLeft")
   }
 }

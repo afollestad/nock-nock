@@ -149,18 +149,6 @@ class ViewSiteActivity : DarkModeSwitchActivity() {
         .toViewText(this, textLastCheckResult)
     viewModel.onNextCheckText()
         .toViewText(this, textNextCheck)
-
-    // Disabled button
-    viewModel.onDisableChecksVisibility()
-        .toViewVisibility(this, disableChecksButton)
-    disableChecksButton.setOnClickListener { maybeDisableChecks() }
-
-    // Done button
-    viewModel.onDoneButtonText()
-        .toViewText(this, doneBtn)
-    doneBtn.setOnClickListener {
-      viewModel.commit { finish() }
-    }
   }
 
   private fun setupUi() {
@@ -195,6 +183,18 @@ class ViewSiteActivity : DarkModeSwitchActivity() {
     )
     validationOptionsAdapter.setDropDownViewResource(R.layout.list_item_spinner_dropdown)
     responseValidationMode.adapter = validationOptionsAdapter
+
+    // Disabled button
+    viewModel.onDisableChecksVisibility()
+        .toViewVisibility(this, disableChecksButton)
+    disableChecksButton.setOnClickListener { maybeDisableChecks() }
+
+    // Done button
+    viewModel.onDoneButtonText()
+        .toViewText(this, doneBtn)
+    doneBtn.setOnClickListener {
+      viewModel.commit { finish() }
+    }
   }
 
   override fun onNewIntent(intent: Intent?) {

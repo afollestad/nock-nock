@@ -50,7 +50,7 @@ class AddSiteActivity : DarkModeSwitchActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_addsite)
-    setupUi(savedInstanceState)
+    setupUi()
 
     lifecycle.addObserver(viewModel)
 
@@ -114,18 +114,9 @@ class AddSiteActivity : DarkModeSwitchActivity() {
         timesData = viewModel.retryPolicyTimes,
         minutesData = viewModel.retryPolicyMinutes
     )
-
-    // Done button
-    doneBtn.setOnClickListener {
-      viewModel.commit {
-        setResult(RESULT_OK)
-        finish()
-        overridePendingTransition(R.anim.fade_out, R.anim.fade_out)
-      }
-    }
   }
 
-  private fun setupUi(savedInstanceState: Bundle?) {
+  private fun setupUi() {
     toolbarTitle.setText(R.string.add_site)
     toolbar.run {
       setNavigationIcon(R.drawable.ic_action_close)
@@ -139,5 +130,14 @@ class AddSiteActivity : DarkModeSwitchActivity() {
     )
     validationOptionsAdapter.setDropDownViewResource(R.layout.list_item_spinner_dropdown)
     responseValidationMode.adapter = validationOptionsAdapter
+
+    // Done button
+    doneBtn.setOnClickListener {
+      viewModel.commit {
+        setResult(RESULT_OK)
+        finish()
+        overridePendingTransition(R.anim.fade_out, R.anim.fade_out)
+      }
+    }
   }
 }

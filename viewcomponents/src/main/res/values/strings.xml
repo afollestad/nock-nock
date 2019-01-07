@@ -10,6 +10,6 @@
   <string name="retry_policy">Retry Policy</string>
   <string name="retry_policy_retry">Retry</string>
   <string name="retry_policy_times_in">times in</string>
-  <string name="retry_policy_minutes">Minutes</string>
+  <string name="retry_policy_minutes">Minute(s)</string>
 
 </resources>

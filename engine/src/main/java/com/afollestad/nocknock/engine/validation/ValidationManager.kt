@@ -51,7 +51,8 @@ interface ValidationManager {
     site: Site,
     rightNow: Boolean = false,
     cancelPrevious: Boolean = rightNow,
-    fromFinishingJob: Boolean = false
+    fromFinishingJob: Boolean = false,
+    overrideDelay: Long = -1
   )
 
   fun cancelCheck(site: Site)
@@ -96,7 +97,8 @@ class RealValidationManager(
     site: Site,
     rightNow: Boolean,
     cancelPrevious: Boolean,
-    fromFinishingJob: Boolean
+    fromFinishingJob: Boolean,
+    overrideDelay: Long
   ) {
     check(site.id != 0L) { "Cannot schedule checks for jobs with no ID." }
     val siteSettings = site.settings
@@ -118,10 +120,10 @@ class RealValidationManager(
     val jobInfo = jobInfoProvider.createCheckJob(
         id = site.id.toInt(),
         onlyUnmeteredNetwork = false,
-        delayMs = if (rightNow) {
-          1
-        } else {
-          siteSettings.validationIntervalMs
+        delayMs = when {
+          rightNow -> 1
+          overrideDelay > -1 -> overrideDelay
+          else -> siteSettings.validationIntervalMs
         },
         extras = extras,
         target = ValidationJob::class.java
