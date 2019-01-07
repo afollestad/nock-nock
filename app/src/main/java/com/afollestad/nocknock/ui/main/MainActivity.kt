@@ -29,7 +29,6 @@ import com.afollestad.nocknock.adapter.SiteAdapter
 import com.afollestad.nocknock.broadcasts.StatusUpdateIntentReceiver
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.dialogs.AboutDialog
-import com.afollestad.nocknock.koin.PREF_DARK_MODE
 import com.afollestad.nocknock.notifications.NockNotificationManager
 import com.afollestad.nocknock.ui.DarkModeSwitchActivity
 import com.afollestad.nocknock.utilities.providers.IntentProvider
@@ -37,7 +36,6 @@ import com.afollestad.nocknock.utilities.ui.toast
 import com.afollestad.nocknock.viewUrl
 import com.afollestad.nocknock.viewUrlWithApp
 import com.afollestad.nocknock.viewcomponents.ext.showOrHide
-import com.afollestad.rxkprefs.Pref
 import kotlinx.android.synthetic.main.activity_main.fab
 import kotlinx.android.synthetic.main.activity_main.list
 import kotlinx.android.synthetic.main.activity_main.loadingProgress
@@ -51,7 +49,6 @@ class MainActivity : DarkModeSwitchActivity() {
 
   private val notificationManager by inject<NockNotificationManager>()
   private val intentProvider by inject<IntentProvider>()
-  private val darkModePref by inject<Pref<Boolean>>(name = PREF_DARK_MODE)
 
   internal val viewModel by viewModel<MainViewModel>()
 
@@ -89,11 +86,11 @@ class MainActivity : DarkModeSwitchActivity() {
     toolbar.run {
       inflateMenu(R.menu.menu_main)
       menu.findItem(R.id.dark_mode)
-          .isChecked = darkModePref.get()
+          .isChecked = isDarkMode()
       setOnMenuItemClickListener { item ->
         when (item.itemId) {
           R.id.about -> AboutDialog.show(this@MainActivity)
-          R.id.dark_mode -> darkModePref.set(!darkModePref.get())
+          R.id.dark_mode -> toggleDarkMode()
           R.id.support_me -> supportMe()
         }
         return@setOnMenuItemClickListener true

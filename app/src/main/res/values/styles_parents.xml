@@ -4,11 +4,14 @@
     <item name="colorPrimary">@color/colorPrimary_lightTheme</item>
     <item name="colorPrimaryDark">@color/colorPrimaryDark_lightTheme</item>
     <item name="colorAccent">@color/colorAccent</item>
-    <item name="colorButtonNormal">@color/inkColorDark</item>
+    <item name="colorButtonNormal">@color/colorAccent</item>
 
     <item name="toolbarTitleColor">#000000</item>
     <item name="dividerColor">#1f000000</item>
     <item name="iconColor">#000000</item>
+
+    <item name="android:textColorPrimary">#212121</item>
+    <item name="android:textColorSecondary">#727272</item>
 
     <item name="android:windowBackground">@color/colorPrimary_lightTheme</item>
     <item name="android:listDivider">@drawable/divider</item>
@@ -25,11 +28,14 @@
     <item name="colorPrimary">@color/colorPrimary_darkTheme</item>
     <item name="colorPrimaryDark">@color/colorPrimaryDark_darkTheme</item>
     <item name="colorAccent">@color/colorAccent</item>
-    <item name="colorButtonNormal">@color/inkColorDark</item>
+    <item name="colorButtonNormal">@color/colorAccent</item>
 
     <item name="toolbarTitleColor">#ffffff</item>
-    <item name="dividerColor">#1fffffff</item>
+    <item name="dividerColor">#1f000000</item>
     <item name="iconColor">#FFFFFF</item>
+
+    <item name="android:textColorPrimary">#FFFFFF</item>
+    <item name="android:textColorSecondary">#F0F0F0</item>
 
     <item name="android:windowBackground">@color/colorPrimary_darkTheme</item>
     <item name="android:listDivider">@drawable/divider</item>
@@ -41,10 +47,6 @@
     <item name="md_font_title">@font/lato_bold</item>
     <item name="md_font_body">@font/lato</item>
     <item name="md_font_button">@font/lato_bold</item>
-  </style>
-
-  <style name="AppThemeParent.Ink" parent="AppThemeParent.Dark">
-    <item name="android:navigationBarColor">@color/inkColorDark</item>
   </style>
 
 </resources>

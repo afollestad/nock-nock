@@ -31,14 +31,12 @@
         android:name="com.afollestad.nocknock.ui.addsite.AddSiteActivity"
         android:label="@string/add_site"
         android:launchMode="singleTop"
-        android:theme="@style/AppTheme.Transparent"
         android:windowSoftInputMode="stateHidden"/>
 
     <activity
         android:name="com.afollestad.nocknock.ui.viewsite.ViewSiteActivity"
         android:label="@string/view_site"
         android:launchMode="singleTop"
-        android:theme="@style/AppTheme.Ink"
         android:windowSoftInputMode="stateHidden"/>
 
     <service

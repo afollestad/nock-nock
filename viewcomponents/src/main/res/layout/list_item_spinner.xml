@@ -4,6 +4,5 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/button_height"
     android:gravity="center_vertical|start"
-    android:textColor="#FFFFFF"
     style="@style/NockText.Body"
     />

@@ -10,7 +10,6 @@
       android:id="@+id/rootView"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:background="?colorPrimary"
       android:orientation="vertical"
       >
 
@@ -45,7 +44,6 @@
               android:layout_height="wrap_content"
               android:hint="@string/site_name"
               android:inputType="textPersonName|textCapWords|textAutoCorrect"
-              android:textColor="#FFFFFF"
               style="@style/NockText.Body"
               />
 
@@ -66,7 +64,6 @@
               android:layout_height="wrap_content"
               android:hint="@string/site_url"
               android:inputType="textUri"
-              android:textColor="#FFFFFF"
               style="@style/NockText.Body"
               />
 
@@ -108,9 +105,8 @@
             android:hint="@string/response_timeout_default"
             android:inputType="number"
             android:maxLength="8"
-            android:textColor="#FFFFFF"
             tools:ignore="Autofill,HardcodedText,LabelFor"
-            style="@style/NockText.Body.Light"
+            style="@style/NockText.Body"
             />
 
         <TextView
@@ -139,7 +135,7 @@
             android:hint="@string/search_term"
             android:visibility="gone"
             tools:ignore="Autofill,TextFields"
-            style="@style/NockText.Body.Light"
+            style="@style/NockText.Body"
             />
 
         <com.afollestad.nocknock.viewcomponents.js.JavaScriptInputLayout
@@ -148,7 +144,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/content_inset"
             android:layout_marginTop="@dimen/content_inset_half"
-            android:background="@color/inkColorDark"
+            android:background="@color/lighterGray"
             />
 
         <TextView

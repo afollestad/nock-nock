@@ -34,9 +34,8 @@
         android:hint="0"
         android:inputType="number"
         android:maxLength="6"
-        android:textColor="#FFFFFF"
         tools:ignore="Autofill,HardcodedText,LabelFor"
-        style="@style/NockText.Body.Light"
+        style="@style/NockText.Body"
         />
 
     <Spinner

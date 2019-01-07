@@ -31,7 +31,7 @@ abstract class DarkModeSwitchActivity : AppCompatActivity() {
   private val darkModePref by inject<Pref<Boolean>>(name = PREF_DARK_MODE)
 
   override fun onCreate(savedInstanceState: Bundle?) {
-    isDarkModeEnabled = darkModePref.get()
+    isDarkModeEnabled = isDarkMode()
     setTheme(themeRes())
     super.onCreate(savedInstanceState)
 
@@ -44,7 +44,13 @@ abstract class DarkModeSwitchActivity : AppCompatActivity() {
         .attachLifecycle(this)
   }
 
-  private fun themeRes() = if (darkModePref.get()) {
+  protected fun isDarkMode() = darkModePref.get()
+
+  protected fun toggleDarkMode() = setDarkMode(!isDarkMode())
+
+  private fun setDarkMode(darkMode: Boolean) = darkModePref.set(darkMode)
+
+  private fun themeRes() = if (isDarkMode()) {
     R.style.AppTheme_Dark
   } else {
     R.style.AppTheme

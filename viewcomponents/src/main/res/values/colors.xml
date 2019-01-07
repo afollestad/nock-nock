@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-  <color name="dividerColorDark">#37474F</color>
-
   <color name="loading_indicator_frame_background">#40000000</color>
 
   <color name="md_red">#E53935</color>

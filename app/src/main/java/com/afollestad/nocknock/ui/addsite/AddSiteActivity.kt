@@ -18,12 +18,9 @@ package com.afollestad.nocknock.ui.addsite
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.widget.ArrayAdapter
-import androidx.appcompat.app.AppCompatActivity
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.data.model.ValidationMode
-import com.afollestad.nocknock.setStatusBarColor
-import com.afollestad.nocknock.viewcomponents.ext.conceal
-import com.afollestad.nocknock.viewcomponents.ext.onLayout
+import com.afollestad.nocknock.ui.DarkModeSwitchActivity
 import com.afollestad.nocknock.viewcomponents.livedata.attachLiveData
 import com.afollestad.nocknock.viewcomponents.livedata.toViewError
 import com.afollestad.nocknock.viewcomponents.livedata.toViewText
@@ -36,35 +33,21 @@ import kotlinx.android.synthetic.main.activity_addsite.loadingProgress
 import kotlinx.android.synthetic.main.activity_addsite.responseTimeoutInput
 import kotlinx.android.synthetic.main.activity_addsite.responseValidationMode
 import kotlinx.android.synthetic.main.activity_addsite.responseValidationSearchTerm
-import kotlinx.android.synthetic.main.activity_addsite.rootView
 import kotlinx.android.synthetic.main.activity_addsite.scriptInputLayout
 import kotlinx.android.synthetic.main.activity_addsite.textUrlWarning
 import kotlinx.android.synthetic.main.activity_addsite.validationModeDescription
 import kotlinx.android.synthetic.main.include_app_bar.toolbar
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import kotlin.math.max
-import kotlin.properties.Delegates.notNull
 import kotlinx.android.synthetic.main.include_app_bar.toolbar_title as toolbarTitle
 
-const val KEY_FAB_X = "fab_x"
-const val KEY_FAB_Y = "fab_y"
-const val KEY_FAB_SIZE = "fab_size"
-
 /** @author Aidan Follestad (@afollestad) */
-class AddSiteActivity : AppCompatActivity() {
-
-  var revealCx by notNull<Int>()
-  var revealCy by notNull<Int>()
-  var revealRadius by notNull<Float>()
-
-  internal var isClosing = false
+class AddSiteActivity : DarkModeSwitchActivity() {
 
   private val viewModel by viewModel<AddSiteViewModel>()
 
   @SuppressLint("SetTextI18n")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setStatusBarColor(res = R.color.inkColorDark)
     setContentView(R.layout.activity_addsite)
     setupUi(savedInstanceState)
 
@@ -139,24 +122,7 @@ class AddSiteActivity : AppCompatActivity() {
     toolbarTitle.setText(R.string.add_site)
     toolbar.run {
       setNavigationIcon(R.drawable.ic_action_close)
-      setNavigationOnClickListener { closeActivityWithReveal() }
-    }
-
-    if (savedInstanceState == null) {
-      rootView.conceal()
-      rootView.onLayout {
-        val fabSize = intent.getIntExtra(KEY_FAB_SIZE, 0)
-        val fabX = intent.getFloatExtra(KEY_FAB_X, 0f)
-            .toInt()
-        val fabY = intent.getFloatExtra(KEY_FAB_Y, 0f)
-            .toInt()
-
-        revealCx = fabX + fabSize / 2
-        revealCy = (fabY + toolbar.measuredHeight + fabSize / 2)
-        revealRadius = max(revealCx, revealCy).toFloat()
-
-        circularRevealActivity()
-      }
+      setNavigationOnClickListener { finish() }
     }
 
     val validationOptionsAdapter = ArrayAdapter(
@@ -167,6 +133,4 @@ class AddSiteActivity : AppCompatActivity() {
     validationOptionsAdapter.setDropDownViewResource(R.layout.list_item_spinner_dropdown)
     responseValidationMode.adapter = validationOptionsAdapter
   }
-
-  override fun onBackPressed() = closeActivityWithReveal()
 }

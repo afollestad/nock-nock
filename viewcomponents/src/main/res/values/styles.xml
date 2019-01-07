@@ -18,11 +18,12 @@
   <style name="NockText.Body">
     <item name="android:textSize">@dimen/body_font_size</item>
     <item name="android:fontFamily">@font/lato</item>
-    <item name="android:textColor">?android:textColorSecondary</item>
+    <item name="android:textColor">?android:textColorPrimary</item>
   </style>
 
   <style name="NockText.Body.Light" parent="NockText.Body">
     <item name="android:fontFamily">@font/lato_light</item>
+    <item name="android:textColor">?android:textColorSecondary</item>
   </style>
 
   <style name="NockText.Caption">

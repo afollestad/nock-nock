@@ -19,13 +19,12 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.broadcasts.StatusUpdateIntentReceiver
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.ValidationMode
-import com.afollestad.nocknock.setStatusBarColor
+import com.afollestad.nocknock.ui.DarkModeSwitchActivity
 import com.afollestad.nocknock.utilities.providers.IntentProvider
 import com.afollestad.nocknock.viewcomponents.ext.dimenFloat
 import com.afollestad.nocknock.viewcomponents.ext.onScroll
@@ -55,7 +54,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlinx.android.synthetic.main.include_app_bar.toolbar_title as toolbarTitle
 
 /** @author Aidan Follestad (@afollestad) */
-class ViewSiteActivity : AppCompatActivity() {
+class ViewSiteActivity : DarkModeSwitchActivity() {
 
   internal val viewModel by viewModel<ViewSiteViewModel>()
 
@@ -69,7 +68,6 @@ class ViewSiteActivity : AppCompatActivity() {
   @SuppressLint("SetTextI18n")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setStatusBarColor(res = R.color.inkColorDark)
     setContentView(R.layout.activity_viewsite)
     setupUi()
 
@@ -159,7 +157,7 @@ class ViewSiteActivity : AppCompatActivity() {
   }
 
   private fun setupUi() {
-    toolbarTitle.setText(R.string.add_site)
+    toolbarTitle.setText(R.string.view_site)
     toolbar.run {
       setNavigationIcon(R.drawable.ic_action_close)
       setNavigationOnClickListener { finish() }

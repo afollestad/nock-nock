@@ -7,8 +7,7 @@
   <color name="colorPrimary_darkTheme">#212121</color>
   <color name="colorPrimaryDark_darkTheme">#252525</color>
 
-  <color name="inkColor">#455A64</color>
-  <color name="inkColorDark">#37474F</color>
+  <color name="lighterGray">#303030</color>
   <color name="colorAccent">#FF6E40</color>
 
 </resources>

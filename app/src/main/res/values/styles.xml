@@ -4,26 +4,6 @@
 
   <style name="AppTheme.Dark" parent="AppThemeParent.Dark"/>
 
-  <style name="AppTheme.Ink" parent="AppThemeParent.Ink">
-    <item name="colorPrimary">@color/inkColor</item>
-    <item name="colorPrimaryDark">@color/inkColorDark</item>
-    <item name="colorAccent">@color/colorAccent</item>
-    <item name="colorButtonNormal">@color/inkColor</item>
-
-    <item name="android:listDivider">@drawable/divider</item>
-
-    <item name="md_corner_radius">16dp</item>
-    <item name="md_font_title">@font/lato_black</item>
-    <item name="md_font_body">@font/lato</item>
-    <item name="md_font_button">@font/lato_bold</item>
-  </style>
-
-  <style name="AppTheme.Transparent" parent="AppTheme.Ink">
-    <item name="android:windowIsTranslucent">true</item>
-    <item name="android:statusBarColor">@android:color/transparent</item>
-    <item name="android:windowBackground">@android:color/transparent</item>
-  </style>
-
   <style name="AccentButton" parent="Widget.MaterialComponents.Button">
     <item name="android:textColor">#fff</item>
     <item name="backgroundTint">@color/colorAccent</item>
@@ -32,7 +12,7 @@
 
   <style name="PrimaryDarkButton" parent="Widget.MaterialComponents.Button">
     <item name="android:textColor">#fff</item>
-    <item name="backgroundTint">@color/inkColorDark</item>
+    <item name="backgroundTint">@color/lighterGray</item>
     <item name="android:fontFamily">@font/lato</item>
   </style>
 
