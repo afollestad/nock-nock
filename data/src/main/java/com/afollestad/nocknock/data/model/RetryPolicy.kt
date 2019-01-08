@@ -57,6 +57,14 @@ data class RetryPolicy(
       return -1
     }
     val timesPerMinute = count.toFloat() / minutes.toFloat()
-    return MINUTE / timesPerMinute.toInt()
+    return MINUTE / timesPerMinute.toSafeInt()
+  }
+
+  private fun Float.toSafeInt(): Int {
+    val intValue = toInt()
+    if (intValue == 0) {
+      return 1
+    }
+    return intValue
   }
 }
