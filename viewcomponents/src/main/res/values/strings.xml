@@ -11,5 +11,9 @@
   <string name="retry_policy_retry">Retry</string>
   <string name="retry_policy_times_in">times in</string>
   <string name="retry_policy_minutes">Minute(s)</string>
+  <string name="retry_policy_description">
+    If a validation fails, perform additional checks sooner by setting the above to non-zero
+    values. After retrying %1$d times over %2$d minutes with no success, you will get a notification.
+  </string>
 
 </resources>

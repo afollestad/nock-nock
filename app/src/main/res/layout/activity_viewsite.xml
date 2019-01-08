@@ -131,13 +131,6 @@
             style="@style/NockText.Body"
             />
 
-        <com.afollestad.nocknock.viewcomponents.retrypolicy.RetryPolicyLayout
-            android:id="@+id/retryPolicyLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/content_inset"
-            />
-
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -191,6 +184,13 @@
             android:lineSpacingMultiplier="1.2"
             android:text="@string/validation_mode_status_desc"
             style="@style/NockText.Body.Light"
+            />
+
+        <com.afollestad.nocknock.viewcomponents.retrypolicy.RetryPolicyLayout
+            android:id="@+id/retryPolicyLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/content_inset"
             />
 
         <include layout="@layout/include_divider"/>

@@ -79,4 +79,14 @@
 
   </LinearLayout>
 
+  <TextView
+      android:id="@+id/retry_policy_desc"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:lineSpacingMultiplier="1.2"
+      android:text="@string/retry_policy_description"
+      android:layout_marginTop="@dimen/content_inset_half"
+      style="@style/NockText.Body.Light"
+      />
+
 </merge>

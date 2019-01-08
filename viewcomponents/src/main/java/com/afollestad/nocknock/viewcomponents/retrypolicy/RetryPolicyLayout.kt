@@ -19,11 +19,14 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import androidx.lifecycle.MutableLiveData
+import com.afollestad.nocknock.utilities.ext.onTextChanged
 import com.afollestad.nocknock.viewcomponents.R
+import com.afollestad.nocknock.viewcomponents.ext.asSafeInt
 import com.afollestad.nocknock.viewcomponents.livedata.attachLiveData
 import com.afollestad.nocknock.viewcomponents.livedata.lifecycleOwner
 import kotlinx.android.synthetic.main.retry_policy_layout.view.minutes
 import kotlinx.android.synthetic.main.retry_policy_layout.view.times
+import kotlinx.android.synthetic.main.retry_policy_layout.view.retry_policy_desc as description
 
 /** @author Aidan Follestad (@afollestad) */
 class RetryPolicyLayout(
@@ -42,5 +45,22 @@ class RetryPolicyLayout(
   ) {
     times.attachLiveData(lifecycleOwner(), timesData)
     minutes.attachLiveData(lifecycleOwner(), minutesData)
+
+    times.onTextChanged { invalidateDescriptionText() }
+    minutes.onTextChanged { invalidateDescriptionText() }
+
+    invalidateDescriptionText()
+  }
+
+  private fun invalidateDescriptionText() {
+    val timesInt = times.text.toString()
+        .asSafeInt()
+    val minutesInt = minutes.text.toString()
+        .asSafeInt()
+    description.text = resources.getString(
+        R.string.retry_policy_description,
+        timesInt,
+        minutesInt
+    )
   }
 }
