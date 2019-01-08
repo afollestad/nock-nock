@@ -7,7 +7,7 @@
     <item name="colorButtonNormal">@color/colorAccent</item>
 
     <item name="toolbarTitleColor">#000000</item>
-    <item name="dividerColor">#F5F5F5</item>
+    <item name="dividerColor">#EEEEEE</item>
     <item name="iconColor">#000000</item>
 
     <item name="android:textColorPrimary">#212121</item>
