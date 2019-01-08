@@ -91,7 +91,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/content_inset"
+            android:layout_marginTop="@dimen/content_inset_less"
             android:text="@string/response_timeout"
             style="@style/NockText.SectionHeader"
             />
