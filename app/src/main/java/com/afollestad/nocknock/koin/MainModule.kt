@@ -23,6 +23,7 @@ import android.content.Context.NOTIFICATION_SERVICE
 import androidx.room.Room.databaseBuilder
 import com.afollestad.nocknock.data.AppDatabase
 import com.afollestad.nocknock.data.Database1to2Migration
+import com.afollestad.nocknock.data.Database2to3Migration
 import com.afollestad.nocknock.notifications.Qualifiers.MAIN_ACTIVITY_CLASS
 import com.afollestad.nocknock.ui.main.MainActivity
 import com.afollestad.nocknock.utilities.ext.systemService
@@ -38,7 +39,10 @@ val mainModule = module {
 
   single {
     databaseBuilder(get(), AppDatabase::class.java, "NockNock.db")
-        .addMigrations(Database1to2Migration())
+        .addMigrations(
+            Database1to2Migration(),
+            Database2to3Migration()
+        )
         .build()
   }
 

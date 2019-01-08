@@ -4,7 +4,7 @@
 
   <application>
     <uses-library
-        android:name="android.test.runner"
+        android:name="androidx.test.runner"
         android:required="false"/>
   </application>
 </manifest>

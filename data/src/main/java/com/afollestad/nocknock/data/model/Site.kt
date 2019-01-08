@@ -31,8 +31,10 @@ data class Site(
   @PrimaryKey(autoGenerate = true) var id: Long = 0,
   /** The site's user-given name. */
   var name: String,
-  /** The URl at which validation attempts are made to. */
+  /** The URL at which validation attempts are made to. */
   var url: String,
+  /** Comma separated tags for this site. */
+  var tags: String,
   /** Settings for the site. */
   @Ignore var settings: SiteSettings?,
   /** The last validation attempt result for the site, if any. */
@@ -41,7 +43,7 @@ data class Site(
   @Ignore var retryPolicy: RetryPolicy?
 ) : CanNotifyModel {
 
-  constructor() : this(0, "", "", null, null, null)
+  constructor() : this(0, "", "", "", null, null, null)
 
   override fun notifyId(): Int = id.toInt()
 

@@ -31,3 +31,15 @@ class Database1to2Migration : Migration(1, 2) {
     )
   }
 }
+
+/**
+ * Migrates the database from version 2 to 3.
+ *
+ * @author Aidan Follestad (@afollestad)
+ */
+class Database2to3Migration : Migration(1, 2) {
+
+  override fun migrate(database: SupportSQLiteDatabase) {
+    database.execSQL("ALTER TABLE `sites` ADD COLUMN tags TEXT NOT NULL")
+  }
+}

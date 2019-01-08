@@ -52,21 +52,28 @@ abstract class AppDatabase : RoomDatabase() {
  *
  * @author Aidan Follestad (@afollestad)
  */
-fun AppDatabase.allSites(): List<Site> {
-  return siteDao().all()
-      .map {
-        val settings = siteSettingsDao().forSite(it.id)
-            .single()
-        val lastResult = validationResultsDao().forSite(it.id)
-            .singleOrNull()
-        val retryPolicy = retryPolicyDao().forSite(it.id)
-            .singleOrNull()
-        return@map it.copy(
-            settings = settings,
-            lastResult = lastResult,
-            retryPolicy = retryPolicy
-        )
-      }
+fun AppDatabase.allSites(forTag: String = ""): List<Site> {
+  val lowercaseTag = forTag.toLowerCase()
+  var all = siteDao().all()
+  if (!forTag.isEmpty()) {
+    all = all.filter {
+      forTag.isEmpty() ||
+          it.tags.toLowerCase().split(",").contains(lowercaseTag)
+    }
+  }
+  return all.map {
+    val settings = siteSettingsDao().forSite(it.id)
+        .single()
+    val lastResult = validationResultsDao().forSite(it.id)
+        .singleOrNull()
+    val retryPolicy = retryPolicyDao().forSite(it.id)
+        .singleOrNull()
+    return@map it.copy(
+        settings = settings,
+        lastResult = lastResult,
+        retryPolicy = retryPolicy
+    )
+  }
 }
 
 /**

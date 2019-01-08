@@ -59,9 +59,7 @@ class AppDatabaseTest() {
 
   @After
   @Throws(IOException::class)
-  fun destroy() {
-    db.close()
-  }
+  fun destroy() = db.close()
 
   // SiteDao
 
@@ -69,6 +67,7 @@ class AppDatabaseTest() {
     val model1 = Site(
         name = "Test 1",
         url = "https://test1.com",
+        tags = "",
         settings = null,
         lastResult = null,
         retryPolicy = null
@@ -79,6 +78,7 @@ class AppDatabaseTest() {
     val model2 = Site(
         name = "Test 2",
         url = "https://test2.com",
+        tags = "",
         settings = null,
         lastResult = null,
         retryPolicy = null
@@ -96,6 +96,7 @@ class AppDatabaseTest() {
     val model = Site(
         name = "Test",
         url = "https://test.com",
+        tags = "",
         settings = null,
         lastResult = null,
         retryPolicy = null
@@ -111,6 +112,7 @@ class AppDatabaseTest() {
     val initialModel = Site(
         name = "Test 1",
         url = "https://test1.com",
+        tags = "",
         settings = null,
         lastResult = null,
         retryPolicy = null
@@ -135,6 +137,7 @@ class AppDatabaseTest() {
     val model1 = Site(
         name = "Test 1",
         url = "https://test1.com",
+        tags = "",
         settings = null,
         lastResult = null,
         retryPolicy = null
@@ -145,6 +148,7 @@ class AppDatabaseTest() {
     val model2 = Site(
         name = "Test 2",
         url = "https://test2.com",
+        tags = "",
         settings = null,
         lastResult = null,
         retryPolicy = null
@@ -292,7 +296,7 @@ class AppDatabaseTest() {
     val newId = retryDao.insert(model)
     assertThat(newId).isEqualTo(1)
 
-    val finalModel = resultsDao.forSite(newId)
+    val finalModel = retryDao.forSite(newId)
         .single()
     assertThat(finalModel).isEqualTo(model.copy(siteId = newId))
   }
@@ -346,6 +350,25 @@ class AppDatabaseTest() {
     assertThat(allSites[0]).isEqualTo(MOCK_MODEL_1)
     assertThat(allSites[1]).isEqualTo(MOCK_MODEL_2)
     assertThat(allSites[2]).isEqualTo(MOCK_MODEL_3)
+  }
+
+  @Test fun extension_put_and_allSites_withTag() {
+    val model1 = MOCK_MODEL_1.copy(tags = "one,two,three")
+    val model2 = MOCK_MODEL_2.copy(tags = "four,five,six")
+    val model3 = MOCK_MODEL_3.copy(tags = "seven,eight,nine")
+
+    db.putSite(model1)
+    db.putSite(model2)
+    db.putSite(model3)
+
+    val allSites1 = db.allSites(forTag = "one")
+    assertThat(allSites1.single()).isEqualTo(model1)
+
+    val allSites2 = db.allSites(forTag = "five")
+    assertThat(allSites2.single()).isEqualTo(model2)
+
+    val allSites3 = db.allSites(forTag = "nine")
+    assertThat(allSites3.single()).isEqualTo(model3)
   }
 
   @Test fun extension_put_getSite() {

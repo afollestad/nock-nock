@@ -83,6 +83,7 @@ fun fakeModel(id: Long) = Site(
     id = id,
     name = "Test",
     url = "https://test.com",
+    tags = "",
     settings = fakeSettingsModel(id),
     lastResult = fakeResultModel(id),
     retryPolicy = fakeRetryPolicy(id)
