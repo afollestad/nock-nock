@@ -1,12 +1,13 @@
 <resources>
 
   <string name="app_name">Nock Nock</string>
+  <string name="app_name_x">Nock Nock %1$s</string>
 
   <string name="no_sites_added">No sites added!</string>
 
   <string name="about">About</string>
   <string name="about_body"><![CDATA[
-        <b>Nock Nock</b>, a simple app designed by <b>Aidan Follestad</b>.<br/>
+        A simple app designed by <b>Aidan Follestad</b>.<br/>
         <a href=\'https://af.codes\'>Website</a>&nbsp;&nbsp;
         <a href=\'https://twitter.com/afollestad\'>Twitter</a>&nbsp;&nbsp;
         <a href=\'https://github.com/afollestad\'>GitHub</a>&nbsp;&nbsp;
