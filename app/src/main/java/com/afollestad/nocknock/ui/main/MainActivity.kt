@@ -21,11 +21,13 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.DividerItemDecoration.VERTICAL
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItems
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.adapter.SiteAdapter
+import com.afollestad.nocknock.adapter.TagAdapter
 import com.afollestad.nocknock.broadcasts.StatusUpdateIntentReceiver
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.dialogs.AboutDialog
@@ -43,6 +45,7 @@ import kotlinx.android.synthetic.main.include_app_bar.toolbar
 import kotlinx.android.synthetic.main.include_empty_view.emptyText
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlinx.android.synthetic.main.activity_main.tags_list as tagsList
 
 /** @author Aidan Follestad (@afollestad) */
 class MainActivity : DarkModeSwitchActivity() {
@@ -53,6 +56,7 @@ class MainActivity : DarkModeSwitchActivity() {
   internal val viewModel by viewModel<MainViewModel>()
 
   private lateinit var siteAdapter: SiteAdapter
+  private lateinit var tagAdapter: TagAdapter
 
   private val statusUpdateReceiver by lazy {
     StatusUpdateIntentReceiver(application, intentProvider) {
@@ -76,6 +80,10 @@ class MainActivity : DarkModeSwitchActivity() {
         .observe(this, Observer { siteAdapter.set(it) })
     viewModel.onEmptyTextVisibility()
         .toViewVisibility(this, emptyText)
+    viewModel.onTags()
+        .observe(this, Observer { tagAdapter.set(it) })
+    viewModel.onTagsListVisibility()
+        .toViewVisibility(this, tagsList)
     loadingProgress.observe(this, viewModel.onIsLoading())
 
     processIntent(intent)
@@ -97,12 +105,18 @@ class MainActivity : DarkModeSwitchActivity() {
     }
 
     siteAdapter = SiteAdapter(this::onSiteSelected)
-
     list.run {
       layoutManager = LinearLayoutManager(this@MainActivity)
       adapter = siteAdapter
       addItemDecoration(DividerItemDecoration(this@MainActivity, VERTICAL))
     }
+
+    tagAdapter = TagAdapter(viewModel::onTagSelection)
+    tagsList.run {
+      layoutManager = LinearLayoutManager(this@MainActivity, HORIZONTAL, false)
+      adapter = tagAdapter
+    }
+
     fab.setOnClickListener { addSite() }
   }
 

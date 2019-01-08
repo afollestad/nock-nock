@@ -56,6 +56,7 @@ class AddSiteViewModel(
 
   // Public properties
   val name = MutableLiveData<String>()
+  val tags = MutableLiveData<String>()
   val url = MutableLiveData<String>()
   val timeout = MutableLiveData<Int>()
   val validationMode = MutableLiveData<ValidationMode>()
@@ -74,6 +75,7 @@ class AddSiteViewModel(
     checkIntervalUnit.value = MINUTE
     retryPolicyMinutes.value = 0
     retryPolicyMinutes.value = 0
+    tags.value = ""
   }
 
   // Private properties
@@ -224,6 +226,8 @@ class AddSiteViewModel(
       return null
     }
 
+    val cleanedTags = tags.value?.split(',')?.joinToString { it.trim() } ?: ""
+
     val newSettings = SiteSettings(
         validationIntervalMs = getCheckIntervalMs(),
         validationMode = validationMode.value!!,
@@ -252,6 +256,7 @@ class AddSiteViewModel(
         id = 0,
         name = name.value!!.trim(),
         url = url.value!!.trim(),
+        tags = cleanedTags,
         settings = newSettings,
         lastResult = newLastResult,
         retryPolicy = newRetryPolicy

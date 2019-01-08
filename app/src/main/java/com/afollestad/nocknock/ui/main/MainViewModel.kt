@@ -44,6 +44,8 @@ class MainViewModel(
   private val sites = MutableLiveData<List<Site>>()
   private val isLoading = MutableLiveData<Boolean>()
   private val emptyTextVisibility = MutableLiveData<Boolean>()
+  private val tags = MutableLiveData<List<String>>()
+  private val tagsListVisibility = MutableLiveData<Boolean>()
 
   @CheckResult fun onSites(): LiveData<List<Site>> = sites
 
@@ -51,8 +53,14 @@ class MainViewModel(
 
   @CheckResult fun onEmptyTextVisibility(): LiveData<Boolean> = emptyTextVisibility
 
+  @CheckResult fun onTags(): LiveData<List<String>> = tags
+
+  @CheckResult fun onTagsListVisibility(): LiveData<Boolean> = tagsListVisibility
+
   @OnLifecycleEvent(ON_RESUME)
-  fun onResume() = loadSites()
+  fun onResume() = loadSites(emptyList())
+
+  fun onTagSelection(tags: List<String>) = loadSites(tags)
 
   fun postSiteUpdate(model: Site) {
     val currentSites = sites.value ?: return
@@ -94,27 +102,49 @@ class MainViewModel(
     }
   }
 
-  private fun loadSites() {
+  private fun loadSites(forTags: List<String>) {
     scope.launch {
       notificationManager.cancelStatusNotifications()
-      sites.value = listOf()
       emptyTextVisibility.value = false
       isLoading.value = true
 
       val result = withContext(ioDispatcher) {
-        database.allSites()
+        database.allSites(forTags)
       }
 
       sites.value = result
       ensureCheckJobs()
       isLoading.value = false
       emptyTextVisibility.value = result.isEmpty()
+
+      if (forTags.isEmpty()) {
+        val tagsValues = pullOutTags(result)
+        tags.value = tagsValues
+        tagsListVisibility.value = tagsValues.isNotEmpty()
+      }
     }
   }
 
   private suspend fun ensureCheckJobs() {
     withContext(ioDispatcher) {
       validationManager.ensureScheduledChecks()
+    }
+  }
+
+  private fun pullOutTags(sites: List<Site>): List<String> {
+    return mutableListOf<String>().apply {
+      for (site in sites) {
+        val splitTags = site.tags.toLowerCase()
+            .split(',')
+        splitTags
+            .filter { it.isNotEmpty() }
+            .forEach { tag ->
+              if (!this.contains(tag)) {
+                this.add(tag)
+              }
+            }
+      }
+      sort()
     }
   }
 }

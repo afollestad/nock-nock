@@ -37,6 +37,7 @@ import kotlinx.android.synthetic.main.activity_viewsite.disableChecksButton
 import kotlinx.android.synthetic.main.activity_viewsite.doneBtn
 import kotlinx.android.synthetic.main.activity_viewsite.iconStatus
 import kotlinx.android.synthetic.main.activity_viewsite.inputName
+import kotlinx.android.synthetic.main.activity_viewsite.inputTags
 import kotlinx.android.synthetic.main.activity_viewsite.inputUrl
 import kotlinx.android.synthetic.main.activity_viewsite.loadingProgress
 import kotlinx.android.synthetic.main.activity_viewsite.responseTimeoutInput
@@ -94,6 +95,9 @@ class ViewSiteActivity : DarkModeSwitchActivity() {
     inputName.attachLiveData(this, viewModel.name)
     viewModel.onNameError()
         .toViewError(this, inputName)
+
+    // Tags
+    inputTags.attachLiveData(this, viewModel.tags)
 
     // Url
     inputUrl.attachLiveData(this, viewModel.url)

@@ -64,6 +64,7 @@ class ViewSiteViewModel(
   // Public properties
   val status = MutableLiveData<Status>()
   val name = MutableLiveData<String>()
+  val tags = MutableLiveData<String>()
   val url = MutableLiveData<String>()
   val timeout = MutableLiveData<Int>()
   val validationMode = MutableLiveData<ValidationMode>()
@@ -305,6 +306,8 @@ class ViewSiteViewModel(
       return null
     }
 
+    val cleanedTags = tags.value?.split(',')?.joinToString { it.trim() } ?: ""
+
     val newSettings = site.settings!!.copy(
         validationIntervalMs = getCheckIntervalMs(),
         validationMode = validationMode.value!!,
@@ -332,6 +335,7 @@ class ViewSiteViewModel(
 
     return site.copy(
         name = name.value!!.trim(),
+        tags = cleanedTags,
         url = url.value!!.trim(),
         settings = newSettings,
         retryPolicy = retryPolicy

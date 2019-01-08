@@ -32,6 +32,7 @@ fun ViewSiteViewModel.setModel(site: Site) {
 
   status.value = site.lastResult?.status ?: WAITING
   name.value = site.name
+  tags.value = site.tags
   url.value = site.url
   timeout.value = settings.networkTimeout
 

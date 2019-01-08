@@ -28,6 +28,7 @@ import com.afollestad.nocknock.viewcomponents.livedata.toViewVisibility
 import kotlinx.android.synthetic.main.activity_addsite.checkIntervalLayout
 import kotlinx.android.synthetic.main.activity_addsite.doneBtn
 import kotlinx.android.synthetic.main.activity_addsite.inputName
+import kotlinx.android.synthetic.main.activity_addsite.inputTags
 import kotlinx.android.synthetic.main.activity_addsite.inputUrl
 import kotlinx.android.synthetic.main.activity_addsite.loadingProgress
 import kotlinx.android.synthetic.main.activity_addsite.responseTimeoutInput
@@ -61,6 +62,9 @@ class AddSiteActivity : DarkModeSwitchActivity() {
     inputName.attachLiveData(this, viewModel.name)
     viewModel.onNameError()
         .toViewError(this, inputName)
+
+    // Tags
+    inputTags.attachLiveData(this, viewModel.tags)
 
     // Url
     inputUrl.attachLiveData(this, viewModel.url)

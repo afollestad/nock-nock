@@ -9,5 +9,7 @@
 
   <color name="lighterGray">#303030</color>
   <color name="colorAccent">#FF6E40</color>
+  <color name="colorAccent_pressed">#E44615</color>
+  <color name="colorAccent_translucent">#40FF6E40</color>
 
 </resources>

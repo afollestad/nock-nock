@@ -27,7 +27,7 @@ class Database1to2Migration : Migration(1, 2) {
 
   override fun migrate(database: SupportSQLiteDatabase) {
     database.execSQL(
-        "CREATE TABLE `retry_policies` (siteId INTEGER PRIMARY KEY NOT NULL, count INTEGER NOT NULL, minutes INTEGER NOT NULL)"
+        "CREATE TABLE `retry_policies` (siteId INTEGER PRIMARY KEY NOT NULL, count INTEGER NOT NULL, minutes INTEGER NOT NULL, lastTryTimestamp INTEGER NOT NULL, triesLeft INTEGER NOT NULL)"
     )
   }
 }
@@ -37,9 +37,9 @@ class Database1to2Migration : Migration(1, 2) {
  *
  * @author Aidan Follestad (@afollestad)
  */
-class Database2to3Migration : Migration(1, 2) {
+class Database2to3Migration : Migration(2, 3) {
 
   override fun migrate(database: SupportSQLiteDatabase) {
-    database.execSQL("ALTER TABLE `sites` ADD COLUMN tags TEXT NOT NULL")
+    database.execSQL("ALTER TABLE `sites` ADD COLUMN tags TEXT NOT NULL DEFAULT ''")
   }
 }

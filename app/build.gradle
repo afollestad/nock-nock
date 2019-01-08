@@ -66,9 +66,6 @@ dependencies {
   // afollestad
   implementation 'com.afollestad.material-dialogs:core:' + versions.materialDialogs
 
-  // Misc
-  implementation 'com.github.okdroid:checkablechipview:' + versions.chipView
-
   // Debugging
   implementation 'com.jakewharton.timber:timber:' + versions.timber
   implementation("com.crashlytics.sdk.android:crashlytics:${versions.fabric}") {

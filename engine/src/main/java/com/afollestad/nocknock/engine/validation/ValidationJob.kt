@@ -225,6 +225,7 @@ class ValidationJob : JobService() {
     triesLeft: Int
   ) {
     retryPolicy.triesLeft = triesLeft
+    retryPolicy.lastTryTimestamp = currentTimeMillis()
     withContext(IO) {
       database.retryPolicyDao()
           .update(retryPolicy)

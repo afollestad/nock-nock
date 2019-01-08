@@ -68,6 +68,18 @@
                 />
 
             <EditText
+                android:id="@+id/inputTags"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:digits=",.?-_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ "
+                android:hint="@string/site_tags_hint"
+                android:inputType="text|textCapWords"
+                android:singleLine="true"
+                tools:ignore="Autofill,UnusedAttribute"
+                style="@style/NockText.Body"
+                />
+
+            <EditText
                 android:id="@+id/inputUrl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -123,9 +135,9 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="-4dp"
             android:layout_marginStart="-4dp"
+            android:layout_marginTop="@dimen/content_inset_quarter"
             android:hint="@string/response_timeout_default"
             android:inputType="number"
-            android:layout_marginTop="@dimen/content_inset_quarter"
             android:maxLength="8"
             tools:ignore="Autofill,HardcodedText,LabelFor"
             style="@style/NockText.Body"

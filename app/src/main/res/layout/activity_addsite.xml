@@ -50,6 +50,27 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tagsTiLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="-4dp"
+            android:layout_marginRight="-4dp"
+            android:layout_marginTop="@dimen/content_inset_less"
+            >
+
+          <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/inputTags"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:digits=",.?-_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ "
+              android:hint="@string/site_tags_hint"
+              android:inputType="textPersonName|textCapWords|textAutoCorrect"
+              style="@style/NockText.Body"
+              />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/urlTiLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

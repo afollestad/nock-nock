@@ -32,7 +32,7 @@ import com.afollestad.nocknock.data.model.ValidationResult
       SiteSettings::class,
       Site::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -52,13 +52,13 @@ abstract class AppDatabase : RoomDatabase() {
  *
  * @author Aidan Follestad (@afollestad)
  */
-fun AppDatabase.allSites(forTag: String = ""): List<Site> {
-  val lowercaseTag = forTag.toLowerCase()
+fun AppDatabase.allSites(tags: List<String> = emptyList()): List<Site> {
   var all = siteDao().all()
-  if (!forTag.isEmpty()) {
-    all = all.filter {
-      forTag.isEmpty() ||
-          it.tags.toLowerCase().split(",").contains(lowercaseTag)
+  if (tags.isNotEmpty()) {
+    all = all.filter { site ->
+      val itemTags = site.tags.toLowerCase()
+          .split(",")
+      return@filter itemTags.any { tag -> tags.contains(tag) }
     }
   }
   return all.map {
