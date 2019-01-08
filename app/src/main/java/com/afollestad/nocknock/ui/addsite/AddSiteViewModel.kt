@@ -28,10 +28,12 @@ import com.afollestad.nocknock.data.AppDatabase
 import com.afollestad.nocknock.data.RetryPolicy
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.SiteSettings
+import com.afollestad.nocknock.data.model.Status.WAITING
 import com.afollestad.nocknock.data.model.ValidationMode
 import com.afollestad.nocknock.data.model.ValidationMode.JAVASCRIPT
 import com.afollestad.nocknock.data.model.ValidationMode.STATUS_CODE
 import com.afollestad.nocknock.data.model.ValidationMode.TERM_SEARCH
+import com.afollestad.nocknock.data.model.ValidationResult
 import com.afollestad.nocknock.data.putSite
 import com.afollestad.nocknock.engine.validation.ValidationManager
 import com.afollestad.nocknock.ui.ScopedViewModel
@@ -42,6 +44,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
+import java.lang.System.currentTimeMillis
 
 /** @author Aidan Follestad (@afollestad) */
 class AddSiteViewModel(
@@ -229,9 +232,15 @@ class AddSiteViewModel(
         disabled = false
     )
 
+    val newLastResult = ValidationResult(
+        timestampMs = currentTimeMillis(),
+        status = WAITING,
+        reason = null
+    )
+
     val retryPolicyTimes = retryPolicyTimes.value ?: 0
     val retryPolicyMinutes = retryPolicyMinutes.value ?: 0
-    val retryPolicy: RetryPolicy? = if (retryPolicyTimes > 0 && retryPolicyMinutes > 0) {
+    val newRetryPolicy: RetryPolicy? = if (retryPolicyTimes > 0 && retryPolicyMinutes > 0) {
       RetryPolicy(count = retryPolicyTimes, minutes = retryPolicyMinutes)
     } else {
       null
@@ -242,8 +251,8 @@ class AddSiteViewModel(
         name = name.value!!.trim(),
         url = url.value!!.trim(),
         settings = newSettings,
-        lastResult = null,
-        retryPolicy = retryPolicy
+        lastResult = newLastResult,
+        retryPolicy = newRetryPolicy
     )
   }
 }

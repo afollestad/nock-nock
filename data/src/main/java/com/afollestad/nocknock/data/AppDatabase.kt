@@ -98,10 +98,12 @@ fun AppDatabase.putSite(site: Site): Site {
   val settings = site.settings ?: throw IllegalArgumentException("Settings cannot be null.")
   val newId = siteDao().insert(site)
   val settingsWithSiteId = settings.copy(siteId = newId)
+  val lastResultWithSiteId = site.lastResult?.copy(siteId = newId)
+  val retryPolicyWithSiteId = site.retryPolicy?.copy(siteId = newId)
   siteSettingsDao().insert(settingsWithSiteId)
 
-  site.lastResult?.let { validationResultsDao().insert(it) }
-  site.retryPolicy?.let { retryPolicyDao().insert(it) }
+  lastResultWithSiteId?.let { validationResultsDao().insert(it) }
+  retryPolicyWithSiteId?.let { retryPolicyDao().insert(it) }
 
   return site.copy(
       id = newId,

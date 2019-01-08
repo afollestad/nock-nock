@@ -136,7 +136,6 @@ class AddSiteActivity : DarkModeSwitchActivity() {
       viewModel.commit {
         setResult(RESULT_OK)
         finish()
-        overridePendingTransition(R.anim.fade_out, R.anim.fade_out)
       }
     }
   }
