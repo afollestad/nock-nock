@@ -108,8 +108,17 @@ class MainViewModel(
       emptyTextVisibility.value = false
       isLoading.value = true
 
-      val result = withContext(ioDispatcher) {
-        database.allSites(forTags)
+      val unfiltered = withContext(ioDispatcher) {
+        database.allSites()
+      }
+      var result = unfiltered
+
+      if (forTags.isNotEmpty()) {
+        result = result.filter { site ->
+          val itemTags = site.tags.toLowerCase()
+              .split(",")
+          itemTags.any { tag -> forTags.contains(tag) }
+        }
       }
 
       sites.value = result
@@ -117,11 +126,9 @@ class MainViewModel(
       isLoading.value = false
       emptyTextVisibility.value = result.isEmpty()
 
-      if (forTags.isEmpty()) {
-        val tagsValues = pullOutTags(result)
-        tags.value = tagsValues
-        tagsListVisibility.value = tagsValues.isNotEmpty()
-      }
+      val tagsValues = pullOutTags(unfiltered)
+      tags.value = tagsValues
+      tagsListVisibility.value = tagsValues.isNotEmpty()
     }
   }
 

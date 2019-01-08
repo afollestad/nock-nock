@@ -29,7 +29,7 @@
           android:paddingBottom="@dimen/content_inset"
           android:paddingLeft="@dimen/content_inset"
           android:paddingRight="@dimen/content_inset"
-          android:paddingTop="@dimen/content_inset"
+          android:paddingTop="@dimen/content_inset_half"
           >
 
         <LinearLayout
@@ -61,20 +61,9 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/site_name"
                 android:inputType="textPersonName|textCapWords|textAutoCorrect"
+                android:nextFocusDown="@+id/inputUrl"
                 android:singleLine="true"
                 android:transitionName="site_name"
-                tools:ignore="Autofill,UnusedAttribute"
-                style="@style/NockText.Body"
-                />
-
-            <EditText
-                android:id="@+id/inputTags"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:digits=",.?-_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ "
-                android:hint="@string/site_tags_hint"
-                android:inputType="text|textCapWords"
-                android:singleLine="true"
                 tools:ignore="Autofill,UnusedAttribute"
                 style="@style/NockText.Body"
                 />
@@ -85,6 +74,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/site_url"
                 android:inputType="textUri"
+                android:nextFocusDown="@+id/inputTags"
                 android:singleLine="true"
                 android:transitionName="site_url"
                 tools:ignore="Autofill,UnusedAttribute"
@@ -101,6 +91,19 @@
                 android:visibility="gone"
                 tools:text="Warning: this app checks for server availability with HTTP requests. It's recommended that you use an HTTP URL."
                 style="@style/NockText.Footnote"
+                />
+
+            <EditText
+                android:id="@+id/inputTags"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:digits=",.?-_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ "
+                android:hint="@string/site_tags_hint"
+                android:imeOptions="actionNext"
+                android:inputType="text|textCapWords"
+                android:singleLine="true"
+                tools:ignore="Autofill,UnusedAttribute"
+                style="@style/NockText.Body"
                 />
 
           </LinearLayout>
@@ -196,6 +199,13 @@
             android:lineSpacingMultiplier="1.2"
             android:text="@string/validation_mode_status_desc"
             style="@style/NockText.Body.Light"
+            />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/content_inset_less"
+            android:background="?dividerColor"
             />
 
         <com.afollestad.nocknock.viewcomponents.retrypolicy.RetryPolicyLayout

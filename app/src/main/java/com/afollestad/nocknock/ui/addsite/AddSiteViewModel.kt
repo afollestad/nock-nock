@@ -189,7 +189,8 @@ class AddSiteViewModel(
     }
 
     // Validate timeout
-    if (timeout.value.isNullOrLessThan(1)) {
+    val timeout = timeout.value ?: 10_000
+    if (timeout < 0) {
       timeoutError.value = R.string.please_enter_networkTimeout
       errorCount++
     } else {
@@ -232,7 +233,7 @@ class AddSiteViewModel(
         validationIntervalMs = getCheckIntervalMs(),
         validationMode = validationMode.value!!,
         validationArgs = getValidationArgs(),
-        networkTimeout = timeout.value!!,
+        networkTimeout = timeout,
         disabled = false
     )
 
