@@ -19,6 +19,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.afollestad.nocknock.data.model.Converters
+import com.afollestad.nocknock.data.model.RetryPolicy
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.SiteSettings
 import com.afollestad.nocknock.data.model.ValidationResult

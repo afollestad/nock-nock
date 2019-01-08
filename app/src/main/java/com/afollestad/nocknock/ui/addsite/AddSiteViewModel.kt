@@ -25,7 +25,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.OnLifecycleEvent
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.data.AppDatabase
-import com.afollestad.nocknock.data.RetryPolicy
+import com.afollestad.nocknock.data.model.RetryPolicy
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.SiteSettings
 import com.afollestad.nocknock.data.model.Status.WAITING
@@ -241,7 +241,9 @@ class AddSiteViewModel(
     val retryPolicyTimes = retryPolicyTimes.value ?: 0
     val retryPolicyMinutes = retryPolicyMinutes.value ?: 0
     val newRetryPolicy: RetryPolicy? = if (retryPolicyTimes > 0 && retryPolicyMinutes > 0) {
-      RetryPolicy(count = retryPolicyTimes, minutes = retryPolicyMinutes)
+      RetryPolicy(
+          count = retryPolicyTimes, minutes = retryPolicyMinutes
+      )
     } else {
       null
     }

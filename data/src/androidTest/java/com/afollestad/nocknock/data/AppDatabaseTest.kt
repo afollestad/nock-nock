@@ -21,6 +21,7 @@ import android.content.Context
 import androidx.room.Room.inMemoryDatabaseBuilder
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.runner.AndroidJUnit4
+import com.afollestad.nocknock.data.model.RetryPolicy
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.SiteSettings
 import com.afollestad.nocknock.data.model.Status.ERROR

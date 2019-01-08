@@ -19,7 +19,7 @@ import android.app.job.JobParameters
 import android.app.job.JobService
 import android.content.Intent
 import com.afollestad.nocknock.data.AppDatabase
-import com.afollestad.nocknock.data.RetryPolicy
+import com.afollestad.nocknock.data.model.RetryPolicy
 import com.afollestad.nocknock.data.getSite
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.Status

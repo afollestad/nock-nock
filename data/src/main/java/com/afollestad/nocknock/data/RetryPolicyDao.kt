@@ -21,6 +21,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy.FAIL
 import androidx.room.Query
 import androidx.room.Update
+import com.afollestad.nocknock.data.model.RetryPolicy
 
 /** @author Aidan Follestad (@afollestad) */
 @Dao

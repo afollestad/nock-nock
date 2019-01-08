@@ -19,7 +19,7 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.content.IntentFilter
 import com.afollestad.nocknock.data.AppDatabase
-import com.afollestad.nocknock.data.RetryPolicy
+import com.afollestad.nocknock.data.model.RetryPolicy
 import com.afollestad.nocknock.data.RetryPolicyDao
 import com.afollestad.nocknock.data.SiteDao
 import com.afollestad.nocknock.data.SiteSettingsDao

@@ -15,6 +15,7 @@
  */
 package com.afollestad.nocknock.data
 
+import com.afollestad.nocknock.data.model.RetryPolicy
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.SiteSettings
 import com.afollestad.nocknock.data.model.Status

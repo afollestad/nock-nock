@@ -18,7 +18,6 @@ package com.afollestad.nocknock.data.model
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import com.afollestad.nocknock.data.RetryPolicy
 import com.afollestad.nocknock.data.model.Status.WAITING
 import com.afollestad.nocknock.utilities.ext.timeString
 import com.afollestad.nocknock.utilities.providers.CanNotifyModel

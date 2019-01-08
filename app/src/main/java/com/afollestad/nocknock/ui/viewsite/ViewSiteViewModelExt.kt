@@ -15,7 +15,7 @@
  */
 package com.afollestad.nocknock.ui.viewsite
 
-import com.afollestad.nocknock.data.RetryPolicy
+import com.afollestad.nocknock.data.model.RetryPolicy
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.Status.WAITING
 import com.afollestad.nocknock.data.model.ValidationMode.JAVASCRIPT

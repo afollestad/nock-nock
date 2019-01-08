@@ -23,7 +23,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.data.AppDatabase
-import com.afollestad.nocknock.data.RetryPolicy
+import com.afollestad.nocknock.data.model.RetryPolicy
 import com.afollestad.nocknock.data.deleteSite
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.Status
@@ -321,7 +321,9 @@ class ViewSiteViewModel(
         site.retryPolicy!!.copy(count = retryPolicyTimes, minutes = retryPolicyMinutes)
       } else {
         // Create new policy
-        RetryPolicy(count = retryPolicyTimes, minutes = retryPolicyMinutes)
+        RetryPolicy(
+            count = retryPolicyTimes, minutes = retryPolicyMinutes
+        )
       }
     } else {
       // No policy
