@@ -53,6 +53,8 @@ data class Site(
 
   override fun notifyTag(): String = url
 
+  override fun notifyDescription() = lastResult?.reason
+
   fun intervalText(): String {
     requireNotNull(settings) { "Settings not queried." }
     val lastCheck = lastResult?.timestampMs ?: -1

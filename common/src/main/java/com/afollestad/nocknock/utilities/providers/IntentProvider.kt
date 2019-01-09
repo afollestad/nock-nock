@@ -30,6 +30,8 @@ interface CanNotifyModel : Serializable {
   fun notifyName(): String
 
   fun notifyTag(): String
+
+  fun notifyDescription(): String?
 }
 
 /** @author Aidan Follestad (@afollestad) */

@@ -73,7 +73,7 @@ class RealNockNotificationManager(
     val newNotification = notificationProvider.create(
         channelId = CheckFailures.id,
         title = model.notifyName(),
-        content = stringProvider.get(R.string.something_wrong),
+        content = model.notifyDescription() ?: stringProvider.get(R.string.something_wrong),
         intent = intent,
         smallIcon = R.drawable.ic_notification
     )
