@@ -19,8 +19,8 @@ import android.app.job.JobParameters
 import android.app.job.JobService
 import android.content.Intent
 import com.afollestad.nocknock.data.AppDatabase
-import com.afollestad.nocknock.data.model.RetryPolicy
 import com.afollestad.nocknock.data.getSite
+import com.afollestad.nocknock.data.model.RetryPolicy
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.Status
 import com.afollestad.nocknock.data.model.Status.CHECKING
@@ -80,6 +80,10 @@ class ValidationJob : JobService() {
       sendBroadcast(Intent(ACTION_JOB_RUNNING).apply { putExtra(KEY_SITE_ID, site.id) })
 
       log("Checking ${site.name} (${site.url})...")
+      val lastResult = site.lastResult
+      if (lastResult != null) {
+        log("Result of previous attempt: ${lastResult.status}")
+      }
 
       val jobResult = async(IO) {
         updateStatus(site, CHECKING)
@@ -139,6 +143,9 @@ class ValidationJob : JobService() {
 
       if (jobResult.lastResult!!.status == OK) {
         notificationManager.cancelStatusNotification(jobResult)
+        if (lastResult != null && lastResult.status != OK) {
+          notificationManager.postValidationSuccessNotification(jobResult)
+        }
       } else {
         val retryPolicy = site.retryPolicy
         if (retryPolicy != null) {
@@ -167,7 +174,7 @@ class ValidationJob : JobService() {
           }
         }
 
-        notificationManager.postStatusNotification(jobResult)
+        notificationManager.postValidationErrorNotification(jobResult)
       }
 
       validationManager.scheduleValidation(

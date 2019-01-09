@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-  <string name="channel_server_check_failures_title">Server Check Failures</string>
+  <string name="channel_server_check_failures_title">Site Validation Failures</string>
   <string name="channel_server_check_failures_description">
-    Notifications for Nock Nock status checks failing for your sites. Something has gone
+    Notifications for Nock Nock validations failing for your sites. Something has gone
     wrong if you see one of these.
   </string>
 
+  <string name="channel_server_check_success_title">Site Validation Success</string>
+  <string name="channel_server_check_success_description">
+    Notifications for Nock Nock when a site validation passes when it previously had not.
+  </string>
+
   <string name="something_wrong">Something\'s wrong! Tap for details.</string>
+  <string name="validation_passed">Yay! No longer in trouble! Validation passed.</string>
 
 </resources>

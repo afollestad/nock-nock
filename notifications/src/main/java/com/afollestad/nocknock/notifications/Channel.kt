@@ -24,7 +24,13 @@ enum class Channel(
   val description: Int,
   val importance: Int
 ) {
-  CheckFailures(
+  ValidationSuccess(
+      id = "check_success",
+      title = R.string.channel_server_check_success_title,
+      description = R.string.channel_server_check_success_description,
+      importance = IMPORTANCE_DEFAULT
+  ),
+  ValidationErrors(
       id = "check_failures",
       title = R.string.channel_server_check_failures_title,
       description = R.string.channel_server_check_failures_description,

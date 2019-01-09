@@ -18,7 +18,7 @@ package com.afollestad.nocknock.notifications
 import android.annotation.TargetApi
 import android.app.NotificationManager
 import android.os.Build.VERSION_CODES
-import com.afollestad.nocknock.notifications.Channel.CheckFailures
+import com.afollestad.nocknock.notifications.Channel.ValidationErrors
 import com.afollestad.nocknock.utilities.providers.CanNotifyModel
 import com.afollestad.nocknock.utilities.providers.IntentProvider
 import com.afollestad.nocknock.utilities.providers.NotificationChannelProvider
@@ -34,7 +34,9 @@ interface NockNotificationManager {
 
   fun createChannels()
 
-  fun postStatusNotification(model: CanNotifyModel)
+  fun postValidationErrorNotification(model: CanNotifyModel)
+
+  fun postValidationSuccessNotification(model: CanNotifyModel)
 
   fun cancelStatusNotification(model: CanNotifyModel)
 
@@ -60,26 +62,48 @@ class RealNockNotificationManager(
   override fun createChannels() =
     Channel.values().forEach(this::createChannel)
 
-  override fun postStatusNotification(model: CanNotifyModel) {
+  override fun postValidationErrorNotification(model: CanNotifyModel) {
     if (isAppOpen) {
       // Don't show notifications while the app is open
-      log("App is open, status notification for site ${model.notifyId()} won't be posted.")
+      log("App is open, validation error notification for site ${model.notifyId()} won't be posted.")
       return
     }
 
-    log("Posting status notification for site ${model.notifyId()}...")
+    log("Posting validation error notification for site ${model.notifyId()}...")
     val intent = intentProvider.getPendingIntentForViewSite(model)
 
     val newNotification = notificationProvider.create(
-        channelId = CheckFailures.id,
+        channelId = ValidationErrors.id,
         title = model.notifyName(),
         content = model.notifyDescription() ?: stringProvider.get(R.string.something_wrong),
         intent = intent,
-        smallIcon = R.drawable.ic_notification
+        smallIcon = R.drawable.ic_notification_error
     )
 
     stockManager.notify(model.notifyTag(), model.notificationId(), newNotification)
-    log("Posted status notification for site ${model.notificationId()}.")
+    log("Posted validation error notification for site ${model.notificationId()}.")
+  }
+
+  override fun postValidationSuccessNotification(model: CanNotifyModel) {
+    if (isAppOpen) {
+      // Don't show notifications while the app is open
+      log("App is open, validation success notification for site ${model.notifyId()} won't be posted.")
+      return
+    }
+
+    log("Posting validation success notification for site ${model.notifyId()}...")
+    val intent = intentProvider.getPendingIntentForViewSite(model)
+
+    val newNotification = notificationProvider.create(
+        channelId = ValidationErrors.id,
+        title = model.notifyName(),
+        content = stringProvider.get(R.string.validation_passed),
+        intent = intent,
+        smallIcon = R.drawable.ic_notification_success
+    )
+
+    stockManager.notify(model.notifyTag(), model.notificationId(), newNotification)
+    log("Posted validation success notification for site ${model.notificationId()}.")
   }
 
   override fun cancelStatusNotification(model: CanNotifyModel) {
