@@ -165,7 +165,7 @@ class RealValidationExecutor(
       val response = client.newCall(request)
           .execute()
 
-      if (response.isSuccessful || response.code() == 401) {
+      if (response.isSuccessful) {
         log("performValidation(${site.id}) = Successful")
         CheckResult(
             model = site.withStatus(status = OK, reason = null),
