@@ -27,7 +27,7 @@ class Database1to2Migration : Migration(1, 2) {
 
   override fun migrate(database: SupportSQLiteDatabase) {
     database.execSQL(
-        "CREATE TABLE `retry_policies` (siteId INTEGER PRIMARY KEY NOT NULL, count INTEGER NOT NULL, minutes INTEGER NOT NULL, lastTryTimestamp INTEGER NOT NULL, triesLeft INTEGER NOT NULL)"
+        "CREATE TABLE IF NOT EXISTS `retry_policies` (siteId INTEGER PRIMARY KEY NOT NULL, count INTEGER NOT NULL, minutes INTEGER NOT NULL, lastTryTimestamp INTEGER NOT NULL, triesLeft INTEGER NOT NULL)"
     )
   }
 }
@@ -53,7 +53,7 @@ class Database3to4Migration : Migration(3, 4) {
 
   override fun migrate(database: SupportSQLiteDatabase) {
     database.execSQL(
-        "CREATE TABLE `headers` (id INTEGER PRIMARY KEY NOT NULL, siteId INTEGER NOT NULL, `key` TEXT NOT NULL, value TEXT NOT NULL)"
+        "CREATE TABLE IF NOT EXISTS `headers` (id INTEGER PRIMARY KEY NOT NULL, siteId INTEGER NOT NULL, `key` TEXT NOT NULL, value TEXT NOT NULL)"
     )
   }
 }

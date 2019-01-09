@@ -143,7 +143,7 @@ class ValidationJob : JobService() {
 
       if (jobResult.lastResult!!.status == OK) {
         notificationManager.cancelStatusNotification(jobResult)
-        if (lastResult != null && lastResult.status != OK) {
+        if (lastResult != null && lastResult.status == ERROR) {
           notificationManager.postValidationSuccessNotification(jobResult)
         }
       } else {
