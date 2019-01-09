@@ -21,12 +21,14 @@ import android.widget.ArrayAdapter
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.data.model.ValidationMode
 import com.afollestad.nocknock.ui.DarkModeSwitchActivity
+import com.afollestad.nocknock.viewcomponents.ext.dimenFloat
+import com.afollestad.nocknock.viewcomponents.ext.onScroll
 import com.afollestad.nocknock.viewcomponents.livedata.attachLiveData
 import com.afollestad.nocknock.viewcomponents.livedata.toViewError
 import com.afollestad.nocknock.viewcomponents.livedata.toViewText
 import com.afollestad.nocknock.viewcomponents.livedata.toViewVisibility
 import kotlinx.android.synthetic.main.activity_addsite.checkIntervalLayout
-import kotlinx.android.synthetic.main.activity_addsite.doneBtn
+import kotlinx.android.synthetic.main.activity_addsite.headersLayout
 import kotlinx.android.synthetic.main.activity_addsite.inputName
 import kotlinx.android.synthetic.main.activity_addsite.inputTags
 import kotlinx.android.synthetic.main.activity_addsite.inputUrl
@@ -36,10 +38,12 @@ import kotlinx.android.synthetic.main.activity_addsite.responseValidationMode
 import kotlinx.android.synthetic.main.activity_addsite.responseValidationSearchTerm
 import kotlinx.android.synthetic.main.activity_addsite.retryPolicyLayout
 import kotlinx.android.synthetic.main.activity_addsite.scriptInputLayout
+import kotlinx.android.synthetic.main.activity_addsite.scrollView
 import kotlinx.android.synthetic.main.activity_addsite.textUrlWarning
 import kotlinx.android.synthetic.main.activity_addsite.validationModeDescription
 import kotlinx.android.synthetic.main.include_app_bar.toolbar
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlinx.android.synthetic.main.include_app_bar.app_toolbar as appToolbar
 import kotlinx.android.synthetic.main.include_app_bar.toolbar_title as toolbarTitle
 
 /** @author Aidan Follestad (@afollestad) */
@@ -118,11 +122,24 @@ class AddSiteActivity : DarkModeSwitchActivity() {
         timesData = viewModel.retryPolicyTimes,
         minutesData = viewModel.retryPolicyMinutes
     )
+
+    // Headers
+    headersLayout.attach(viewModel.headers)
   }
 
   private fun setupUi() {
     toolbarTitle.setText(R.string.add_site)
     toolbar.run {
+      inflateMenu(R.menu.menu_addsite)
+      setOnMenuItemClickListener {
+        if (it.itemId == R.id.commit) {
+          viewModel.commit {
+            setResult(RESULT_OK)
+            finish()
+          }
+        }
+        true
+      }
       setNavigationIcon(R.drawable.ic_action_close)
       setNavigationOnClickListener { finish() }
     }
@@ -135,11 +152,11 @@ class AddSiteActivity : DarkModeSwitchActivity() {
     validationOptionsAdapter.setDropDownViewResource(R.layout.list_item_spinner_dropdown)
     responseValidationMode.adapter = validationOptionsAdapter
 
-    // Done button
-    doneBtn.setOnClickListener {
-      viewModel.commit {
-        setResult(RESULT_OK)
-        finish()
+    scrollView.onScroll {
+      appToolbar.elevation = if (it > appToolbar.measuredHeight / 2) {
+        appToolbar.dimenFloat(R.dimen.default_elevation)
+      } else {
+        0f
       }
     }
   }

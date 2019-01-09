@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:parentTag="android.widget.LinearLayout"
+    >
+
+  <EditText
+      android:id="@+id/inputKey"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_vertical"
+      android:layout_marginEnd="@dimen/content_inset_quarter"
+      android:layout_marginStart="-4dp"
+      android:layout_weight="1"
+      android:hint="@string/header_name"
+      android:inputType="text"
+      android:nextFocusDown="@+id/inputValue"
+      android:nextFocusRight="@+id/inputValue"
+      android:singleLine="true"
+      tools:ignore="Autofill,UnusedAttribute"
+      style="@style/NockText.Body"
+      />
+
+  <ImageView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_vertical"
+      android:focusable="false"
+      android:focusableInTouchMode="false"
+      android:src="@drawable/ic_chevron_right"
+      tools:ignore="ContentDescription"
+      />
+
+  <EditText
+      android:id="@+id/inputValue"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_vertical"
+      android:layout_marginStart="@dimen/content_inset_quarter"
+      android:layout_weight="1"
+      android:hint="@string/header_value"
+      android:inputType="text"
+      android:singleLine="true"
+      tools:ignore="Autofill,UnusedAttribute"
+      style="@style/NockText.Body"
+      />
+
+  <androidx.appcompat.widget.AppCompatImageButton
+      android:id="@+id/btnRemove"
+      android:layout_width="48dp"
+      android:layout_height="48dp"
+      android:layout_marginStart="@dimen/content_inset_half"
+      android:background="?selectableItemBackground"
+      android:src="@drawable/ic_close"
+      />
+
+</merge>

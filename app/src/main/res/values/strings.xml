@@ -20,9 +20,11 @@
   <string name="dismiss">Dismiss</string>
   <string name="add_site">Add Site</string>
   <string name="site_name">Site Name</string>
+  <string name="site_name_hint">Site display name</string>
   <string name="site_url">Site URL</string>
+  <string name="site_url_hint">https://yoursite.com</string>
   <string name="site_tags">Site Tags</string>
-  <string name="site_tags_hint">Site Tags (one, two, three)</string>
+  <string name="site_tags_hint">One,Two,Three</string>
   <string name="please_enter_name">Please enter a name!</string>
   <string name="please_enter_url">Please enter a URL.</string>
   <string name="please_enter_valid_url">Please enter a valid URL.</string>
@@ -46,8 +48,8 @@
   <string name="disable_automatic_checks">Disable Automatic Validation</string>
   <string name="disable_automatic_checks_prompt"><![CDATA[
       Disable automatic validation for <b>%1$s</b>? The site will not be checked in the background
-      until you re-enable validation for it. You can still manually perform validation by tapping the
-      Refresh icon at the top of this page.
+      until you re-enable validation by tapping the checkmark (Save) icon. You can still manually
+      perform validation by tapping the Refresh icon at the top of this page.
   ]]></string>
   <string name="disable">Disable</string>
   <string name="renable_and_save_changes">Enable Auto Validation &amp; Save Changes</string>

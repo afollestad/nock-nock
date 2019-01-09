@@ -6,6 +6,7 @@
   <string name="function_end">}</string>
 
   <string name="check_interval">Check Interval</string>
+  <string name="check_interval_every">Every</string>
 
   <string name="retry_policy">Retry Policy</string>
   <string name="retry_policy_retry">Retry</string>
@@ -15,5 +16,11 @@
     If a validation fails, perform additional checks sooner by setting the above to non-zero
     values. After retrying %1$d times over %2$d minutes with no success, you will get a notification.
   </string>
+
+  <string name="headers">Headers</string>
+  <string name="add_header">Add Header…</string>
+  <string name="header_desc">Add HTTP headers to each request made to validate this site.</string>
+  <string name="header_name">Header Name</string>
+  <string name="header_value">Header Value</string>
 
 </resources>

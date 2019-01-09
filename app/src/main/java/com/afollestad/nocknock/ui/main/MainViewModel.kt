@@ -25,7 +25,7 @@ import com.afollestad.nocknock.data.AppDatabase
 import com.afollestad.nocknock.data.allSites
 import com.afollestad.nocknock.data.deleteSite
 import com.afollestad.nocknock.data.model.Site
-import com.afollestad.nocknock.engine.validation.ValidationManager
+import com.afollestad.nocknock.engine.validation.ValidationExecutor
 import com.afollestad.nocknock.notifications.NockNotificationManager
 import com.afollestad.nocknock.ui.ScopedViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -36,7 +36,7 @@ import kotlinx.coroutines.withContext
 class MainViewModel(
   private val database: AppDatabase,
   private val notificationManager: NockNotificationManager,
-  private val validationManager: ValidationManager,
+  private val validationManager: ValidationExecutor,
   mainDispatcher: CoroutineDispatcher,
   private val ioDispatcher: CoroutineDispatcher
 ) : ScopedViewModel(mainDispatcher), LifecycleObserver {
@@ -73,7 +73,7 @@ class MainViewModel(
   }
 
   fun refreshSite(model: Site) {
-    validationManager.scheduleCheck(
+    validationManager.scheduleValidation(
         site = model,
         rightNow = true,
         cancelPrevious = true
@@ -81,7 +81,7 @@ class MainViewModel(
   }
 
   fun removeSite(model: Site) {
-    validationManager.cancelCheck(model)
+    validationManager.cancelScheduledValidation(model)
     notificationManager.cancelStatusNotification(model)
 
     scope.launch {
@@ -134,7 +134,7 @@ class MainViewModel(
 
   private suspend fun ensureCheckJobs() {
     withContext(ioDispatcher) {
-      validationManager.ensureScheduledChecks()
+      validationManager.ensureScheduledValidations()
     }
   }
 

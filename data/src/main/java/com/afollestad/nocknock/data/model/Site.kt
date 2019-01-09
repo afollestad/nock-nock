@@ -40,10 +40,12 @@ data class Site(
   /** The last validation attempt result for the site, if any. */
   @Ignore var lastResult: ValidationResult?,
   /** The site's retry policy, if any. */
-  @Ignore var retryPolicy: RetryPolicy?
+  @Ignore var retryPolicy: RetryPolicy?,
+  /** Request headers sent with this site's validation attempts. */
+  @Ignore var headers: List<Header>
 ) : CanNotifyModel {
 
-  constructor() : this(0, "", "", "", null, null, null)
+  constructor() : this(0, "", "", "", null, null, null, emptyList())
 
   override fun notifyId(): Int = id.toInt()
 

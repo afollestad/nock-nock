@@ -25,6 +25,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.OnLifecycleEvent
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.data.AppDatabase
+import com.afollestad.nocknock.data.model.Header
 import com.afollestad.nocknock.data.model.RetryPolicy
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.SiteSettings
@@ -35,7 +36,7 @@ import com.afollestad.nocknock.data.model.ValidationMode.STATUS_CODE
 import com.afollestad.nocknock.data.model.ValidationMode.TERM_SEARCH
 import com.afollestad.nocknock.data.model.ValidationResult
 import com.afollestad.nocknock.data.putSite
-import com.afollestad.nocknock.engine.validation.ValidationManager
+import com.afollestad.nocknock.engine.validation.ValidationExecutor
 import com.afollestad.nocknock.ui.ScopedViewModel
 import com.afollestad.nocknock.utilities.ext.MINUTE
 import com.afollestad.nocknock.utilities.livedata.map
@@ -49,7 +50,7 @@ import java.lang.System.currentTimeMillis
 /** @author Aidan Follestad (@afollestad) */
 class AddSiteViewModel(
   private val database: AppDatabase,
-  private val validationManager: ValidationManager,
+  private val validationManager: ValidationExecutor,
   mainDispatcher: CoroutineDispatcher,
   private val ioDispatcher: CoroutineDispatcher
 ) : ScopedViewModel(mainDispatcher), LifecycleObserver {
@@ -66,6 +67,7 @@ class AddSiteViewModel(
   val checkIntervalUnit = MutableLiveData<Long>()
   val retryPolicyTimes = MutableLiveData<Int>()
   val retryPolicyMinutes = MutableLiveData<Int>()
+  val headers = MutableLiveData<List<Header>>()
 
   @OnLifecycleEvent(ON_START)
   fun setDefaults() {
@@ -76,6 +78,7 @@ class AddSiteViewModel(
     retryPolicyMinutes.value = 0
     retryPolicyMinutes.value = 0
     tags.value = ""
+    headers.value = emptyList()
   }
 
   // Private properties
@@ -134,7 +137,7 @@ class AddSiteViewModel(
       val storedModel = withContext(ioDispatcher) {
         database.putSite(newModel)
       }
-      validationManager.scheduleCheck(
+      validationManager.scheduleValidation(
           site = storedModel,
           rightNow = true,
           cancelPrevious = true
@@ -260,7 +263,8 @@ class AddSiteViewModel(
         tags = cleanedTags,
         settings = newSettings,
         lastResult = newLastResult,
-        retryPolicy = newRetryPolicy
+        retryPolicy = newRetryPolicy,
+        headers = headers.value ?: emptyList()
     )
   }
 }

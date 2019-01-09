@@ -25,8 +25,7 @@ import com.afollestad.nocknock.utilities.ext.DAY
 import com.afollestad.nocknock.utilities.ext.HOUR
 import com.afollestad.nocknock.utilities.ext.MINUTE
 import com.afollestad.nocknock.utilities.ext.WEEK
-import com.afollestad.nocknock.viewcomponents.R.array
-import com.afollestad.nocknock.viewcomponents.R.layout
+import com.afollestad.nocknock.viewcomponents.R
 import com.afollestad.nocknock.viewcomponents.livedata.attachLiveData
 import com.afollestad.nocknock.viewcomponents.livedata.lifecycleOwner
 import com.afollestad.nocknock.viewcomponents.livedata.toViewError
@@ -48,18 +47,18 @@ class ValidationIntervalLayout(
 
   init {
     orientation = VERTICAL
-    inflate(context, layout.validation_interval_layout, this)
+    inflate(context, R.layout.validation_interval_layout, this)
   }
 
   override fun onFinishInflate() {
     super.onFinishInflate()
     val spinnerAdapter = ArrayAdapter(
         context,
-        layout.list_item_spinner,
-        resources.getStringArray(array.interval_options)
+        R.layout.list_item_spinner,
+        resources.getStringArray(R.array.interval_options)
     )
     spinnerAdapter.setDropDownViewResource(
-        layout.list_item_spinner_dropdown
+        R.layout.list_item_spinner_dropdown
     )
     spinner.adapter = spinnerAdapter
   }

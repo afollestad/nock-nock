@@ -43,11 +43,11 @@ data class CheckResult(
 typealias ClientTimeoutChanger = (client: OkHttpClient, timeout: Int) -> OkHttpClient
 
 /** @author Aidan Follestad (@afollestad) */
-interface ValidationManager {
+interface ValidationExecutor {
 
-  suspend fun ensureScheduledChecks()
+  suspend fun ensureScheduledValidations()
 
-  fun scheduleCheck(
+  fun scheduleValidation(
     site: Site,
     rightNow: Boolean = false,
     cancelPrevious: Boolean = rightNow,
@@ -55,19 +55,19 @@ interface ValidationManager {
     overrideDelay: Long = -1
   )
 
-  fun cancelCheck(site: Site)
+  fun cancelScheduledValidation(site: Site)
 
-  suspend fun performCheck(site: Site): CheckResult
+  suspend fun performValidation(site: Site): CheckResult
 }
 
-class RealValidationManager(
+class RealValidationExecutor(
   private val jobScheduler: JobScheduler,
   private val okHttpClient: OkHttpClient,
   private val stringProvider: StringProvider,
   private val bundleProvider: BundleProvider,
   private val jobInfoProvider: JobInfoProvider,
   private val database: AppDatabase
-) : ValidationManager {
+) : ValidationExecutor {
 
   private var clientTimeoutChanger: ClientTimeoutChanger = { client, timeout ->
     client.newBuilder()
@@ -75,37 +75,37 @@ class RealValidationManager(
         .build()
   }
 
-  override suspend fun ensureScheduledChecks() {
+  override suspend fun ensureScheduledValidations() {
     val sites = database.allSites()
     if (sites.isEmpty()) {
       return
     }
-    log("Ensuring enabled sites have scheduled checks.")
+    log("Ensuring enabled sites have scheduled validations.")
     sites.filter { it.settings?.disabled != true }
         .forEach { site ->
           val existingJob = jobForSite(site)
           if (existingJob == null) {
             log("Site ${site.id} does NOT have a scheduled job, running one now.")
-            scheduleCheck(site = site, rightNow = true)
+            scheduleValidation(site = site, rightNow = true)
           } else {
             log("Site ${site.id} already has a scheduled job. Nothing to do.")
           }
         }
   }
 
-  override fun scheduleCheck(
+  override fun scheduleValidation(
     site: Site,
     rightNow: Boolean,
     cancelPrevious: Boolean,
     fromFinishingJob: Boolean,
     overrideDelay: Long
   ) {
-    check(site.id != 0L) { "Cannot schedule checks for jobs with no ID." }
+    check(site.id != 0L) { "Cannot schedule validations for jobs with no ID." }
     val siteSettings = site.settings
     requireNotNull(siteSettings) { "Site settings must be populated." }
 
     if (cancelPrevious) {
-      cancelCheck(site)
+      cancelScheduledValidation(site)
     } else if (!fromFinishingJob) {
       val existingJob = jobForSite(site)
       check(existingJob == null) {
@@ -113,7 +113,7 @@ class RealValidationManager(
       }
     }
 
-    log("Requesting a check job for site to be scheduled: $site")
+    log("Requesting a validation job for site to be scheduled: $site")
     val extras = bundleProvider.createPersistable {
       putLong(KEY_SITE_ID, site.id)
     }
@@ -131,28 +131,33 @@ class RealValidationManager(
 
     val dispatchResult = jobScheduler.schedule(jobInfo)
     if (dispatchResult != RESULT_SUCCESS) {
-      log("Failed to schedule a check job for site: ${site.id}")
+      log("Failed to schedule a validation job for site: ${site.id}")
     } else {
-      log("Check job successfully scheduled for site: ${site.id}")
+      log("Validation job successfully scheduled for site: ${site.id}")
     }
   }
 
-  override fun cancelCheck(site: Site) {
-    check(site.id != 0L) { "Cannot cancel scheduled checks for jobs with no ID." }
-    log("Cancelling scheduled checks for site: ${site.id}")
+  override fun cancelScheduledValidation(site: Site) {
+    check(site.id != 0L) { "Cannot cancel scheduled validations for jobs with no ID." }
+    log("Cancelling scheduled validations for site: ${site.id}")
     jobScheduler.cancel(site.id.toInt())
   }
 
-  override suspend fun performCheck(site: Site): CheckResult {
-    check(site.id != 0L) { "Cannot schedule checks for jobs with no ID." }
+  override suspend fun performValidation(site: Site): CheckResult {
+    check(site.id != 0L) { "Cannot schedule validations for jobs with no ID." }
     val siteSettings = site.settings
     requireNotNull(siteSettings) { "Site settings must be populated." }
     check(siteSettings.networkTimeout > 0) { "Network timeout not set for site ${site.id}" }
-    log("performCheck(${site.id}) - GET ${site.url}")
+    log("performValidation(${site.id}) - GET ${site.url}")
 
     val request = Request.Builder()
-        .url(site.url)
-        .get()
+        .apply {
+          url(site.url)
+          get()
+          site.headers.forEach { header ->
+            addHeader(header.key, header.value)
+          }
+        }
         .build()
 
     return try {
@@ -161,13 +166,13 @@ class RealValidationManager(
           .execute()
 
       if (response.isSuccessful || response.code() == 401) {
-        log("performCheck(${site.id}) = Successful")
+        log("performValidation(${site.id}) = Successful")
         CheckResult(
             model = site.withStatus(status = OK, reason = null),
             response = response
         )
       } else {
-        log("performCheck(${site.id}) = Failure, HTTP code ${response.code()}")
+        log("performValidation(${site.id}) = Failure, HTTP code ${response.code()}")
         CheckResult(
             model = site.withStatus(
                 status = ERROR,
@@ -177,7 +182,7 @@ class RealValidationManager(
         )
       }
     } catch (timeoutEx: SocketTimeoutException) {
-      log("performCheck(${site.id}) = Socket Timeout")
+      log("performValidation(${site.id}) = Socket Timeout")
       CheckResult(
           model = site.withStatus(
               status = ERROR,
@@ -185,7 +190,7 @@ class RealValidationManager(
           )
       )
     } catch (ex: Exception) {
-      log("performCheck(${site.id}) = Error: ${ex.message}")
+      log("performValidation(${site.id}) = Error: ${ex.message}")
       CheckResult(model = site.withStatus(status = ERROR, reason = ex.message))
     }
   }

@@ -16,4 +16,8 @@
     <item name="android:fontFamily">@font/lato</item>
   </style>
 
+  <style name="AccentTextButton" parent="Widget.MaterialComponents.Button.TextButton">
+    <item name="android:fontFamily">@font/lato</item>
+  </style>
+
 </resources>

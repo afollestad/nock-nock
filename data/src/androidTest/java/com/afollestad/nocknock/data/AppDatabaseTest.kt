@@ -21,6 +21,7 @@ import android.content.Context
 import androidx.room.Room.inMemoryDatabaseBuilder
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.runner.AndroidJUnit4
+import com.afollestad.nocknock.data.model.Header
 import com.afollestad.nocknock.data.model.RetryPolicy
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.SiteSettings
@@ -47,6 +48,7 @@ class AppDatabaseTest() {
   private lateinit var settingsDao: SiteSettingsDao
   private lateinit var resultsDao: ValidationResultsDao
   private lateinit var retryDao: RetryPolicyDao
+  private lateinit var headerDao: HeaderDao
 
   @Before fun setup() {
     val context = getApplicationContext<Context>()
@@ -55,6 +57,7 @@ class AppDatabaseTest() {
     settingsDao = db.siteSettingsDao()
     resultsDao = db.validationResultsDao()
     retryDao = db.retryPolicyDao()
+    headerDao = db.headerDao()
   }
 
   @After
@@ -70,7 +73,8 @@ class AppDatabaseTest() {
         tags = "",
         settings = null,
         lastResult = null,
-        retryPolicy = null
+        retryPolicy = null,
+        headers = emptyList()
     )
     val newId1 = sitesDao.insert(model1)
     assertThat(newId1).isGreaterThan(0)
@@ -81,7 +85,8 @@ class AppDatabaseTest() {
         tags = "",
         settings = null,
         lastResult = null,
-        retryPolicy = null
+        retryPolicy = null,
+        headers = emptyList()
     )
     val newId2 = sitesDao.insert(model2)
     assertThat(newId2).isGreaterThan(newId1)
@@ -99,7 +104,8 @@ class AppDatabaseTest() {
         tags = "",
         settings = null,
         lastResult = null,
-        retryPolicy = null
+        retryPolicy = null,
+        headers = emptyList()
     )
     val newId = sitesDao.insert(model)
     assertThat(newId).isGreaterThan(0)
@@ -115,7 +121,8 @@ class AppDatabaseTest() {
         tags = "",
         settings = null,
         lastResult = null,
-        retryPolicy = null
+        retryPolicy = null,
+        headers = emptyList()
     )
     val newId = sitesDao.insert(initialModel)
     assertThat(newId).isGreaterThan(0)
@@ -140,7 +147,8 @@ class AppDatabaseTest() {
         tags = "",
         settings = null,
         lastResult = null,
-        retryPolicy = null
+        retryPolicy = null,
+        headers = emptyList()
     )
     val newId1 = sitesDao.insert(model1)
     assertThat(newId1).isGreaterThan(0)
@@ -151,7 +159,8 @@ class AppDatabaseTest() {
         tags = "",
         settings = null,
         lastResult = null,
-        retryPolicy = null
+        retryPolicy = null,
+        headers = emptyList()
     )
     val newId2 = sitesDao.insert(model2)
     assertThat(newId2).isGreaterThan(newId1)
@@ -338,6 +347,78 @@ class AppDatabaseTest() {
     assertThat(retryDao.forSite(1)).isEmpty()
   }
 
+  // HeaderDao
+
+  @Test fun headers_insert_and_forSite() {
+    val models = listOf(
+        Header(
+            siteId = 1,
+            key = "Name",
+            value = "Aidan"
+        ),
+        Header(
+            siteId = 1,
+            key = "Born",
+            value = "1995"
+        )
+    )
+    val newIds = headerDao.insert(models)
+    assertThat(newIds.first()).isEqualTo(1)
+    assertThat(newIds.last()).isEqualTo(2)
+
+    val finalModels = headerDao.forSite(1)
+    assertThat(finalModels.first()).isEqualTo(models.first().copy(id = 1))
+    assertThat(finalModels.last()).isEqualTo(models.last().copy(id = 2))
+  }
+
+  @Test fun headers_update() {
+    val models = listOf(
+        Header(
+            siteId = 1,
+            key = "Name",
+            value = "Aidan"
+        ),
+        Header(
+            siteId = 1,
+            key = "Born",
+            value = "1995"
+        )
+    )
+    headerDao.insert(models)
+
+    val insertedModel = headerDao.forSite(1)
+        .last()
+    val updatedModel = insertedModel.copy(
+        key = "Test",
+        value = "Hello"
+    )
+    assertThat(headerDao.update(updatedModel)).isEqualTo(1)
+
+    val finalModels = headerDao.forSite(1)
+    assertThat(finalModels.first()).isEqualTo(models.first().copy(id = 1))
+    assertThat(finalModels.last()).isEqualTo(updatedModel)
+  }
+
+  @Test fun headers_delete() {
+    val models = listOf(
+        Header(
+            siteId = 1,
+            key = "Name",
+            value = "Aidan"
+        ),
+        Header(
+            siteId = 1,
+            key = "Born",
+            value = "1995"
+        )
+    )
+    headerDao.insert(models)
+
+    val insertedModels = headerDao.forSite(1)
+    headerDao.delete(insertedModels)
+    assertThat(headerDao.forSite(1)).isEmpty()
+  }
+
   // Extension Methods
 
   @Test fun extension_put_and_allSites() {
@@ -350,25 +431,6 @@ class AppDatabaseTest() {
     assertThat(allSites[0]).isEqualTo(MOCK_MODEL_1)
     assertThat(allSites[1]).isEqualTo(MOCK_MODEL_2)
     assertThat(allSites[2]).isEqualTo(MOCK_MODEL_3)
-  }
-
-  @Test fun extension_put_and_allSites_withTag() {
-    val model1 = MOCK_MODEL_1.copy(tags = "one,two,three")
-    val model2 = MOCK_MODEL_2.copy(tags = "four,five,six")
-    val model3 = MOCK_MODEL_3.copy(tags = "seven,eight,nine")
-
-    db.putSite(model1)
-    db.putSite(model2)
-    db.putSite(model3)
-
-    val allSites1 = db.allSites(forTag = "one")
-    assertThat(allSites1.single()).isEqualTo(model1)
-
-    val allSites2 = db.allSites(forTag = "five")
-    assertThat(allSites2.single()).isEqualTo(model2)
-
-    val allSites3 = db.allSites(forTag = "nine")
-    assertThat(allSites3.single()).isEqualTo(model3)
   }
 
   @Test fun extension_put_getSite() {
@@ -403,12 +465,23 @@ class AppDatabaseTest() {
         count = 4,
         minutes = 8
     )
+    val updatedHeaders = listOf(
+        modelToUpdate.headers.first().copy(
+            key = "One",
+            value = "Hello"
+        ),
+        modelToUpdate.headers.last().copy(
+            key = "Two",
+            value = "Hey"
+        )
+    )
     val updatedModel = modelToUpdate.copy(
         name = "Oijrfouhef",
         url = "https://iojfdfsdk.io",
         settings = updatedSettings,
         lastResult = updatedValidationResult,
-        retryPolicy = updatedRetryPolicy
+        retryPolicy = updatedRetryPolicy,
+        headers = updatedHeaders
     )
 
     db.updateSite(updatedModel)
@@ -417,6 +490,8 @@ class AppDatabaseTest() {
     assertThat(finalSite.settings).isEqualTo(updatedSettings)
     assertThat(finalSite.lastResult).isEqualTo(updatedValidationResult)
     assertThat(finalSite.retryPolicy).isEqualTo(updatedRetryPolicy)
+    assertThat(finalSite.headers.first()).isEqualTo(updatedHeaders.first())
+    assertThat(finalSite.headers.last()).isEqualTo(updatedHeaders.last())
     assertThat(finalSite).isEqualTo(updatedModel)
   }
 
@@ -426,7 +501,7 @@ class AppDatabaseTest() {
     db.putSite(MOCK_MODEL_3)
     val allSites = db.allSites()
 
-    db.deleteSite(MOCK_MODEL_2)
+    db.deleteSite(allSites[1])
 
     val remainingSettings = settingsDao.all()
     assertThat(remainingSettings.size).isEqualTo(2)
@@ -442,5 +517,12 @@ class AppDatabaseTest() {
     assertThat(remainingRetryPolicies.size).isEqualTo(2)
     assertThat(remainingRetryPolicies[0]).isEqualTo(allSites[0].retryPolicy!!)
     assertThat(remainingRetryPolicies[1]).isEqualTo(allSites[2].retryPolicy!!)
+
+    val remainingHeaders = headerDao.all()
+    assertThat(remainingHeaders.size).isEqualTo(4)
+    assertThat(remainingHeaders[0]).isEqualTo(allSites[0].headers.first())
+    assertThat(remainingHeaders[1]).isEqualTo(allSites[0].headers.last())
+    assertThat(remainingHeaders[2]).isEqualTo(allSites[2].headers.first())
+    assertThat(remainingHeaders[3]).isEqualTo(allSites[2].headers.last())
   }
 }

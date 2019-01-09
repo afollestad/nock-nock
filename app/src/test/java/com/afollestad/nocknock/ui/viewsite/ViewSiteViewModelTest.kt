@@ -28,7 +28,7 @@ import com.afollestad.nocknock.data.model.ValidationMode.JAVASCRIPT
 import com.afollestad.nocknock.data.model.ValidationMode.STATUS_CODE
 import com.afollestad.nocknock.data.model.ValidationMode.TERM_SEARCH
 import com.afollestad.nocknock.data.model.ValidationResult
-import com.afollestad.nocknock.engine.validation.ValidationManager
+import com.afollestad.nocknock.engine.validation.ValidationExecutor
 import com.afollestad.nocknock.mockDatabase
 import com.afollestad.nocknock.notifications.NockNotificationManager
 import com.afollestad.nocknock.utilities.livedata.test
@@ -75,7 +75,7 @@ class ViewSiteViewModelTest {
     }
   }
   private val database = mockDatabase()
-  private val validationManager = mock<ValidationManager>()
+  private val validationManager = mock<ValidationExecutor>()
   private val notificationManager = mock<NockNotificationManager>()
 
   @Rule @JvmField val rule = InstantTaskExecutorRule()
@@ -276,7 +276,7 @@ class ViewSiteViewModelTest {
     viewModel.commit(onDone)
 
     verify(validationManager, never())
-        .scheduleCheck(any(), any(), any(), any())
+        .scheduleValidation(any(), any(), any(), any())
     onNameError.assertValues(R.string.please_enter_name)
     onUrlError.assertNoValues()
     onTimeoutError.assertNoValues()
@@ -308,7 +308,7 @@ class ViewSiteViewModelTest {
     viewModel.commit(onDone)
 
     verify(validationManager, never())
-        .scheduleCheck(any(), any(), any(), any())
+        .scheduleValidation(any(), any(), any(), any())
     onNameError.assertNoValues()
     onUrlError.assertValues(R.string.please_enter_url)
     onTimeoutError.assertNoValues()
@@ -340,7 +340,7 @@ class ViewSiteViewModelTest {
     viewModel.commit(onDone)
 
     verify(validationManager, never())
-        .scheduleCheck(any(), any(), any(), any())
+        .scheduleValidation(any(), any(), any(), any())
     onNameError.assertNoValues()
     onUrlError.assertValues(R.string.please_enter_valid_url)
     onTimeoutError.assertNoValues()
@@ -372,7 +372,7 @@ class ViewSiteViewModelTest {
     viewModel.commit(onDone)
 
     verify(validationManager, never())
-        .scheduleCheck(any(), any(), any(), any())
+        .scheduleValidation(any(), any(), any(), any())
     onNameError.assertNoValues()
     onUrlError.assertNoValues()
     onTimeoutError.assertValues(R.string.please_enter_networkTimeout)
@@ -404,7 +404,7 @@ class ViewSiteViewModelTest {
     viewModel.commit(onDone)
 
     verify(validationManager, never())
-        .scheduleCheck(any(), any(), any(), any())
+        .scheduleValidation(any(), any(), any(), any())
     onNameError.assertNoValues()
     onUrlError.assertNoValues()
     onTimeoutError.assertNoValues()
@@ -437,7 +437,7 @@ class ViewSiteViewModelTest {
     viewModel.commit(onDone)
 
     verify(validationManager, never())
-        .scheduleCheck(any(), any(), any(), any())
+        .scheduleValidation(any(), any(), any(), any())
     onNameError.assertNoValues()
     onUrlError.assertNoValues()
     onTimeoutError.assertNoValues()
@@ -470,7 +470,7 @@ class ViewSiteViewModelTest {
     viewModel.commit(onDone)
 
     verify(validationManager, never())
-        .scheduleCheck(any(), any(), any(), any())
+        .scheduleValidation(any(), any(), any(), any())
     onNameError.assertNoValues()
     onUrlError.assertNoValues()
     onTimeoutError.assertNoValues()
@@ -534,7 +534,7 @@ class ViewSiteViewModelTest {
     assertThat(settingsCaptor.firstValue).isEqualTo(updatedSettings)
     assertThat(resultCaptor.firstValue).isEqualTo(updatedResult)
 
-    verify(validationManager).scheduleCheck(
+    verify(validationManager).scheduleValidation(
         site = updatedModel,
         rightNow = true,
         cancelPrevious = true,
@@ -562,7 +562,7 @@ class ViewSiteViewModelTest {
     )
 
     viewModel.checkNow()
-    verify(validationManager).scheduleCheck(
+    verify(validationManager).scheduleValidation(
         site = expectedModel,
         rightNow = true,
         cancelPrevious = true
@@ -579,7 +579,7 @@ class ViewSiteViewModelTest {
     viewModel.removeSite(onDone)
     isLoading.assertValues(true, false)
 
-    verify(validationManager).cancelCheck(MOCK_MODEL_1)
+    verify(validationManager).cancelScheduledValidation(MOCK_MODEL_1)
     verify(notificationManager).cancelStatusNotification(MOCK_MODEL_1)
     verify(database.siteDao()).delete(MOCK_MODEL_1)
     verify(database.siteSettingsDao()).delete(MOCK_MODEL_1.settings!!)
@@ -603,7 +603,7 @@ class ViewSiteViewModelTest {
         )
     )
 
-    verify(validationManager).cancelCheck(MOCK_MODEL_1)
+    verify(validationManager).cancelScheduledValidation(MOCK_MODEL_1)
     verify(notificationManager).cancelStatusNotification(MOCK_MODEL_1)
     verify(database.siteDao()).update(expectedSite)
     verify(database.siteSettingsDao()).update(expectedSite.settings!!)

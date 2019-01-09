@@ -20,7 +20,7 @@ import com.afollestad.nocknock.ALL_MOCK_MODELS
 import com.afollestad.nocknock.MOCK_MODEL_1
 import com.afollestad.nocknock.MOCK_MODEL_2
 import com.afollestad.nocknock.MOCK_MODEL_3
-import com.afollestad.nocknock.engine.validation.ValidationManager
+import com.afollestad.nocknock.engine.validation.ValidationExecutor
 import com.afollestad.nocknock.mockDatabase
 import com.afollestad.nocknock.notifications.NockNotificationManager
 import com.afollestad.nocknock.utilities.livedata.test
@@ -39,7 +39,7 @@ class MainViewModelTest {
 
   private val database = mockDatabase()
   private val notificationManager = mock<NockNotificationManager>()
-  private val validationManager = mock<ValidationManager>()
+  private val validationManager = mock<ValidationExecutor>()
 
   @Rule @JvmField val rule = InstantTaskExecutorRule()
 
@@ -64,7 +64,7 @@ class MainViewModelTest {
     viewModel.onResume()
 
     verify(notificationManager).cancelStatusNotifications()
-    verify(validationManager).ensureScheduledChecks()
+    verify(validationManager).ensureScheduledValidations()
 
     sites.assertValues(
         listOf(),
@@ -106,7 +106,7 @@ class MainViewModelTest {
   @Test fun refreshSite() {
     viewModel.refreshSite(MOCK_MODEL_3)
 
-    verify(validationManager).scheduleCheck(
+    verify(validationManager).scheduleValidation(
         site = MOCK_MODEL_3,
         rightNow = true,
         cancelPrevious = true
@@ -132,7 +132,7 @@ class MainViewModelTest {
     sites.assertNoValues()
     isLoading.assertValues(true, false)
 
-    verify(validationManager).cancelCheck(modifiedModel)
+    verify(validationManager).cancelScheduledValidation(modifiedModel)
     verify(notificationManager).cancelStatusNotification(modifiedModel)
     verify(database.siteDao()).delete(modifiedModel)
     verify(database.siteSettingsDao()).delete(modifiedModel.settings!!)
@@ -163,7 +163,7 @@ class MainViewModelTest {
     isLoading.assertValues(true, false)
     emptyTextVisibility.assertValues(false, false, false)
 
-    verify(validationManager).cancelCheck(MOCK_MODEL_1)
+    verify(validationManager).cancelScheduledValidation(MOCK_MODEL_1)
     verify(notificationManager).cancelStatusNotification(MOCK_MODEL_1)
     verify(database.siteDao()).delete(MOCK_MODEL_1)
     verify(database.siteSettingsDao()).delete(MOCK_MODEL_1.settings!!)

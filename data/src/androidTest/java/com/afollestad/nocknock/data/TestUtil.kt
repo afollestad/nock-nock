@@ -15,6 +15,7 @@
  */
 package com.afollestad.nocknock.data
 
+import com.afollestad.nocknock.data.model.Header
 import com.afollestad.nocknock.data.model.RetryPolicy
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.SiteSettings
@@ -58,6 +59,11 @@ fun fakeRetryPolicy(
     minutes = minutes
 )
 
+fun fakeHeaders(siteId: Long) = listOf(
+    Header(siteId = siteId, key = "Content-Type", value = "text/html"),
+    Header(siteId = siteId, key = "User-Agent", value = "NockNock")
+)
+
 fun fakeModel(id: Long) = Site(
     id = id,
     name = "Test",
@@ -65,7 +71,8 @@ fun fakeModel(id: Long) = Site(
     tags = "",
     settings = fakeSettingsModel(id),
     lastResult = fakeResultModel(id),
-    retryPolicy = fakeRetryPolicy(id)
+    retryPolicy = fakeRetryPolicy(id),
+    headers = fakeHeaders(id)
 )
 
 val MOCK_MODEL_1 = fakeModel(1)

@@ -19,6 +19,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.afollestad.nocknock.data.model.Converters
+import com.afollestad.nocknock.data.model.Header
 import com.afollestad.nocknock.data.model.RetryPolicy
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.SiteSettings
@@ -27,12 +28,13 @@ import com.afollestad.nocknock.data.model.ValidationResult
 /** @author Aidan Follestad (@afollestad) */
 @Database(
     entities = [
+      Header::class,
       RetryPolicy::class,
       ValidationResult::class,
       SiteSettings::class,
       Site::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -45,6 +47,8 @@ abstract class AppDatabase : RoomDatabase() {
   abstract fun validationResultsDao(): ValidationResultsDao
 
   abstract fun retryPolicyDao(): RetryPolicyDao
+
+  abstract fun headerDao(): HeaderDao
 }
 
 /**
@@ -61,10 +65,12 @@ fun AppDatabase.allSites(): List<Site> {
             .singleOrNull()
         val retryPolicy = retryPolicyDao().forSite(it.id)
             .singleOrNull()
+        val headers = headerDao().forSite(it.id)
         return@map it.copy(
             settings = settings,
             lastResult = lastResult,
-            retryPolicy = retryPolicy
+            retryPolicy = retryPolicy,
+            headers = headers
         )
       }
 }
@@ -83,10 +89,12 @@ fun AppDatabase.getSite(id: Long): Site? {
       .singleOrNull()
   val retryPolicy = retryPolicyDao().forSite(id)
       .singleOrNull()
+  val headers = headerDao().forSite(id)
   return result.copy(
       settings = settings,
       lastResult = lastResult,
-      retryPolicy = retryPolicy
+      retryPolicy = retryPolicy,
+      headers = headers
   )
 }
 
@@ -101,14 +109,19 @@ fun AppDatabase.putSite(site: Site): Site {
   val settingsWithSiteId = settings.copy(siteId = newId)
   val lastResultWithSiteId = site.lastResult?.copy(siteId = newId)
   val retryPolicyWithSiteId = site.retryPolicy?.copy(siteId = newId)
-  siteSettingsDao().insert(settingsWithSiteId)
+  val headersWithSiteId = site.headers.map { it.copy(siteId = newId) }
 
+  siteSettingsDao().insert(settingsWithSiteId)
   lastResultWithSiteId?.let { validationResultsDao().insert(it) }
   retryPolicyWithSiteId?.let { retryPolicyDao().insert(it) }
+  headerDao().insert(headersWithSiteId)
 
   return site.copy(
       id = newId,
-      settings = settingsWithSiteId
+      settings = settingsWithSiteId,
+      lastResult = lastResultWithSiteId,
+      retryPolicy = retryPolicyWithSiteId,
+      headers = headersWithSiteId
   )
 }
 
@@ -152,6 +165,13 @@ fun AppDatabase.updateSite(site: Site) {
       retryPolicyDao().insert(retryPolicy)
     }
   }
+
+  // Wipe existing headers
+  headerDao().delete(headerDao().forSite(site.id))
+  // Then add ones that still exist
+  site.headers.forEach { header ->
+    headerDao().insert(header.copy(id = 0, siteId = site.id))
+  }
 }
 
 /**
@@ -163,5 +183,9 @@ fun AppDatabase.deleteSite(site: Site) {
   site.settings?.let { siteSettingsDao().delete(it) }
   site.lastResult?.let { validationResultsDao().delete(it) }
   site.retryPolicy?.let { retryPolicyDao().delete(it) }
+  if (site.headers.any { it.id == 0L }) {
+    throw IllegalStateException("Cannot delete header with ID = 0.")
+  }
+  headerDao().delete(site.headers)
   siteDao().delete(site)
 }

@@ -16,6 +16,7 @@
     <include layout="@layout/include_app_bar"/>
 
     <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
@@ -24,89 +25,62 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:orientation="vertical"
-          android:paddingBottom="@dimen/content_inset"
+          android:paddingBottom="@dimen/content_inset_double"
           android:paddingLeft="@dimen/content_inset"
           android:paddingRight="@dimen/content_inset"
           android:paddingTop="@dimen/content_inset_half"
           >
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/nameTiLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="-4dp"
-            android:layout_marginRight="-4dp"
-            android:nextFocusDown="@+id/urlTiLayout"
-            >
+        <TextView
+            android:layout_marginTop="0dp"
+            android:text="@string/site_name"
+            style="@style/InputForm.Header"
+            />
 
-          <com.google.android.material.textfield.TextInputEditText
-              android:id="@+id/inputName"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:hint="@string/site_name"
-              android:inputType="textPersonName|textCapWords|textAutoCorrect"
-              android:nextFocusDown="@+id/inputUrl"
-              style="@style/NockText.Body"
-              />
+        <EditText
+            android:id="@+id/inputName"
+            android:hint="@string/site_name_hint"
+            android:inputType="textPersonName|textCapWords|textAutoCorrect"
+            android:nextFocusDown="@+id/inputUrl"
+            tools:ignore="Autofill"
+            style="@style/InputForm.Field"
+            />
 
-        </com.google.android.material.textfield.TextInputLayout>
+        <TextView
+            android:text="@string/site_url"
+            style="@style/InputForm.Header"
+            />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/urlTiLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="-4dp"
-            android:layout_marginRight="-4dp"
-            android:layout_marginTop="@dimen/content_inset_half"
-            android:nextFocusDown="@+id/tagsTiLayout"
-            >
-
-          <com.google.android.material.textfield.TextInputEditText
-              android:id="@+id/inputUrl"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:hint="@string/site_url"
-              android:inputType="textUri"
-              android:nextFocusDown="@+id/inputTags"
-              style="@style/NockText.Body"
-              />
-
-        </com.google.android.material.textfield.TextInputLayout>
+        <EditText
+            android:id="@+id/inputUrl"
+            android:hint="@string/site_url_hint"
+            android:inputType="textUri"
+            android:nextFocusDown="@+id/inputTags"
+            tools:ignore="Autofill"
+            style="@style/InputForm.Field"
+            />
 
         <TextView
             android:id="@+id/textUrlWarning"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/list_text_spacing"
             android:text="@string/warning_http_url"
             android:visibility="gone"
-            style="@style/NockText.Footnote"
+            style="@style/InputForm.FieldNote"
             />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tagsTiLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="-4dp"
-            android:layout_marginRight="-4dp"
-            android:layout_marginTop="@dimen/content_inset_half"
-            android:nextFocusDown="@+id/urlTiLayout"
-            >
+        <TextView
+            android:text="@string/site_tags"
+            style="@style/InputForm.Header"
+            />
 
-          <com.google.android.material.textfield.TextInputEditText
-              android:id="@+id/inputTags"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:digits=",.?-_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ "
-              android:hint="@string/site_tags_hint"
-              android:imeOptions="actionNext"
-              android:inputType="text|textCapWords"
-              android:nextFocusDown="@+id/inputUrl"
-              android:singleLine="true"
-              style="@style/NockText.Body"
-              />
-
-        </com.google.android.material.textfield.TextInputLayout>
+        <EditText
+            android:id="@+id/inputTags"
+            android:digits=",.?-_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ "
+            android:hint="@string/site_tags_hint"
+            android:inputType="text|textCapWords"
+            android:nextFocusDown="@+id/inputUrl"
+            tools:ignore="Autofill"
+            style="@style/InputForm.Field"
+            />
 
         <include layout="@layout/include_divider"/>
 
@@ -118,34 +92,23 @@
             />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/content_inset_less"
             android:text="@string/response_timeout"
-            style="@style/NockText.SectionHeader"
+            style="@style/InputForm.Header"
             />
 
         <EditText
             android:id="@+id/responseTimeoutInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="-4dp"
-            android:layout_marginStart="-4dp"
-            android:layout_marginTop="@dimen/content_inset_quarter"
             android:hint="@string/response_timeout_default"
             android:inputType="number"
             android:maxLength="8"
-            tools:ignore="Autofill,HardcodedText,LabelFor"
-            style="@style/NockText.Body"
+            tools:ignore="Autofill"
+            style="@style/InputForm.Field"
             />
 
         <TextView
             android:id="@+id/responseValidationLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/content_inset_more"
             android:text="@string/response_validation_mode"
-            style="@style/NockText.SectionHeader"
+            style="@style/InputForm.Header"
             />
 
         <Spinner
@@ -187,12 +150,7 @@
             style="@style/NockText.Body.Light"
             />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="@dimen/content_inset_less"
-            android:background="?dividerColor"
-            />
+        <include layout="@layout/include_divider"/>
 
         <com.afollestad.nocknock.viewcomponents.retrypolicy.RetryPolicyLayout
             android:id="@+id/retryPolicyLayout"
@@ -201,13 +159,13 @@
             android:layout_marginTop="@dimen/content_inset_more"
             />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/doneBtn"
+        <include layout="@layout/include_divider"/>
+
+        <com.afollestad.nocknock.viewcomponents.headers.HeaderStackLayout
+            android:id="@+id/headersLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/content_inset_double"
-            android:text="@string/add_site"
-            style="@style/AccentButton"
+            android:layout_marginTop="@dimen/content_inset_half"
             />
 
       </LinearLayout>

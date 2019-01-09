@@ -43,3 +43,17 @@ class Database2to3Migration : Migration(2, 3) {
     database.execSQL("ALTER TABLE `sites` ADD COLUMN tags TEXT NOT NULL DEFAULT ''")
   }
 }
+
+/**
+ * Migrates the database from version 3 to 4.
+ *
+ * @author Aidan Follestad (@afollestad)
+ */
+class Database3to4Migration : Migration(3, 4) {
+
+  override fun migrate(database: SupportSQLiteDatabase) {
+    database.execSQL(
+        "CREATE TABLE `headers` (id INTEGER PRIMARY KEY NOT NULL, siteId INTEGER NOT NULL, `key` TEXT NOT NULL, value TEXT NOT NULL)"
+    )
+  }
+}

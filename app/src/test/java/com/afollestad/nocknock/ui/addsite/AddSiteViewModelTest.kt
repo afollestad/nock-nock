@@ -22,7 +22,7 @@ import com.afollestad.nocknock.data.model.SiteSettings
 import com.afollestad.nocknock.data.model.ValidationMode.JAVASCRIPT
 import com.afollestad.nocknock.data.model.ValidationMode.STATUS_CODE
 import com.afollestad.nocknock.data.model.ValidationMode.TERM_SEARCH
-import com.afollestad.nocknock.engine.validation.ValidationManager
+import com.afollestad.nocknock.engine.validation.ValidationExecutor
 import com.afollestad.nocknock.mockDatabase
 import com.afollestad.nocknock.utilities.ext.MINUTE
 import com.afollestad.nocknock.utilities.livedata.test
@@ -44,7 +44,7 @@ import org.junit.Test
 class AddSiteViewModelTest {
 
   private val database = mockDatabase()
-  private val validationManager = mock<ValidationManager>()
+  private val validationManager = mock<ValidationExecutor>()
 
   @Rule @JvmField val rule = InstantTaskExecutorRule()
 
@@ -170,7 +170,7 @@ class AddSiteViewModelTest {
     viewModel.commit(onDone)
 
     verify(validationManager, never())
-        .scheduleCheck(any(), any(), any(), any())
+        .scheduleValidation(any(), any(), any(), any())
     onNameError.assertValues(R.string.please_enter_name)
     onUrlError.assertNoValues()
     onTimeoutError.assertNoValues()
@@ -202,7 +202,7 @@ class AddSiteViewModelTest {
     viewModel.commit(onDone)
 
     verify(validationManager, never())
-        .scheduleCheck(any(), any(), any(), any())
+        .scheduleValidation(any(), any(), any(), any())
     onNameError.assertNoValues()
     onUrlError.assertValues(R.string.please_enter_url)
     onTimeoutError.assertNoValues()
@@ -234,7 +234,7 @@ class AddSiteViewModelTest {
     viewModel.commit(onDone)
 
     verify(validationManager, never())
-        .scheduleCheck(any(), any(), any(), any())
+        .scheduleValidation(any(), any(), any(), any())
     onNameError.assertNoValues()
     onUrlError.assertValues(R.string.please_enter_valid_url)
     onTimeoutError.assertNoValues()
@@ -266,7 +266,7 @@ class AddSiteViewModelTest {
     viewModel.commit(onDone)
 
     verify(validationManager, never())
-        .scheduleCheck(any(), any(), any(), any())
+        .scheduleValidation(any(), any(), any(), any())
     onNameError.assertNoValues()
     onUrlError.assertNoValues()
     onTimeoutError.assertValues(R.string.please_enter_networkTimeout)
@@ -298,7 +298,7 @@ class AddSiteViewModelTest {
     viewModel.commit(onDone)
 
     verify(validationManager, never())
-        .scheduleCheck(any(), any(), any(), any())
+        .scheduleValidation(any(), any(), any(), any())
     onNameError.assertNoValues()
     onUrlError.assertNoValues()
     onTimeoutError.assertNoValues()
@@ -331,7 +331,7 @@ class AddSiteViewModelTest {
     viewModel.commit(onDone)
 
     verify(validationManager, never())
-        .scheduleCheck(any(), any(), any(), any())
+        .scheduleValidation(any(), any(), any(), any())
     onNameError.assertNoValues()
     onUrlError.assertNoValues()
     onTimeoutError.assertNoValues()
@@ -364,7 +364,7 @@ class AddSiteViewModelTest {
     viewModel.commit(onDone)
 
     verify(validationManager, never())
-        .scheduleCheck(any(), any(), any(), any())
+        .scheduleValidation(any(), any(), any(), any())
     onNameError.assertNoValues()
     onUrlError.assertNoValues()
     onTimeoutError.assertNoValues()
@@ -410,7 +410,7 @@ class AddSiteViewModelTest {
         lastResult = null
     )
 
-    verify(validationManager).scheduleCheck(
+    verify(validationManager).scheduleValidation(
         site = model,
         rightNow = true,
         cancelPrevious = true,

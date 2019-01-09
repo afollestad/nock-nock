@@ -29,8 +29,22 @@
           android:paddingBottom="@dimen/content_inset"
           android:paddingLeft="@dimen/content_inset"
           android:paddingRight="@dimen/content_inset"
-          android:paddingTop="@dimen/content_inset_half"
+          android:paddingTop="@dimen/content_inset_less"
           >
+
+        <EditText
+            android:id="@+id/inputName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:hint="@string/site_name"
+            android:inputType="textPersonName|textCapWords|textAutoCorrect"
+            android:nextFocusDown="@+id/inputUrl"
+            android:singleLine="true"
+            android:transitionName="site_name"
+            tools:ignore="Autofill,UnusedAttribute"
+            style="@style/NockText.Header"
+            />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -54,19 +68,6 @@
               android:layout_height="wrap_content"
               android:orientation="vertical"
               >
-
-            <EditText
-                android:id="@+id/inputName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/site_name"
-                android:inputType="textPersonName|textCapWords|textAutoCorrect"
-                android:nextFocusDown="@+id/inputUrl"
-                android:singleLine="true"
-                android:transitionName="site_name"
-                tools:ignore="Autofill,UnusedAttribute"
-                style="@style/NockText.Body"
-                />
 
             <EditText
                 android:id="@+id/inputUrl"
@@ -127,7 +128,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/content_inset"
+            android:layout_marginTop="@dimen/content_inset_less"
             android:text="@string/response_timeout"
             style="@style/NockText.SectionHeader"
             />
@@ -217,6 +218,16 @@
 
         <include layout="@layout/include_divider"/>
 
+        <com.afollestad.nocknock.viewcomponents.headers.HeaderStackLayout
+            android:id="@+id/headersLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/content_inset_half"
+            />
+
+
+        <include layout="@layout/include_divider"/>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -249,24 +260,6 @@
             android:layout_marginTop="@dimen/list_text_spacing"
             tools:text="In 2 hours"
             style="@style/NockText.Body"
-            />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/doneBtn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/content_inset_double"
-            android:text="@string/save_changes"
-            style="@style/AccentButton"
-            />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/disableChecksButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/content_inset_quarter"
-            android:text="@string/disable_automatic_checks"
-            style="@style/PrimaryDarkButton"
             />
 
       </LinearLayout>

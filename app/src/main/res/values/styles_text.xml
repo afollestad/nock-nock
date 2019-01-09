@@ -6,4 +6,28 @@
     <item name="android:textColor">?toolbarTitleColor</item>
   </style>
 
+  <style name="InputForm"/>
+
+  <style name="InputForm.Header" parent="NockText.SectionHeader">
+    <item name="android:layout_width">wrap_content</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:layout_marginTop">@dimen/content_inset_less</item>
+  </style>
+
+  <style name="InputForm.Field" parent="NockText.Body">
+    <item name="android:layout_width">match_parent</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:layout_marginTop">@dimen/content_inset_quarter</item>
+    <item name="android:singleLine">true</item>
+    <item name="android:imeOptions">actionNext</item>
+    <item name="android:layout_marginStart">-4dp</item>
+    <item name="android:layout_marginEnd">-4dp</item>
+  </style>
+
+  <style name="InputForm.FieldNote" parent="NockText.Footnote">
+    <item name="android:layout_width">wrap_content</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:layout_marginTop">@dimen/list_text_spacing</item>
+  </style>
+
 </resources>

@@ -25,6 +25,7 @@ import com.afollestad.nocknock.R
 import com.afollestad.nocknock.data.AppDatabase
 import com.afollestad.nocknock.data.model.RetryPolicy
 import com.afollestad.nocknock.data.deleteSite
+import com.afollestad.nocknock.data.model.Header
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.Status
 import com.afollestad.nocknock.data.model.Status.WAITING
@@ -35,7 +36,7 @@ import com.afollestad.nocknock.data.model.ValidationMode.TERM_SEARCH
 import com.afollestad.nocknock.data.model.ValidationResult
 import com.afollestad.nocknock.data.model.textRes
 import com.afollestad.nocknock.data.updateSite
-import com.afollestad.nocknock.engine.validation.ValidationManager
+import com.afollestad.nocknock.engine.validation.ValidationExecutor
 import com.afollestad.nocknock.notifications.NockNotificationManager
 import com.afollestad.nocknock.ui.ScopedViewModel
 import com.afollestad.nocknock.utilities.ext.formatDate
@@ -54,7 +55,7 @@ class ViewSiteViewModel(
   private val stringProvider: StringProvider,
   private val database: AppDatabase,
   private val notificationManager: NockNotificationManager,
-  private val validationManager: ValidationManager,
+  private val validationManager: ValidationExecutor,
   mainDispatcher: CoroutineDispatcher,
   private val ioDispatcher: CoroutineDispatcher
 ) : ScopedViewModel(mainDispatcher), LifecycleObserver {
@@ -74,6 +75,7 @@ class ViewSiteViewModel(
   val checkIntervalUnit = MutableLiveData<Long>()
   val retryPolicyTimes = MutableLiveData<Int>()
   val retryPolicyMinutes = MutableLiveData<Int>()
+  val headers = MutableLiveData<List<Header>>()
   internal val disabled = MutableLiveData<Boolean>()
   internal val lastResult = MutableLiveData<ValidationResult?>()
 
@@ -169,7 +171,7 @@ class ViewSiteViewModel(
       withContext(ioDispatcher) {
         database.updateSite(updatedModel)
       }
-      validationManager.scheduleCheck(
+      validationManager.scheduleValidation(
           site = updatedModel,
           rightNow = true,
           cancelPrevious = true
@@ -185,7 +187,7 @@ class ViewSiteViewModel(
         status = WAITING
     )
     setModel(checkModel)
-    validationManager.scheduleCheck(
+    validationManager.scheduleValidation(
         site = checkModel,
         rightNow = true,
         cancelPrevious = true
@@ -193,7 +195,7 @@ class ViewSiteViewModel(
   }
 
   fun removeSite(done: () -> Unit) {
-    validationManager.cancelCheck(site)
+    validationManager.cancelScheduledValidation(site)
     notificationManager.cancelStatusNotification(site)
 
     scope.launch {
@@ -207,7 +209,7 @@ class ViewSiteViewModel(
   }
 
   fun disableSite() {
-    validationManager.cancelCheck(site)
+    validationManager.cancelScheduledValidation(site)
     notificationManager.cancelStatusNotification(site)
 
     scope.launch {
@@ -339,7 +341,8 @@ class ViewSiteViewModel(
         tags = cleanedTags,
         url = url.value!!.trim(),
         settings = newSettings,
-        retryPolicy = retryPolicy
+        retryPolicy = retryPolicy,
+        headers = headers.value ?: emptyList()
     )
         .withStatus(status = WAITING)
   }

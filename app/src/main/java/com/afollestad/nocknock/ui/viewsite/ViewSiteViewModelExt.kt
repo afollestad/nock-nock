@@ -54,6 +54,7 @@ fun ViewSiteViewModel.setModel(site: Site) {
 
   setCheckInterval(settings.validationIntervalMs)
   setRetryPolicy(site.retryPolicy)
+  headers.value = site.headers
 
   this.disabled.value = settings.disabled
   this.lastResult.value = site.lastResult

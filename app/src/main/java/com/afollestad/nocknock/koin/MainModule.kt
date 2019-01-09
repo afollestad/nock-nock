@@ -24,6 +24,7 @@ import androidx.room.Room.databaseBuilder
 import com.afollestad.nocknock.data.AppDatabase
 import com.afollestad.nocknock.data.Database1to2Migration
 import com.afollestad.nocknock.data.Database2to3Migration
+import com.afollestad.nocknock.data.Database3to4Migration
 import com.afollestad.nocknock.notifications.Qualifiers.MAIN_ACTIVITY_CLASS
 import com.afollestad.nocknock.ui.main.MainActivity
 import com.afollestad.nocknock.utilities.ext.systemService
@@ -41,7 +42,8 @@ val mainModule = module {
     databaseBuilder(get(), AppDatabase::class.java, "NockNock.db")
         .addMigrations(
             Database1to2Migration(),
-            Database2to3Migration()
+            Database2to3Migration(),
+            Database3to4Migration()
         )
         .build()
   }

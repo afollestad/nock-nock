@@ -32,7 +32,7 @@ import timber.log.Timber.d as log
 /** @author Aidan Follestad (@afollestad) */
 class BootReceiver : BroadcastReceiver(), KoinComponent {
 
-  private val validationManager by inject<ValidationManager>()
+  private val validationManager by inject<ValidationExecutor>()
   private val mainDispatcher by inject<CoroutineDispatcher>(name = MAIN_DISPATCHER)
   private val ioDispatcher by inject<CoroutineDispatcher>(name = IO_DISPATCHER)
 
@@ -48,7 +48,7 @@ class BootReceiver : BroadcastReceiver(), KoinComponent {
 
     val pendingResult = goAsync()
     GlobalScope.launch(mainDispatcher) {
-      withContext(ioDispatcher) { validationManager.ensureScheduledChecks() }
+      withContext(ioDispatcher) { validationManager.ensureScheduledValidations() }
       pendingResult.resultCode = 0
       pendingResult.finish()
     }

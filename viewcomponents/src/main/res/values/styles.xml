@@ -9,6 +9,12 @@
     <item name="android:textColor">?colorAccent</item>
   </style>
 
+  <style name="NockText.Header">
+    <item name="android:textSize">@dimen/title_font_size</item>
+    <item name="android:fontFamily">@font/lato_bold</item>
+    <item name="android:textColor">?android:textColorPrimary</item>
+  </style>
+
   <style name="NockText.Title">
     <item name="android:textSize">@dimen/title_font_size</item>
     <item name="android:fontFamily">@font/lato</item>

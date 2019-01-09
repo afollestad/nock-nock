@@ -19,17 +19,25 @@
   <LinearLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:gravity="center"
       android:orientation="horizontal"
       android:weightSum="2"
       >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/check_interval_every"
+        style="@style/NockText.Body"
+        />
 
     <EditText
         android:id="@+id/input"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="start|center_vertical"
-        android:layout_marginEnd="@dimen/content_inset_half"
-        android:layout_marginStart="-4dp"
+        android:layout_marginEnd="@dimen/content_inset_less"
+        android:layout_marginStart="@dimen/content_inset_less"
         android:layout_weight="1"
         android:hint="0"
         android:inputType="number"

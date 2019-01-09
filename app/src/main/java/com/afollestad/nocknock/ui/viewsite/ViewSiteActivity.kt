@@ -33,8 +33,7 @@ import com.afollestad.nocknock.viewcomponents.livedata.toViewError
 import com.afollestad.nocknock.viewcomponents.livedata.toViewText
 import com.afollestad.nocknock.viewcomponents.livedata.toViewVisibility
 import kotlinx.android.synthetic.main.activity_viewsite.checkIntervalLayout
-import kotlinx.android.synthetic.main.activity_viewsite.disableChecksButton
-import kotlinx.android.synthetic.main.activity_viewsite.doneBtn
+import kotlinx.android.synthetic.main.activity_viewsite.headersLayout
 import kotlinx.android.synthetic.main.activity_viewsite.iconStatus
 import kotlinx.android.synthetic.main.activity_viewsite.inputName
 import kotlinx.android.synthetic.main.activity_viewsite.inputTags
@@ -50,6 +49,7 @@ import kotlinx.android.synthetic.main.activity_viewsite.textLastCheckResult
 import kotlinx.android.synthetic.main.activity_viewsite.textNextCheck
 import kotlinx.android.synthetic.main.activity_viewsite.textUrlWarning
 import kotlinx.android.synthetic.main.activity_viewsite.validationModeDescription
+import kotlinx.android.synthetic.main.include_app_bar.app_toolbar as appToolbar
 import kotlinx.android.synthetic.main.include_app_bar.toolbar
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -148,6 +148,9 @@ class ViewSiteActivity : DarkModeSwitchActivity() {
         minutesData = viewModel.retryPolicyMinutes
     )
 
+    // Headers
+    headersLayout.attach(viewModel.headers)
+
     // Last/next check
     viewModel.onLastCheckResultText()
         .toViewText(this, textLastCheckResult)
@@ -156,25 +159,31 @@ class ViewSiteActivity : DarkModeSwitchActivity() {
   }
 
   private fun setupUi() {
-    toolbarTitle.setText(R.string.view_site)
+    toolbarTitle.text = ""
     toolbar.run {
       setNavigationIcon(R.drawable.ic_action_close)
       setNavigationOnClickListener { finish() }
       inflateMenu(R.menu.menu_viewsite)
+
       menu.findItem(R.id.refresh)
           .setActionView(R.layout.menu_item_refresh_icon)
           .apply {
             actionView.setOnClickListener { viewModel.checkNow() }
           }
+
       setOnMenuItemClickListener {
-        maybeRemoveSite()
+        when (it.itemId) {
+          R.id.commit -> viewModel.commit { finish() }
+          R.id.remove -> maybeRemoveSite()
+          R.id.disableChecks -> maybeDisableChecks()
+        }
         true
       }
     }
 
     scrollView.onScroll {
-      toolbar.elevation = if (it > toolbar.height / 4) {
-        toolbar.dimenFloat(R.dimen.default_elevation)
+      appToolbar.elevation = if (it > appToolbar.measuredHeight / 2) {
+        appToolbar.dimenFloat(R.dimen.default_elevation)
       } else {
         0f
       }
@@ -190,15 +199,17 @@ class ViewSiteActivity : DarkModeSwitchActivity() {
 
     // Disabled button
     viewModel.onDisableChecksVisibility()
-        .toViewVisibility(this, disableChecksButton)
-    disableChecksButton.setOnClickListener { maybeDisableChecks() }
+        .observe(this, Observer {
+          toolbar.menu.findItem(R.id.disableChecks)
+              .isVisible = it
+        })
 
     // Done button
     viewModel.onDoneButtonText()
-        .toViewText(this, doneBtn)
-    doneBtn.setOnClickListener {
-      viewModel.commit { finish() }
-    }
+        .observe(this, Observer {
+          toolbar.menu.findItem(R.id.commit)
+              .setTitle(it)
+        })
   }
 
   override fun onNewIntent(intent: Intent?) {
