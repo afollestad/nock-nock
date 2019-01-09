@@ -135,7 +135,8 @@ class MainActivity : DarkModeSwitchActivity() {
         listItems(R.array.site_long_options) { _, i, _ ->
           when (i) {
             0 -> viewModel.refreshSite(model)
-            1 -> maybeRemoveSite(model)
+            1 -> addSiteForDuplication(model)
+            2 -> maybeRemoveSite(model)
           }
         }
       }

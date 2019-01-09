@@ -28,9 +28,22 @@ import com.afollestad.nocknock.utilities.providers.RealIntentProvider.Companion.
 internal const val VIEW_SITE_RQ = 6923
 internal const val ADD_SITE_RQ = 6969
 
+// ADD
+
 internal fun MainActivity.addSite() {
-  startActivityForResult(Intent(this, AddSiteActivity::class.java), ADD_SITE_RQ)
+  startActivityForResult(intentToAdd(), ADD_SITE_RQ)
 }
+
+internal fun MainActivity.addSiteForDuplication(site: Site) {
+  startActivityForResult(intentToAdd(site), ADD_SITE_RQ)
+}
+
+private fun MainActivity.intentToAdd(model: Site? = null) =
+  Intent(this, AddSiteActivity::class.java).apply {
+    model?.let { putExtra(KEY_SITE, it) }
+  }
+
+// VIEW
 
 internal fun MainActivity.viewSite(model: Site) {
   startActivityForResult(intentToView(model), VIEW_SITE_RQ)
@@ -40,6 +53,8 @@ private fun MainActivity.intentToView(model: Site) =
   Intent(this, ViewSiteActivity::class.java).apply {
     putExtra(KEY_SITE, model)
   }
+
+// MISC
 
 internal fun MainActivity.maybeRemoveSite(model: Site) {
   MaterialDialog(this).show {

@@ -35,6 +35,7 @@
 
   <string name="options">Options</string>
   <string name="remove_site">Remove Site</string>
+  <string name="duplicate_and_modify">Duplicate and Modify</string>
   <string name="remove_site_prompt"><![CDATA[Remove <b>%1$s</b> from your sites?]]></string>
   <string name="remove">Remove</string>
   <string name="save_changes">Save Changes</string>

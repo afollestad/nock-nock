@@ -19,8 +19,10 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import com.afollestad.nocknock.R
+import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.ValidationMode
 import com.afollestad.nocknock.ui.DarkModeSwitchActivity
+import com.afollestad.nocknock.ui.viewsite.KEY_SITE
 import com.afollestad.nocknock.viewcomponents.ext.dimenFloat
 import com.afollestad.nocknock.viewcomponents.ext.onScroll
 import com.afollestad.nocknock.viewcomponents.livedata.attachLiveData
@@ -58,6 +60,10 @@ class AddSiteActivity : DarkModeSwitchActivity() {
     setupUi()
 
     lifecycle.addObserver(viewModel)
+
+    // Populate view model with initial data
+    val model = intent.getSerializableExtra(KEY_SITE) as? Site
+    model?.let { viewModel.prePopulateFromModel(model) }
 
     // Loading
     loadingProgress.observe(this, viewModel.onIsLoading())
