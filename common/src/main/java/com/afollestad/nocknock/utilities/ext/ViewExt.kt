@@ -21,7 +21,12 @@ import android.widget.EditText
 import androidx.annotation.IntRange
 import kotlin.math.min
 
-fun EditText.setTextAndMaintainSelection(text: CharSequence) {
+fun EditText.setTextAndMaintainSelection(text: CharSequence?) {
+  if (text == null) {
+    setText("")
+    return
+  }
+
   val formerStart = min(selectionStart, text.length)
   val formerEnd = min(selectionEnd, text.length)
   setText(text)

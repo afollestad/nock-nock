@@ -24,7 +24,6 @@ import com.afollestad.nocknock.utilities.ext.DAY
 import com.afollestad.nocknock.utilities.ext.HOUR
 import com.afollestad.nocknock.utilities.ext.MINUTE
 import com.afollestad.nocknock.utilities.ext.WEEK
-import com.afollestad.nocknock.utilities.ext.toUri
 import kotlin.math.ceil
 
 fun ViewSiteViewModel.setModel(site: Site) {
@@ -56,9 +55,7 @@ fun ViewSiteViewModel.setModel(site: Site) {
   setCheckInterval(settings.validationIntervalMs)
   setRetryPolicy(site.retryPolicy)
   headers.value = site.headers
-  if (settings.certificate != null) {
-    certificateUri.value = settings.certificate!!.toUri()
-  }
+  certificateUri.value = settings.certificate
 
   this.disabled.value = settings.disabled
   this.lastResult.value = site.lastResult

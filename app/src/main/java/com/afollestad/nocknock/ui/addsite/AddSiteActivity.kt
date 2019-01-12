@@ -28,7 +28,7 @@ import com.afollestad.nocknock.data.model.ValidationMode
 import com.afollestad.nocknock.ui.DarkModeSwitchActivity
 import com.afollestad.nocknock.ui.viewsite.KEY_SITE
 import com.afollestad.nocknock.utilities.ext.onTextChanged
-import com.afollestad.nocknock.utilities.ext.toUri
+import com.afollestad.nocknock.utilities.ext.setTextAndMaintainSelection
 import com.afollestad.nocknock.utilities.livedata.distinct
 import com.afollestad.nocknock.viewcomponents.ext.dimenFloat
 import com.afollestad.nocknock.viewcomponents.ext.onScroll
@@ -141,6 +141,13 @@ class AddSiteActivity : DarkModeSwitchActivity() {
         minutesData = viewModel.retryPolicyMinutes
     )
 
+    // SSL certificate
+    sslCertificateInput.onTextChanged { viewModel.certificateUri.value = it }
+    viewModel.certificateUri.distinct()
+        .observe(this, Observer { sslCertificateInput.setTextAndMaintainSelection(it) })
+    viewModel.onCertificateError()
+        .toViewError(this, sslCertificateInput)
+
     // Headers
     headersLayout.attach(viewModel.headers)
   }
@@ -179,9 +186,6 @@ class AddSiteActivity : DarkModeSwitchActivity() {
     }
 
     // SSL certificate
-    sslCertificateInput.onTextChanged { viewModel.certificateUri.value = it.toUri() }
-    viewModel.certificateUri.distinct()
-        .observe(this, Observer { sslCertificateInput.setText(it.toString()) })
     sslCertificateBrowse.setOnClickListener {
       val intent = Intent(ACTION_OPEN_DOCUMENT).apply {
         addCategory(CATEGORY_OPENABLE)
@@ -193,12 +197,11 @@ class AddSiteActivity : DarkModeSwitchActivity() {
 
   override fun onResume() {
     super.onResume()
-    appToolbar.elevation =
-        if (scrollView.scrollY > appToolbar.measuredHeight / 2) {
-          appToolbar.dimenFloat(R.dimen.default_elevation)
-        } else {
-          0f
-        }
+    appToolbar.elevation = if (scrollView.scrollY > appToolbar.measuredHeight / 2) {
+      appToolbar.dimenFloat(R.dimen.default_elevation)
+    } else {
+      0f
+    }
   }
 
   override fun onActivityResult(

@@ -28,7 +28,7 @@ import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.ValidationMode
 import com.afollestad.nocknock.ui.DarkModeSwitchActivity
 import com.afollestad.nocknock.utilities.ext.onTextChanged
-import com.afollestad.nocknock.utilities.ext.toUri
+import com.afollestad.nocknock.utilities.ext.setTextAndMaintainSelection
 import com.afollestad.nocknock.utilities.livedata.distinct
 import com.afollestad.nocknock.utilities.providers.IntentProvider
 import com.afollestad.nocknock.viewcomponents.ext.dimenFloat
@@ -158,6 +158,13 @@ class ViewSiteActivity : DarkModeSwitchActivity() {
         minutesData = viewModel.retryPolicyMinutes
     )
 
+    // SSL certificate
+    sslCertificateInput.onTextChanged { viewModel.certificateUri.value = it }
+    viewModel.certificateUri.distinct()
+        .observe(this, Observer { sslCertificateInput.setTextAndMaintainSelection(it) })
+    viewModel.onCertificateError()
+        .toViewError(this, sslCertificateInput)
+
     // Headers
     headersLayout.attach(viewModel.headers)
 
@@ -214,7 +221,7 @@ class ViewSiteActivity : DarkModeSwitchActivity() {
               .isVisible = it
         })
 
-    // Done button
+    // Done item text
     viewModel.onDoneButtonText()
         .observe(this, Observer {
           toolbar.menu.findItem(R.id.commit)
@@ -222,9 +229,6 @@ class ViewSiteActivity : DarkModeSwitchActivity() {
         })
 
     // SSL certificate
-    sslCertificateInput.onTextChanged { viewModel.certificateUri.value = it.toUri() }
-    viewModel.certificateUri.distinct()
-        .observe(this, Observer { sslCertificateInput.setText(it.toString()) })
     sslCertificateBrowse.setOnClickListener {
       val intent = Intent(ACTION_OPEN_DOCUMENT).apply {
         addCategory(CATEGORY_OPENABLE)
@@ -236,12 +240,11 @@ class ViewSiteActivity : DarkModeSwitchActivity() {
 
   override fun onResume() {
     super.onResume()
-    appToolbar.elevation =
-        if (scrollView.scrollY > appToolbar.measuredHeight / 2) {
-          appToolbar.dimenFloat(R.dimen.default_elevation)
-        } else {
-          0f
-        }
+    appToolbar.elevation = if (scrollView.scrollY > appToolbar.measuredHeight / 2) {
+      appToolbar.dimenFloat(R.dimen.default_elevation)
+    } else {
+      0f
+    }
   }
 
   override fun onActivityResult(

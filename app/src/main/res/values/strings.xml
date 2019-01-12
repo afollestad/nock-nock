@@ -33,6 +33,7 @@
   <string name="please_enter_search_term">Please input a search term.</string>
   <string name="please_enter_javaScript">Please input a validation script.</string>
   <string name="please_enter_networkTimeout">Please enter a network timeout greater than 0.</string>
+  <string name="please_enter_validCertUri">Certificate should be a valid file or content URI.</string>
 
   <string name="options">Options</string>
   <string name="remove_site">Remove Site</string>

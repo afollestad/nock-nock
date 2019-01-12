@@ -15,7 +15,6 @@
  */
 package com.afollestad.nocknock.ui.viewsite
 
-import android.net.Uri
 import androidx.annotation.CheckResult
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.VisibleForTesting.PRIVATE
@@ -24,9 +23,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.data.AppDatabase
-import com.afollestad.nocknock.data.model.RetryPolicy
 import com.afollestad.nocknock.data.deleteSite
 import com.afollestad.nocknock.data.model.Header
+import com.afollestad.nocknock.data.model.RetryPolicy
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.Status
 import com.afollestad.nocknock.data.model.Status.WAITING
@@ -41,6 +40,7 @@ import com.afollestad.nocknock.engine.validation.ValidationExecutor
 import com.afollestad.nocknock.notifications.NockNotificationManager
 import com.afollestad.nocknock.ui.ScopedViewModel
 import com.afollestad.nocknock.utilities.ext.formatDate
+import com.afollestad.nocknock.utilities.ext.toUri
 import com.afollestad.nocknock.utilities.livedata.map
 import com.afollestad.nocknock.utilities.livedata.zip
 import com.afollestad.nocknock.utilities.providers.StringProvider
@@ -77,7 +77,7 @@ class ViewSiteViewModel(
   val retryPolicyTimes = MutableLiveData<Int>()
   val retryPolicyMinutes = MutableLiveData<Int>()
   val headers = MutableLiveData<List<Header>>()
-  val certificateUri = MutableLiveData<Uri>()
+  val certificateUri = MutableLiveData<String>()
   internal val disabled = MutableLiveData<Boolean>()
   internal val lastResult = MutableLiveData<ValidationResult?>()
 
@@ -89,6 +89,7 @@ class ViewSiteViewModel(
   private val validationSearchTermError = MutableLiveData<Int?>()
   private val validationScriptError = MutableLiveData<Int?>()
   private val checkIntervalValueError = MutableLiveData<Int?>()
+  private val certificateError = MutableLiveData<Int?>()
 
   // Expose private properties or calculated properties
   @CheckResult fun onIsLoading(): LiveData<Boolean> = isLoading
@@ -130,6 +131,8 @@ class ViewSiteViewModel(
 
   @CheckResult fun onDisableChecksVisibility(): LiveData<Boolean> =
     disabled.map { !it }
+
+  @CheckResult fun onCertificateError(): LiveData<Int?> = certificateError
 
   @CheckResult fun onDoneButtonText(): LiveData<Int> =
     disabled.map {
@@ -305,6 +308,25 @@ class ViewSiteViewModel(
     } else {
       validationSearchTermError.value = null
       validationScriptError.value = null
+    }
+
+    // Validate SSL certificate
+    val certString = certificateUri.value
+    if (certString != null) {
+      val rawCertUri = certString.toUri()
+      val certUri = if (rawCertUri.scheme == null) {
+        rawCertUri.buildUpon()
+            .scheme("file")
+            .build()
+      } else {
+        rawCertUri
+      }
+      if (certUri.scheme != "content" && certUri.scheme != "file") {
+        errorCount++
+        certificateError.value = R.string.please_enter_validCertUri
+      } else {
+        certificateError.value = null
+      }
     }
 
     if (errorCount > 0) {

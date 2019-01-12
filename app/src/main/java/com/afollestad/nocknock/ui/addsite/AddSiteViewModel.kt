@@ -15,7 +15,6 @@
  */
 package com.afollestad.nocknock.ui.addsite
 
-import android.net.Uri
 import androidx.annotation.CheckResult
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.VisibleForTesting.PRIVATE
@@ -40,6 +39,7 @@ import com.afollestad.nocknock.data.putSite
 import com.afollestad.nocknock.engine.validation.ValidationExecutor
 import com.afollestad.nocknock.ui.ScopedViewModel
 import com.afollestad.nocknock.utilities.ext.MINUTE
+import com.afollestad.nocknock.utilities.ext.toUri
 import com.afollestad.nocknock.utilities.livedata.map
 import com.afollestad.nocknock.viewcomponents.ext.isNullOrLessThan
 import kotlinx.coroutines.CoroutineDispatcher
@@ -69,7 +69,7 @@ class AddSiteViewModel(
   val retryPolicyTimes = MutableLiveData<Int>()
   val retryPolicyMinutes = MutableLiveData<Int>()
   val headers = MutableLiveData<List<Header>>()
-  val certificateUri = MutableLiveData<Uri>()
+  val certificateUri = MutableLiveData<String>()
 
   @OnLifecycleEvent(ON_START)
   fun setDefaults() {
@@ -91,6 +91,7 @@ class AddSiteViewModel(
   private val validationSearchTermError = MutableLiveData<Int?>()
   private val validationScriptError = MutableLiveData<Int?>()
   private val checkIntervalValueError = MutableLiveData<Int?>()
+  private val certificateError = MutableLiveData<Int?>()
 
   // Expose private properties or calculated properties
   @CheckResult fun onIsLoading(): LiveData<Boolean> = isLoading
@@ -129,6 +130,8 @@ class AddSiteViewModel(
     validationMode.map { it == JAVASCRIPT }
 
   @CheckResult fun onCheckIntervalError(): LiveData<Int?> = checkIntervalValueError
+
+  @CheckResult fun onCertificateError(): LiveData<Int?> = certificateError
 
   // Actions
   fun commit(done: () -> Unit) {
@@ -226,6 +229,25 @@ class AddSiteViewModel(
     } else {
       validationSearchTermError.value = null
       validationScriptError.value = null
+    }
+
+    // Validate SSL certificate
+    val certString = certificateUri.value
+    if (certString != null) {
+      val rawCertUri = certString.toUri()
+      val certUri = if (rawCertUri.scheme == null) {
+        rawCertUri.buildUpon()
+            .scheme("file")
+            .build()
+      } else {
+        rawCertUri
+      }
+      if (certUri.scheme != "content" && certUri.scheme != "file") {
+        errorCount++
+        certificateError.value = R.string.please_enter_validCertUri
+      } else {
+        certificateError.value = null
+      }
     }
 
     if (errorCount > 0) {
