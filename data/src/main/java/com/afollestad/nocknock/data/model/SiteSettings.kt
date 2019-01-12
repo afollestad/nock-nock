@@ -40,8 +40,10 @@ data class SiteSettings(
   /** Whether or not the [Site] is enabled for automatic periodic checks. */
   var disabled: Boolean,
   /** The network response timeout for validation attempts. */
-  var networkTimeout: Int
+  var networkTimeout: Int,
+  /** The Uri to a self signed certificate. */
+  var certificate: String?
 ) : Serializable {
 
-  constructor() : this(0, 0, STATUS_CODE, null, false, 0)
+  constructor() : this(0, 0, STATUS_CODE, null, false, 0, null)
 }

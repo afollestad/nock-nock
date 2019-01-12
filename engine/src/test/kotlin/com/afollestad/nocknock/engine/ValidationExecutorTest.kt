@@ -45,7 +45,7 @@ import okhttp3.ResponseBody
 import org.junit.Test
 import java.net.SocketTimeoutException
 
-class CheckStatusManagerTest {
+class ValidationExecutorTest {
 
   private val timeoutError = "Oh no, a timeout"
 

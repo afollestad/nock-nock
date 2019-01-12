@@ -25,6 +25,7 @@ import com.afollestad.nocknock.data.AppDatabase
 import com.afollestad.nocknock.data.Database1to2Migration
 import com.afollestad.nocknock.data.Database2to3Migration
 import com.afollestad.nocknock.data.Database3to4Migration
+import com.afollestad.nocknock.data.Database4to5Migration
 import com.afollestad.nocknock.notifications.Qualifiers.MAIN_ACTIVITY_CLASS
 import com.afollestad.nocknock.ui.main.MainActivity
 import com.afollestad.nocknock.utilities.ext.systemService
@@ -43,7 +44,8 @@ val mainModule = module {
         .addMigrations(
             Database1to2Migration(),
             Database2to3Migration(),
-            Database3to4Migration()
+            Database3to4Migration(),
+            Database4to5Migration()
         )
         .build()
   }

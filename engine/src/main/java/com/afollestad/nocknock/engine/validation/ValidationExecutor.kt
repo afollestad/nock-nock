@@ -23,13 +23,16 @@ import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.Status.ERROR
 import com.afollestad.nocknock.data.model.Status.OK
 import com.afollestad.nocknock.engine.R
+import com.afollestad.nocknock.engine.ssl.SslManager
 import com.afollestad.nocknock.engine.validation.ValidationJob.Companion.KEY_SITE_ID
+import com.afollestad.nocknock.utilities.ext.toUri
 import com.afollestad.nocknock.utilities.providers.BundleProvider
 import com.afollestad.nocknock.utilities.providers.JobInfoProvider
 import com.afollestad.nocknock.utilities.providers.StringProvider
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import org.jetbrains.annotations.TestOnly
 import java.net.SocketTimeoutException
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import timber.log.Timber.d as log
@@ -66,7 +69,8 @@ class RealValidationExecutor(
   private val stringProvider: StringProvider,
   private val bundleProvider: BundleProvider,
   private val jobInfoProvider: JobInfoProvider,
-  private val database: AppDatabase
+  private val database: AppDatabase,
+  private val sslManager: SslManager
 ) : ValidationExecutor {
 
   private var clientTimeoutChanger: ClientTimeoutChanger = { client, timeout ->
@@ -161,7 +165,16 @@ class RealValidationExecutor(
         .build()
 
     return try {
-      val client = clientTimeoutChanger(okHttpClient, siteSettings.networkTimeout)
+      val clientWithTimeout = clientTimeoutChanger(okHttpClient, siteSettings.networkTimeout)
+      val client = if (!siteSettings.certificate.isNullOrEmpty()) {
+        sslManager.clientForCertificate(
+            certUri = siteSettings.certificate!!.toUri(),
+            host = site.url.toUri().host ?: "",
+            client = clientWithTimeout
+        )
+      } else {
+        clientWithTimeout
+      }
       val response = client.newCall(request)
           .execute()
 
@@ -199,7 +212,9 @@ class RealValidationExecutor(
     jobScheduler.allPendingJobs
         .firstOrNull { job -> job.id == site.id.toInt() }
 
-//  @TestOnly fun setClientTimeoutChanger(changer: ClientTimeoutChanger) {
-//    this.clientTimeoutChanger = changer
-//  }
+  @Suppress("unused")
+  @TestOnly
+  fun setClientTimeoutChanger(changer: ClientTimeoutChanger) {
+    this.clientTimeoutChanger = changer
+  }
 }

@@ -13,20 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.afollestad.nocknock.engine
+package com.afollestad.nocknock.utilities.ext
 
-import com.afollestad.nocknock.engine.ssl.RealSslManager
-import com.afollestad.nocknock.engine.ssl.SslManager
-import com.afollestad.nocknock.engine.validation.RealValidationExecutor
-import com.afollestad.nocknock.engine.validation.ValidationExecutor
-import org.koin.dsl.module.module
+import android.net.Uri
 
-/** @author Aidan Follestad (@afollestad) */
-val engineModule = module {
-
-  single {
-    RealValidationExecutor(get(), get(), get(), get(), get(), get(), get())
-  } bind ValidationExecutor::class
-
-  factory { RealSslManager(get()) } bind SslManager::class
-}
+fun String.toUri() = Uri.parse(this)!!

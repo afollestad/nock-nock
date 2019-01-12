@@ -34,7 +34,7 @@ import com.afollestad.nocknock.data.model.ValidationResult
       SiteSettings::class,
       Site::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

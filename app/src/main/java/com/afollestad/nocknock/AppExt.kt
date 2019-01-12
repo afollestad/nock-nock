@@ -20,12 +20,12 @@ import android.app.Application
 import android.app.Application.ActivityLifecycleCallbacks
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.HtmlCompat.fromHtml
 import com.afollestad.materialdialogs.utils.MDUtil.resolveColor
+import com.afollestad.nocknock.utilities.ext.toUri
 import com.afollestad.nocknock.utilities.ui.toast
 
 typealias ActivityLifeChange = (activity: Activity, resumed: Boolean) -> Unit
@@ -56,8 +56,6 @@ fun Application.onActivityLifeChange(cb: ActivityLifeChange) {
 }
 
 fun String.toHtml() = fromHtml(this, FROM_HTML_MODE_LEGACY)
-
-fun String.toUri() = Uri.parse(this)!!
 
 fun Activity.viewUrl(url: String) {
   val customTabsIntent = CustomTabsIntent.Builder()
