@@ -15,6 +15,8 @@
  */
 package com.afollestad.nocknock.engine
 
+import com.afollestad.nocknock.engine.ssl.RealSslManager
+import com.afollestad.nocknock.engine.ssl.SslManager
 import com.afollestad.nocknock.engine.validation.RealValidationExecutor
 import com.afollestad.nocknock.engine.validation.ValidationExecutor
 import org.koin.dsl.module.module
@@ -25,4 +27,6 @@ val engineModule = module {
   single {
     RealValidationExecutor(get(), get(), get(), get(), get(), get())
   } bind ValidationExecutor::class
+
+  factory { RealSslManager(get()) } bind SslManager::class
 }
