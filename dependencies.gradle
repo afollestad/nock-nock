@@ -3,8 +3,8 @@ ext.versions = [
     minSdk              : 21,
     compileSdk          : 28,
     buildTools          : '28.0.3',
-    publishVersion      : '0.8.4',
-    publishVersionCode  : 37,
+    publishVersion      : '0.8.5',
+    publishVersionCode  : 39,
 
     // Plugins
     gradlePlugin        : '3.2.1',

@@ -31,6 +31,7 @@ android {
 
   buildTypes {
     debug {
+      ext.enableCrashlytics = false
       buildConfigField "String", "FABRIC_API_KEY", "\"\""
     }
     release {
