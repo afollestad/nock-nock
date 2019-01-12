@@ -19,7 +19,8 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import com.afollestad.nocknock.notifications.Channel.CheckFailures
+import com.afollestad.nocknock.notifications.Channel.ValidationErrors
+import com.afollestad.nocknock.notifications.Channel.ValidationSuccess
 import com.afollestad.nocknock.utilities.providers.CanNotifyModel
 import com.afollestad.nocknock.utilities.providers.IntentProvider
 import com.afollestad.nocknock.utilities.providers.NotificationChannelProvider
@@ -41,12 +42,13 @@ import org.junit.Test
 
 class NockNotificationManagerTest {
 
-  private val appIconRes = 1024
   private val somethingWentWrong = "something went wrong"
+  private val yay = "yay!"
 
   private val stockManager = mock<NotificationManager>()
   private val stringProvider = mock<StringProvider> {
     on { get(R.string.something_wrong) } doReturn somethingWentWrong
+    on { get(R.string.validation_passed) } doReturn yay
   }
   private val intentProvider = mock<IntentProvider>()
   private val channelProvider = mock<NotificationChannelProvider>()
@@ -77,30 +79,42 @@ class NockNotificationManagerTest {
 
   @Test fun createChannels() {
     whenever(stringProvider.get(any())).doReturn("")
-    val createdChannel = mock<NotificationChannel> {
-      on { this.id } doReturn CheckFailures.id
+    val errorChannel = mock<NotificationChannel> {
+      on { this.id } doReturn ValidationErrors.id
     }
-    whenever(channelProvider.create(any(), any(), any(), any()))
-        .doReturn(createdChannel)
+    val successChannel = mock<NotificationChannel> {
+      on { this.id } doReturn ValidationSuccess.id
+    }
+
+    whenever(channelProvider.create(any(), any(), any(), any())).doAnswer { inv ->
+      val channelId = inv.getArgument<String>(0)
+      when (channelId) {
+        ValidationErrors.id -> errorChannel
+        ValidationSuccess.id -> successChannel
+        else -> null
+      }
+    }
     manager.createChannels()
 
     val captor = argumentCaptor<NotificationChannel>()
-    verify(stockManager, times(1)).createNotificationChannel(captor.capture())
+    verify(stockManager, times(2)).createNotificationChannel(captor.capture())
 
-    val channel = captor.allValues.single()
-    assertThat(channel.id).isEqualTo(CheckFailures.id)
+    val channels = captor.allValues
+    assertThat(channels.size).isEqualTo(2)
+    assertThat(channels.first()).isEqualTo(successChannel)
+    assertThat(channels.last()).isEqualTo(errorChannel)
 
     verifyNoMoreInteractions(stockManager)
   }
 
-  @Test fun postStatusNotification_appIsOpen() {
+  @Test fun postValidationSuccessNotification_appIsOpen() {
     manager.setIsAppOpen(true)
-    manager.postStatusNotification(fakeModel())
+    manager.postValidationSuccessNotification(fakeModel())
 
     verifyNoMoreInteractions(stockManager)
   }
 
-  @Test fun postStatusNotification_appNotOpen() {
+  @Test fun postValidationSuccessNotification_appNotOpen() {
     manager.setIsAppOpen(false)
     val model = fakeModel()
 
@@ -111,21 +125,28 @@ class NockNotificationManagerTest {
     val notification = mock<Notification>()
     whenever(
         notificationProvider.create(
-            CheckFailures.id,
+            ValidationErrors.id,
             "Testing",
-            somethingWentWrong,
+            yay,
             pendingIntent,
-            R.drawable.ic_notification
+            R.drawable.ic_notification_success
         )
     ).doReturn(notification)
 
-    manager.postStatusNotification(model)
+    manager.postValidationSuccessNotification(model)
 
     verify(stockManager).notify(
         "https://hello.com",
         BASE_NOTIFICATION_REQUEST_CODE + 1,
         notification
     )
+    verifyNoMoreInteractions(stockManager)
+  }
+
+  @Test fun postValidationErrorNotification_appIsOpen() {
+    manager.setIsAppOpen(true)
+    manager.postValidationErrorNotification(fakeModel())
+
     verifyNoMoreInteractions(stockManager)
   }
 
@@ -148,5 +169,7 @@ class NockNotificationManagerTest {
     override fun notifyName() = "Testing"
 
     override fun notifyTag() = "https://hello.com"
+
+    override fun notifyDescription() = "Hello, World!"
   }
 }
