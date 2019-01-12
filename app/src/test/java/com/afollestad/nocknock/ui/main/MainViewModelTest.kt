@@ -60,18 +60,45 @@ class MainViewModelTest {
         .test()
     val sites = viewModel.onSites()
         .test()
+    val tags = viewModel.onTags()
+        .test()
+    val tagsVisibility = viewModel.onTagsListVisibility()
+        .test()
 
     viewModel.onResume()
 
     verify(notificationManager).cancelStatusNotifications()
     verify(validationManager).ensureScheduledValidations()
 
-    sites.assertValues(
-        listOf(),
-        ALL_MOCK_MODELS
-    )
+    sites.assertValues(ALL_MOCK_MODELS)
     isLoading.assertValues(true, false)
     emptyTextVisibility.assertValues(false, false)
+    tags.assertValues(listOf("one", "two", "three", "four", "five", "six").sorted())
+    tagsVisibility.assertValues(true)
+  }
+
+  @Test fun onTagSelection() = runBlocking {
+    val isLoading = viewModel.onIsLoading()
+        .test()
+    val emptyTextVisibility = viewModel.onEmptyTextVisibility()
+        .test()
+    val sites = viewModel.onSites()
+        .test()
+    val tags = viewModel.onTags()
+        .test()
+    val tagsVisibility = viewModel.onTagsListVisibility()
+        .test()
+
+    viewModel.onTagSelection(listOf("four", "six"))
+
+    verify(notificationManager).cancelStatusNotifications()
+    verify(validationManager).ensureScheduledValidations()
+
+    sites.assertValues(listOf(MOCK_MODEL_2, MOCK_MODEL_3))
+    isLoading.assertValues(true, false)
+    emptyTextVisibility.assertValues(false, false)
+    tags.assertValues(listOf("one", "two", "three", "four", "five", "six").sorted())
+    tagsVisibility.assertValues(true)
   }
 
   @Test fun postSiteUpdate_notFound() {
@@ -86,10 +113,7 @@ class MainViewModelTest {
         .test()
 
     viewModel.onResume()
-    sites.assertValues(
-        listOf(),
-        ALL_MOCK_MODELS
-    )
+    sites.assertValues(ALL_MOCK_MODELS)
 
     val updatedModel2 = MOCK_MODEL_2.copy(
         name = "Wakanda Forever!!!"
@@ -120,10 +144,7 @@ class MainViewModelTest {
         .test()
 
     viewModel.onResume()
-    sites.assertValues(
-        listOf(),
-        ALL_MOCK_MODELS
-    )
+    sites.assertValues(ALL_MOCK_MODELS)
     isLoading.assertValues(true, false)
 
     val modifiedModel = MOCK_MODEL_1.copy(id = 11111)
@@ -147,10 +168,7 @@ class MainViewModelTest {
         .test()
 
     viewModel.onResume()
-    sites.assertValues(
-        listOf(),
-        ALL_MOCK_MODELS
-    )
+    sites.assertValues(ALL_MOCK_MODELS)
     isLoading.assertValues(true, false)
 
     val modelsWithout1 = ALL_MOCK_MODELS.toMutableList()

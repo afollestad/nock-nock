@@ -89,20 +89,24 @@ fun fakeHeaders(siteId: Long): List<Header> {
   )
 }
 
-fun fakeModel(id: Long) = Site(
+fun fakeModel(
+  id: Long,
+  tags: String = ""
+) = Site(
     id = id,
     name = "Test",
     url = "https://test.com",
-    tags = "",
+    tags = tags,
     settings = fakeSettingsModel(id),
     lastResult = fakeResultModel(id),
     retryPolicy = fakeRetryPolicy(id),
     headers = fakeHeaders(id)
 )
 
-val MOCK_MODEL_1 = fakeModel(1)
-val MOCK_MODEL_2 = fakeModel(2)
-val MOCK_MODEL_3 = fakeModel(3)
+val MOCK_MODEL_1 = fakeModel(1, tags = "one,two")
+val MOCK_MODEL_2 = fakeModel(2, tags = "three,four")
+val MOCK_MODEL_3 = fakeModel(3, tags = "five,six")
+
 val ALL_MOCK_MODELS = listOf(MOCK_MODEL_1, MOCK_MODEL_2, MOCK_MODEL_3)
 
 fun mockDatabase(): AppDatabase {
@@ -168,13 +172,13 @@ fun mockDatabase(): AppDatabase {
     on { delete(isA()) } doReturn 1
   }
   val headerDao = mock<HeaderDao> {
-    on { all() } doReturn com.afollestad.nocknock.engine.MOCK_MODEL_1.headers + com.afollestad.nocknock.engine.MOCK_MODEL_2.headers + com.afollestad.nocknock.engine.MOCK_MODEL_3.headers
+    on { all() } doReturn MOCK_MODEL_1.headers + MOCK_MODEL_2.headers + MOCK_MODEL_3.headers
     on { forSite(isA()) } doAnswer { inv ->
       val id = inv.getArgument<Long>(0)
       return@doAnswer when (id) {
-        1L -> com.afollestad.nocknock.engine.MOCK_MODEL_1.headers
-        2L -> com.afollestad.nocknock.engine.MOCK_MODEL_2.headers
-        3L -> com.afollestad.nocknock.engine.MOCK_MODEL_3.headers
+        1L -> MOCK_MODEL_1.headers
+        2L -> MOCK_MODEL_2.headers
+        3L -> MOCK_MODEL_3.headers
         else -> listOf()
       }
     }
