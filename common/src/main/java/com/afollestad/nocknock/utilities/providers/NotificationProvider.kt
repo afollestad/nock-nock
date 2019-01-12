@@ -20,6 +20,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationCompat.BigTextStyle
 import androidx.core.app.NotificationCompat.DEFAULT_VIBRATE
 
 /** @author Aidan Follestad (@afollestad) */
@@ -56,6 +57,10 @@ class RealNotificationProvider(
         .setLargeIcon(largeIcon)
         .setAutoCancel(true)
         .setDefaults(DEFAULT_VIBRATE)
+        .setStyle(
+            BigTextStyle()
+                .bigText(content)
+        )
         .build()
   }
 }
