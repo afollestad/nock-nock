@@ -59,6 +59,10 @@
   <string name="response_timeout">Network Response Timeout (ms)</string>
   <string name="response_timeout_default">10000</string>
 
+  <string name="ssl_certificate">SSL Certificate</string>
+  <string name="ssl_certificate_automatic">(Automatic)</string>
+  <string name="ssl_certificate_browse">Browse</string>
+
   <string name="refresh_status">Refresh Status</string>
 
   <string name="warning_http_url">

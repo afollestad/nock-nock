@@ -5,8 +5,8 @@
   <string name="function_declaration">function validate(response) {</string>
   <string name="function_end">}</string>
 
-  <string name="check_interval">Check Interval</string>
-  <string name="check_interval_every">Every</string>
+  <string name="validation_interval">Validation Interval</string>
+  <string name="validation_interval_every">Every</string>
 
   <string name="retry_policy">Retry Policy</string>
   <string name="retry_policy_retry">Retry</string>

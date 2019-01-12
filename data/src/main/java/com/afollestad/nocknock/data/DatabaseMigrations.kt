@@ -66,6 +66,6 @@ class Database3to4Migration : Migration(3, 4) {
 class Database4to5Migration : Migration(4, 5) {
 
   override fun migrate(database: SupportSQLiteDatabase) {
-    database.execSQL("ALTER TABLE `site_settings` ADD COLUMN certificatePath TEXT")
+    database.execSQL("ALTER TABLE `site_settings` ADD COLUMN certificate TEXT")
   }
 }

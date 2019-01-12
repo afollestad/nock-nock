@@ -26,7 +26,7 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:orientation="vertical"
-          android:paddingBottom="@dimen/content_inset"
+          android:paddingBottom="@dimen/content_inset_double"
           android:paddingLeft="@dimen/content_inset"
           android:paddingRight="@dimen/content_inset"
           android:paddingTop="@dimen/content_inset_less"
@@ -127,35 +127,6 @@
             />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/content_inset_less"
-            android:text="@string/response_timeout"
-            style="@style/NockText.SectionHeader"
-            />
-
-        <EditText
-            android:id="@+id/responseTimeoutInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="-4dp"
-            android:layout_marginStart="-4dp"
-            android:layout_marginTop="@dimen/content_inset_quarter"
-            android:hint="@string/response_timeout_default"
-            android:inputType="number"
-            android:maxLength="8"
-            tools:ignore="Autofill,HardcodedText,LabelFor"
-            style="@style/NockText.Body"
-            />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="@dimen/content_inset_less"
-            android:background="?dividerColor"
-            />
-
-        <TextView
             android:id="@+id/responseValidationLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -216,6 +187,66 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/content_inset"
             />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/content_inset"
+            android:text="@string/response_timeout"
+            style="@style/NockText.SectionHeader"
+            />
+
+        <EditText
+            android:id="@+id/responseTimeoutInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="-4dp"
+            android:layout_marginStart="-4dp"
+            android:layout_marginTop="@dimen/content_inset_quarter"
+            android:hint="@string/response_timeout_default"
+            android:inputType="number"
+            android:maxLength="8"
+            tools:ignore="Autofill,HardcodedText,LabelFor"
+            style="@style/NockText.Body"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/content_inset"
+            android:text="@string/ssl_certificate"
+            style="@style/NockText.SectionHeader"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
+          <EditText
+              android:id="@+id/sslCertificateInput"
+              android:layout_width="0dp"
+              android:layout_height="wrap_content"
+              android:layout_gravity="start|center_vertical"
+              android:layout_marginStart="-4dp"
+              android:layout_weight="1"
+              android:hint="@string/ssl_certificate_automatic"
+              android:inputType="textUri"
+              tools:ignore="Autofill,HardcodedText,LabelFor"
+              style="@style/NockText.Body"
+              />
+
+          <Button
+              android:id="@+id/sslCertificateBrowse"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_gravity="end|center_vertical"
+              android:text="@string/ssl_certificate_browse"
+              style="@style/AccentTextButton"
+              />
+
+        </LinearLayout>
 
         <include layout="@layout/include_divider"/>
 

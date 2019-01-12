@@ -74,6 +74,10 @@ class RealSslManager(
     log("Loaded successfully!")
     return client.newBuilder()
         .sslSocketFactory(sslContext.socketFactory, trustManager)
+        .hostnameVerifier { hostname, _ ->
+          log("Verifying hostname $hostname")
+          hostname == host
+        }
         .build()
   }
 }

@@ -15,6 +15,7 @@
  */
 package com.afollestad.nocknock.ui.addsite
 
+import android.net.Uri
 import androidx.annotation.CheckResult
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.VisibleForTesting.PRIVATE
@@ -68,6 +69,7 @@ class AddSiteViewModel(
   val retryPolicyTimes = MutableLiveData<Int>()
   val retryPolicyMinutes = MutableLiveData<Int>()
   val headers = MutableLiveData<List<Header>>()
+  val certificateUri = MutableLiveData<Uri>()
 
   @OnLifecycleEvent(ON_START)
   fun setDefaults() {
@@ -237,7 +239,8 @@ class AddSiteViewModel(
         validationMode = validationMode.value!!,
         validationArgs = getValidationArgs(),
         networkTimeout = timeout,
-        disabled = false
+        disabled = false,
+        certificate = certificateUri.value.toString()
     )
 
     val newLastResult = ValidationResult(

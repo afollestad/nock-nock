@@ -16,13 +16,20 @@
 package com.afollestad.nocknock.ui.addsite
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.content.Intent.ACTION_OPEN_DOCUMENT
+import android.content.Intent.CATEGORY_OPENABLE
 import android.os.Bundle
 import android.widget.ArrayAdapter
+import androidx.lifecycle.Observer
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.ValidationMode
 import com.afollestad.nocknock.ui.DarkModeSwitchActivity
 import com.afollestad.nocknock.ui.viewsite.KEY_SITE
+import com.afollestad.nocknock.utilities.ext.onTextChanged
+import com.afollestad.nocknock.utilities.ext.toUri
+import com.afollestad.nocknock.utilities.livedata.distinct
 import com.afollestad.nocknock.viewcomponents.ext.dimenFloat
 import com.afollestad.nocknock.viewcomponents.ext.onScroll
 import com.afollestad.nocknock.viewcomponents.livedata.attachLiveData
@@ -41,6 +48,8 @@ import kotlinx.android.synthetic.main.activity_addsite.responseValidationSearchT
 import kotlinx.android.synthetic.main.activity_addsite.retryPolicyLayout
 import kotlinx.android.synthetic.main.activity_addsite.scriptInputLayout
 import kotlinx.android.synthetic.main.activity_addsite.scrollView
+import kotlinx.android.synthetic.main.activity_addsite.sslCertificateBrowse
+import kotlinx.android.synthetic.main.activity_addsite.sslCertificateInput
 import kotlinx.android.synthetic.main.activity_addsite.textUrlWarning
 import kotlinx.android.synthetic.main.activity_addsite.validationModeDescription
 import kotlinx.android.synthetic.main.include_app_bar.toolbar
@@ -50,6 +59,9 @@ import kotlinx.android.synthetic.main.include_app_bar.toolbar_title as toolbarTi
 
 /** @author Aidan Follestad (@afollestad) */
 class AddSiteActivity : DarkModeSwitchActivity() {
+  companion object {
+    private const val SELECT_CERT_FILE_RQ = 23
+  }
 
   private val viewModel by viewModel<AddSiteViewModel>()
 
@@ -164,6 +176,39 @@ class AddSiteActivity : DarkModeSwitchActivity() {
       } else {
         0f
       }
+    }
+
+    // SSL certificate
+    sslCertificateInput.onTextChanged { viewModel.certificateUri.value = it.toUri() }
+    viewModel.certificateUri.distinct()
+        .observe(this, Observer { sslCertificateInput.setText(it.toString()) })
+    sslCertificateBrowse.setOnClickListener {
+      val intent = Intent(ACTION_OPEN_DOCUMENT).apply {
+        addCategory(CATEGORY_OPENABLE)
+        type = "*/*"
+      }
+      startActivityForResult(intent, SELECT_CERT_FILE_RQ)
+    }
+  }
+
+  override fun onResume() {
+    super.onResume()
+    appToolbar.elevation =
+        if (scrollView.scrollY > appToolbar.measuredHeight / 2) {
+          appToolbar.dimenFloat(R.dimen.default_elevation)
+        } else {
+          0f
+        }
+  }
+
+  override fun onActivityResult(
+    requestCode: Int,
+    resultCode: Int,
+    resultData: Intent?
+  ) {
+    super.onActivityResult(requestCode, resultCode, resultData)
+    if (requestCode == SELECT_CERT_FILE_RQ && resultCode == RESULT_OK) {
+      sslCertificateInput.setText(resultData?.data?.toString() ?: "")
     }
   }
 }

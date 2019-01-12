@@ -4,19 +4,9 @@
 
   <style name="AppTheme.Dark" parent="AppThemeParent.Dark"/>
 
-  <style name="AccentButton" parent="Widget.MaterialComponents.Button">
-    <item name="android:textColor">#fff</item>
-    <item name="backgroundTint">@color/colorAccent</item>
-    <item name="android:fontFamily">@font/lato</item>
-  </style>
-
   <style name="PrimaryDarkButton" parent="Widget.MaterialComponents.Button">
     <item name="android:textColor">#fff</item>
     <item name="backgroundTint">@color/lighterGray</item>
-    <item name="android:fontFamily">@font/lato</item>
-  </style>
-
-  <style name="AccentTextButton" parent="Widget.MaterialComponents.Button.TextButton">
     <item name="android:fontFamily">@font/lato</item>
   </style>
 

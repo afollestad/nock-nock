@@ -15,6 +15,7 @@
  */
 package com.afollestad.nocknock.ui.viewsite
 
+import android.net.Uri
 import androidx.annotation.CheckResult
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.VisibleForTesting.PRIVATE
@@ -76,6 +77,7 @@ class ViewSiteViewModel(
   val retryPolicyTimes = MutableLiveData<Int>()
   val retryPolicyMinutes = MutableLiveData<Int>()
   val headers = MutableLiveData<List<Header>>()
+  val certificateUri = MutableLiveData<Uri>()
   internal val disabled = MutableLiveData<Boolean>()
   internal val lastResult = MutableLiveData<ValidationResult?>()
 
@@ -316,7 +318,8 @@ class ViewSiteViewModel(
         validationMode = validationMode.value!!,
         validationArgs = getValidationArgs(),
         networkTimeout = timeout,
-        disabled = false
+        disabled = false,
+        certificate = certificateUri.value.toString()
     )
 
     val retryPolicyTimes = retryPolicyTimes.value ?: 0

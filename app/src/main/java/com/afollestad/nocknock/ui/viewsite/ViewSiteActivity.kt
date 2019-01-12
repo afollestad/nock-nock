@@ -17,6 +17,8 @@ package com.afollestad.nocknock.ui.viewsite
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.Intent.ACTION_OPEN_DOCUMENT
+import android.content.Intent.CATEGORY_OPENABLE
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import androidx.lifecycle.Observer
@@ -25,6 +27,9 @@ import com.afollestad.nocknock.broadcasts.StatusUpdateIntentReceiver
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.ValidationMode
 import com.afollestad.nocknock.ui.DarkModeSwitchActivity
+import com.afollestad.nocknock.utilities.ext.onTextChanged
+import com.afollestad.nocknock.utilities.ext.toUri
+import com.afollestad.nocknock.utilities.livedata.distinct
 import com.afollestad.nocknock.utilities.providers.IntentProvider
 import com.afollestad.nocknock.viewcomponents.ext.dimenFloat
 import com.afollestad.nocknock.viewcomponents.ext.onScroll
@@ -45,18 +50,23 @@ import kotlinx.android.synthetic.main.activity_viewsite.responseValidationSearch
 import kotlinx.android.synthetic.main.activity_viewsite.retryPolicyLayout
 import kotlinx.android.synthetic.main.activity_viewsite.scriptInputLayout
 import kotlinx.android.synthetic.main.activity_viewsite.scrollView
+import kotlinx.android.synthetic.main.activity_viewsite.sslCertificateBrowse
+import kotlinx.android.synthetic.main.activity_viewsite.sslCertificateInput
 import kotlinx.android.synthetic.main.activity_viewsite.textLastCheckResult
 import kotlinx.android.synthetic.main.activity_viewsite.textNextCheck
 import kotlinx.android.synthetic.main.activity_viewsite.textUrlWarning
 import kotlinx.android.synthetic.main.activity_viewsite.validationModeDescription
-import kotlinx.android.synthetic.main.include_app_bar.app_toolbar as appToolbar
 import kotlinx.android.synthetic.main.include_app_bar.toolbar
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlinx.android.synthetic.main.include_app_bar.app_toolbar as appToolbar
 import kotlinx.android.synthetic.main.include_app_bar.toolbar_title as toolbarTitle
 
 /** @author Aidan Follestad (@afollestad) */
 class ViewSiteActivity : DarkModeSwitchActivity() {
+  companion object {
+    private const val SELECT_CERT_FILE_RQ = 23
+  }
 
   internal val viewModel by viewModel<ViewSiteViewModel>()
 
@@ -210,6 +220,39 @@ class ViewSiteActivity : DarkModeSwitchActivity() {
           toolbar.menu.findItem(R.id.commit)
               .setTitle(it)
         })
+
+    // SSL certificate
+    sslCertificateInput.onTextChanged { viewModel.certificateUri.value = it.toUri() }
+    viewModel.certificateUri.distinct()
+        .observe(this, Observer { sslCertificateInput.setText(it.toString()) })
+    sslCertificateBrowse.setOnClickListener {
+      val intent = Intent(ACTION_OPEN_DOCUMENT).apply {
+        addCategory(CATEGORY_OPENABLE)
+        type = "*/*"
+      }
+      startActivityForResult(intent, SELECT_CERT_FILE_RQ)
+    }
+  }
+
+  override fun onResume() {
+    super.onResume()
+    appToolbar.elevation =
+        if (scrollView.scrollY > appToolbar.measuredHeight / 2) {
+          appToolbar.dimenFloat(R.dimen.default_elevation)
+        } else {
+          0f
+        }
+  }
+
+  override fun onActivityResult(
+    requestCode: Int,
+    resultCode: Int,
+    resultData: Intent?
+  ) {
+    super.onActivityResult(requestCode, resultCode, resultData)
+    if (requestCode == SELECT_CERT_FILE_RQ && resultCode == RESULT_OK) {
+      sslCertificateInput.setText(resultData?.data?.toString() ?: "")
+    }
   }
 
   override fun onNewIntent(intent: Intent?) {

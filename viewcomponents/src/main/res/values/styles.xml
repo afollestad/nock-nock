@@ -52,4 +52,14 @@
     <item name="android:textColor">@color/md_red</item>
   </style>
 
+  <style name="AccentButton" parent="Widget.MaterialComponents.Button">
+    <item name="android:textColor">#fff</item>
+    <item name="backgroundTint">?colorAccent</item>
+    <item name="android:fontFamily">@font/lato</item>
+  </style>
+
+  <style name="AccentTextButton" parent="Widget.MaterialComponents.Button.TextButton">
+    <item name="android:fontFamily">@font/lato</item>
+  </style>
+
 </resources>
