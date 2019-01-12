@@ -17,6 +17,7 @@ package com.afollestad.nocknock.engine.validation
 
 import android.app.job.JobScheduler
 import android.app.job.JobScheduler.RESULT_SUCCESS
+import android.net.Uri
 import com.afollestad.nocknock.data.AppDatabase
 import com.afollestad.nocknock.data.allSites
 import com.afollestad.nocknock.data.model.Site
@@ -25,7 +26,6 @@ import com.afollestad.nocknock.data.model.Status.OK
 import com.afollestad.nocknock.engine.R
 import com.afollestad.nocknock.engine.ssl.SslManager
 import com.afollestad.nocknock.engine.validation.ValidationJob.Companion.KEY_SITE_ID
-import com.afollestad.nocknock.utilities.ext.toUri
 import com.afollestad.nocknock.utilities.providers.BundleProvider
 import com.afollestad.nocknock.utilities.providers.JobInfoProvider
 import com.afollestad.nocknock.utilities.providers.StringProvider
@@ -44,6 +44,8 @@ data class CheckResult(
 )
 
 typealias ClientTimeoutChanger = (client: OkHttpClient, timeout: Int) -> OkHttpClient
+
+typealias UriConverter = (String) -> Uri
 
 /** @author Aidan Follestad (@afollestad) */
 interface ValidationExecutor {
@@ -168,8 +170,8 @@ class RealValidationExecutor(
       val clientWithTimeout = clientTimeoutChanger(okHttpClient, siteSettings.networkTimeout)
       val client = if (!siteSettings.certificate.isNullOrEmpty()) {
         sslManager.clientForCertificate(
-            certUri = siteSettings.certificate!!.toUri(),
-            host = site.url.toUri().host ?: "",
+            certUri = siteSettings.certificate!!,
+            siteUri = site.url,
             client = clientWithTimeout
         )
       } else {
@@ -212,9 +214,7 @@ class RealValidationExecutor(
     jobScheduler.allPendingJobs
         .firstOrNull { job -> job.id == site.id.toInt() }
 
-  @Suppress("unused")
-  @TestOnly
-  fun setClientTimeoutChanger(changer: ClientTimeoutChanger) {
+  @TestOnly fun setClientTimeoutChanger(changer: ClientTimeoutChanger) {
     this.clientTimeoutChanger = changer
   }
 }

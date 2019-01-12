@@ -19,6 +19,7 @@ import android.app.Application
 import android.content.Context
 import android.net.Uri
 import androidx.annotation.CheckResult
+import com.afollestad.nocknock.utilities.ext.toUri
 import okhttp3.OkHttpClient
 import java.io.BufferedInputStream
 import java.io.FileInputStream
@@ -33,8 +34,8 @@ import timber.log.Timber.d as log
 interface SslManager {
 
   @CheckResult fun clientForCertificate(
-    certUri: Uri,
-    host: String,
+    certUri: String,
+    siteUri: String,
     client: OkHttpClient
   ): OkHttpClient
 }
@@ -45,21 +46,25 @@ class RealSslManager(
 ) : SslManager {
 
   override fun clientForCertificate(
-    certUri: Uri,
-    host: String,
+    certUri: String,
+    siteUri: String,
     client: OkHttpClient
   ): OkHttpClient {
-    log("Loading certificate $certUri for host $host")
+    val parsedCertUri = certUri.toUri()
+    val parsedSiteUri = siteUri.toUri()
+    val siteHost = parsedSiteUri.host ?: ""
+
+    log("Loading certificate $certUri for host $siteHost")
     val keyStore = KeyStore.getInstance(KeyStore.getDefaultType())
     keyStore.load(null, null)
 
-    val certInputStream = app.openUri(certUri)
+    val certInputStream = app.openUri(parsedCertUri)
     val bis = BufferedInputStream(certInputStream)
     val certificateFactory = CertificateFactory.getInstance("X.509")
 
     while (bis.available() > 0) {
       val cert = certificateFactory.generateCertificate(bis)
-      keyStore.setCertificateEntry(host, cert)
+      keyStore.setCertificateEntry(siteHost, cert)
     }
 
     val trustManagerFactory =
@@ -76,7 +81,7 @@ class RealSslManager(
         .sslSocketFactory(sslContext.socketFactory, trustManager)
         .hostnameVerifier { hostname, _ ->
           log("Verifying hostname $hostname")
-          hostname == host
+          hostname == siteHost
         }
         .build()
   }

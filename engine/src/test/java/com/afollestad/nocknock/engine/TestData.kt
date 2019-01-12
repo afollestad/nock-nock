@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.afollestad.nocknock
+package com.afollestad.nocknock.engine
 
-import android.app.PendingIntent
 import android.content.Intent
-import android.content.IntentFilter
 import com.afollestad.nocknock.data.AppDatabase
 import com.afollestad.nocknock.data.HeaderDao
 import com.afollestad.nocknock.data.RetryPolicyDao
@@ -33,9 +31,6 @@ import com.afollestad.nocknock.data.model.Status.OK
 import com.afollestad.nocknock.data.model.ValidationMode
 import com.afollestad.nocknock.data.model.ValidationMode.STATUS_CODE
 import com.afollestad.nocknock.data.model.ValidationResult
-import com.afollestad.nocknock.utilities.providers.CanNotifyModel
-import com.afollestad.nocknock.utilities.providers.IntentProvider
-import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doAnswer
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.isA
@@ -168,13 +163,13 @@ fun mockDatabase(): AppDatabase {
     on { delete(isA()) } doReturn 1
   }
   val headerDao = mock<HeaderDao> {
-    on { all() } doReturn com.afollestad.nocknock.engine.MOCK_MODEL_1.headers + com.afollestad.nocknock.engine.MOCK_MODEL_2.headers + com.afollestad.nocknock.engine.MOCK_MODEL_3.headers
+    on { all() } doReturn MOCK_MODEL_1.headers + MOCK_MODEL_2.headers + MOCK_MODEL_3.headers
     on { forSite(isA()) } doAnswer { inv ->
       val id = inv.getArgument<Long>(0)
       return@doAnswer when (id) {
-        1L -> com.afollestad.nocknock.engine.MOCK_MODEL_1.headers
-        2L -> com.afollestad.nocknock.engine.MOCK_MODEL_2.headers
-        3L -> com.afollestad.nocknock.engine.MOCK_MODEL_3.headers
+        1L -> MOCK_MODEL_1.headers
+        2L -> MOCK_MODEL_2.headers
+        3L -> MOCK_MODEL_3.headers
         else -> listOf()
       }
     }
@@ -190,23 +185,5 @@ fun mockDatabase(): AppDatabase {
     on { validationResultsDao() } doReturn resultsDao
     on { retryPolicyDao() } doReturn retryDao
     on { headerDao() } doReturn headerDao
-  }
-}
-
-fun mockIntentProvider() = object : IntentProvider {
-  override fun createFilter(vararg actions: String): IntentFilter {
-    return mock {
-      on { this.getAction(any()) } doAnswer { inv ->
-        val index = inv.getArgument<Int>(0)
-        return@doAnswer actions[index]
-      }
-      on { this.actionsIterator() } doReturn actions.iterator()
-      on { this.countActions() } doReturn actions.size
-    }
-  }
-
-  override fun getPendingIntentForViewSite(model: CanNotifyModel): PendingIntent {
-    // basically no-op right now
-    return mock()
   }
 }

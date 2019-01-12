@@ -17,13 +17,12 @@ package com.afollestad.nocknock.engine
 
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
-import com.afollestad.nocknock.data.legacy.ServerModel
+import com.afollestad.nocknock.data.model.Header
 import com.afollestad.nocknock.data.model.Status.ERROR
 import com.afollestad.nocknock.data.model.Status.OK
-import com.afollestad.nocknock.data.model.ValidationMode.STATUS_CODE
-import com.afollestad.nocknock.data.legacy.ServerModelStore
+import com.afollestad.nocknock.engine.ssl.SslManager
+import com.afollestad.nocknock.engine.validation.RealValidationExecutor
 import com.afollestad.nocknock.engine.validation.ValidationJob.Companion.KEY_SITE_ID
-import com.afollestad.nocknock.engine.validation.RealValidationManager
 import com.afollestad.nocknock.utilities.providers.StringProvider
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
@@ -56,15 +55,21 @@ class ValidationExecutorTest {
   }
   private val bundleProvider = testBundleProvider()
   private val jobInfoProvider = testJobInfoProvider()
-  private val store = mock<ServerModelStore>()
+  private val database = mockDatabase()
+  private val sslManager = mock<SslManager> {
+    on { clientForCertificate(any(), any(), any()) } doAnswer { inv ->
+      inv.getArgument<OkHttpClient>(2)
+    }
+  }
 
-  private val manager = RealValidationManager(
+  private val manager = RealValidationExecutor(
       jobScheduler,
       okHttpClient,
       stringProvider,
       bundleProvider,
       jobInfoProvider,
-      store
+      database,
+      sslManager
   ).apply {
     setClientTimeoutChanger { _, timeout ->
       whenever(okHttpClient.callTimeoutMillis()).doReturn(timeout)
@@ -72,202 +77,241 @@ class ValidationExecutorTest {
     }
   }
 
-  @Test fun ensureScheduledChecks_noEnabledSites() = runBlocking {
-    val model1 = fakeModel().copy(disabled = true)
-    whenever(store.get()).doReturn(listOf(model1))
+  @Test fun ensureScheduledValidations_noEnabledSites() = runBlocking {
+    val model1 = fakeModel(id = 1)
+    model1.settings = model1.settings!!.copy(disabled = true)
+    database.setAllSites(model1)
 
-    manager.ensureScheduledChecks()
+    manager.ensureScheduledValidations()
 
     verifyNoMoreInteractions(jobScheduler)
   }
 
-  @Test fun ensureScheduledChecks_sitesAlreadyHaveJobs() = runBlocking<Unit> {
-    val model1 = fakeModel()
-    val job1 = fakeJob(model1.id)
-    whenever(store.get()).doReturn(listOf(model1))
+  @Test fun ensureScheduledValidations_sitesAlreadyHaveJobs() = runBlocking<Unit> {
+    val model1 = fakeModel(id = 1)
+    val job1 = fakeJob(1)
+    database.setAllSites(model1)
     whenever(jobScheduler.allPendingJobs).doReturn(listOf(job1))
 
-    manager.ensureScheduledChecks()
+    manager.ensureScheduledValidations()
 
     verify(jobScheduler, never()).schedule(any())
   }
 
-  @Test fun ensureScheduledChecks() = runBlocking {
-    val model1 = fakeModel()
-    whenever(store.get()).doReturn(listOf(model1))
+  @Test fun ensureScheduledValidations() = runBlocking {
+    val model1 = fakeModel(id = 1)
+    database.setAllSites(model1)
+
     whenever(jobScheduler.allPendingJobs).doReturn(listOf<JobInfo>())
 
-    manager.ensureScheduledChecks()
+    manager.ensureScheduledValidations()
 
     val jobCaptor = argumentCaptor<JobInfo>()
     verify(jobScheduler).schedule(jobCaptor.capture())
     val jobInfo = jobCaptor.allValues.single()
     assertThat(jobInfo.id).isEqualTo(model1.id)
-    assertThat(jobInfo.extras.getInt(KEY_SITE_ID)).isEqualTo(model1.id)
+    assertThat(jobInfo.extras.getLong(KEY_SITE_ID)).isEqualTo(model1.id)
   }
 
-  @Test fun scheduleCheck_rightNow() {
-    val model1 = fakeModel()
+  @Test fun scheduleValidation_rightNow() {
+    val model1 = fakeModel(id = 1)
     whenever(jobScheduler.allPendingJobs).doReturn(listOf<JobInfo>())
 
-    manager.scheduleCheck(
+    manager.scheduleValidation(
         site = model1,
         rightNow = true
     )
 
     val jobCaptor = argumentCaptor<JobInfo>()
     verify(jobScheduler).schedule(jobCaptor.capture())
-    verify(jobScheduler).cancel(model1.id)
+    verify(jobScheduler).cancel(1)
 
     val jobInfo = jobCaptor.allValues.single()
     assertThat(jobInfo.id).isEqualTo(model1.id)
-    assertThat(jobInfo.extras.getInt(KEY_SITE_ID)).isEqualTo(model1.id)
+    assertThat(jobInfo.extras.getLong(KEY_SITE_ID)).isEqualTo(model1.id)
   }
 
   @Test(expected = IllegalStateException::class)
-  fun scheduleCheck_notFromFinishingJob_haveExistingJob() {
-    val model1 = fakeModel()
-    val job1 = fakeJob(model1.id)
+  fun scheduleValidation_notFromFinishingJob_haveExistingJob() {
+    val model1 = fakeModel(id = 1)
+    val job1 = fakeJob(1)
     whenever(jobScheduler.allPendingJobs).doReturn(listOf(job1))
 
-    manager.scheduleCheck(
+    manager.scheduleValidation(
         site = model1,
         fromFinishingJob = false
     )
   }
 
-  @Test fun scheduleCheck_fromFinishingJob_haveExistingJob() {
-    val model1 = fakeModel()
-    val job1 = fakeJob(model1.id)
+  @Test fun scheduleValidation_fromFinishingJob_haveExistingJob() {
+    val model1 = fakeModel(id = 1)
+    val job1 = fakeJob(1)
     whenever(jobScheduler.allPendingJobs).doReturn(listOf(job1))
 
-    manager.scheduleCheck(
+    manager.scheduleValidation(
         site = model1,
         fromFinishingJob = true
     )
 
     val jobCaptor = argumentCaptor<JobInfo>()
     verify(jobScheduler).schedule(jobCaptor.capture())
-    verify(jobScheduler, never()).cancel(model1.id)
+    verify(jobScheduler, never()).cancel(any())
 
     val jobInfo = jobCaptor.allValues.single()
     assertThat(jobInfo.id).isEqualTo(model1.id)
-    assertThat(jobInfo.extras.getInt(KEY_SITE_ID)).isEqualTo(model1.id)
+    assertThat(jobInfo.extras.getLong(KEY_SITE_ID)).isEqualTo(model1.id)
   }
 
-  @Test fun scheduleCheck() {
-    val model1 = fakeModel()
+  @Test fun scheduleValidation() {
+    val model1 = fakeModel(id = 1)
     whenever(jobScheduler.allPendingJobs).doReturn(listOf<JobInfo>())
 
-    manager.scheduleCheck(
+    manager.scheduleValidation(
         site = model1,
         fromFinishingJob = true
     )
 
     val jobCaptor = argumentCaptor<JobInfo>()
     verify(jobScheduler).schedule(jobCaptor.capture())
-    verify(jobScheduler, never()).cancel(model1.id)
+    verify(jobScheduler, never()).cancel(any())
 
     val jobInfo = jobCaptor.allValues.single()
     assertThat(jobInfo.id).isEqualTo(model1.id)
-    assertThat(jobInfo.extras.getInt(KEY_SITE_ID)).isEqualTo(model1.id)
+    assertThat(jobInfo.extras.getLong(KEY_SITE_ID)).isEqualTo(model1.id)
   }
 
-  @Test fun cancelCheck() {
-    val model1 = fakeModel()
-    manager.cancelCheck(model1)
-    verify(jobScheduler).cancel(model1.id)
+  @Test fun cancelScheduledValidation() {
+    val model1 = fakeModel(id = 1)
+    manager.cancelScheduledValidation(model1)
+    verify(jobScheduler).cancel(1)
   }
 
-  @Test fun performCheck_httpNotSuccess() = runBlocking {
+  @Test fun performValidation_httpNotSuccess() = runBlocking {
     val response = fakeResponse(500, "Internal Server Error", "Hello World")
     val call = mock<Call> {
       on { execute() } doReturn response
     }
     whenever(okHttpClient.newCall(any())).doReturn(call)
 
-    val model1 = fakeModel()
-    val result = manager.performCheck(model1)
+    val model1 = fakeModel(id = 1)
+    val result = manager.performValidation(model1)
 
     assertThat(result.model).isEqualTo(
         model1.copy(
-            status = ERROR,
-            reason = "Response 500 - Hello World"
+            lastResult = model1.lastResult?.copy(
+                status = ERROR,
+                reason = "Response 500 - Hello World"
+            )
         )
     )
   }
 
-  @Test fun performCheck_socketTimeout() = runBlocking {
+  @Test fun performValidation_socketTimeout() = runBlocking {
     val error = SocketTimeoutException("Oh no!")
     val call = mock<Call> {
       on { execute() } doAnswer { throw error }
     }
     whenever(okHttpClient.newCall(any())).doReturn(call)
 
-    val model1 = fakeModel()
-    val result = manager.performCheck(model1)
+    val model1 = fakeModel(id = 1)
+    val result = manager.performValidation(model1)
 
     assertThat(result.model).isEqualTo(
         model1.copy(
-            status = ERROR,
-            reason = timeoutError
+            lastResult = model1.lastResult?.copy(
+                status = ERROR,
+                reason = timeoutError
+            )
         )
     )
   }
 
-  @Test fun performCheck_exception() = runBlocking {
+  @Test fun performValidation_exception() = runBlocking {
     val error = Exception("Oh no!")
     val call = mock<Call> {
       on { execute() } doAnswer { throw error }
     }
     whenever(okHttpClient.newCall(any())).doReturn(call)
 
-    val model1 = fakeModel()
-    val result = manager.performCheck(model1)
+    val model1 = fakeModel(id = 1)
+    val result = manager.performValidation(model1)
 
     assertThat(result.model).isEqualTo(
         model1.copy(
-            status = ERROR,
-            reason = "Oh no!"
+            lastResult = model1.lastResult?.copy(
+                status = ERROR,
+                reason = "Oh no!"
+            )
         )
     )
   }
 
-  @Test fun performCheck_success() = runBlocking {
+  @Test fun performValidation_success_withHeaders() = runBlocking {
+    val requestCaptor = argumentCaptor<Request>()
+    val response = fakeResponse(200, "OK", "Hello World")
+
+    val call = mock<Call> {
+      on { execute() } doReturn response
+    }
+    whenever(okHttpClient.newCall(requestCaptor.capture()))
+        .doReturn(call)
+
+    val model1 = fakeModel(id = 1).copy(
+        headers = listOf(
+            Header(
+                key = "X-Test-Header",
+                value = "Hello, World!"
+            )
+        )
+    )
+    val result = manager.performValidation(model1)
+    val httpRequest = requestCaptor.firstValue
+
+    assertThat(result.model).isEqualTo(
+        model1.copy(
+            lastResult = model1.lastResult?.copy(
+                status = OK,
+                reason = null
+            )
+        )
+    )
+    assertThat(okHttpClient.callTimeoutMillis())
+        .isEqualTo(model1.settings!!.networkTimeout)
+    assertThat(httpRequest.header("X-Test-Header"))
+        .isEqualTo("Hello, World!")
+  }
+
+  @Test fun performValidation_success_withCustomSslCert() = runBlocking<Unit> {
     val response = fakeResponse(200, "OK", "Hello World")
     val call = mock<Call> {
       on { execute() } doReturn response
     }
     whenever(okHttpClient.newCall(any())).doReturn(call)
 
-    val model1 = fakeModel()
-    val result = manager.performCheck(model1)
+    val model1 = fakeModel(id = 1).copy(
+        url = "http://wwww.mysite.com/test.html",
+        headers = emptyList()
+    )
+    model1.settings = model1.settings!!.copy(
+        certificate = "file:///sdcard/cert.pem"
+    )
+    val result = manager.performValidation(model1)
 
     assertThat(result.model).isEqualTo(
         model1.copy(
-            status = OK,
-            reason = null
+            lastResult = model1.lastResult?.copy(
+                status = OK,
+                reason = null
+            )
         )
     )
     assertThat(okHttpClient.callTimeoutMillis())
-        .isEqualTo(model1.networkTimeout)
-  }
+        .isEqualTo(model1.settings!!.networkTimeout)
 
-  @Test fun performCheck_401_butStillSuccess() = runBlocking {
-    val response = fakeResponse(401, "Unauthorized", "Hello World")
-    val call = mock<Call> {
-      on { execute() } doReturn response
-    }
-    whenever(okHttpClient.newCall(any())).doReturn(call)
-
-    val model1 = fakeModel()
-    val result = manager.performCheck(model1)
-
-    assertThat(result.model).isEqualTo(
-        model1.copy(
-            status = OK,
-            reason = null
-        )
+    verify(sslManager).clientForCertificate(
+        "file:///sdcard/cert.pem",
+        "http://wwww.mysite.com/test.html",
+        okHttpClient
     )
   }
 
@@ -292,14 +336,6 @@ class ValidationExecutorTest {
         .body(responseBody)
         .build()
   }
-
-  private fun fakeModel() = ServerModel(
-      id = 1,
-      name = "Wakanda Forever",
-      url = "https://www.wakanda.gov",
-      validationMode = STATUS_CODE,
-      networkTimeout = 60000
-  )
 
   private fun fakeJob(id: Int): JobInfo {
     return mock {

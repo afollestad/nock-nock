@@ -18,6 +18,8 @@ package com.afollestad.nocknock.engine
 import android.app.job.JobInfo
 import android.content.ComponentName
 import android.os.PersistableBundle
+import com.afollestad.nocknock.data.AppDatabase
+import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.utilities.providers.BundleProvider
 import com.afollestad.nocknock.utilities.providers.IBundle
 import com.afollestad.nocknock.utilities.providers.IBundler
@@ -34,11 +36,11 @@ fun testBundleProvider(): BundleProvider {
     val realBundle = mock<PersistableBundle>()
     val creator = it.getArgument<IBundler>(0)
     creator(object : IBundle {
-      override fun putInt(
+      override fun putLong(
         key: String,
-        value: Int
+        value: Long
       ) {
-        whenever(realBundle.getInt(key)).doReturn(value)
+        whenever(realBundle.getLong(key)).doReturn(value)
       }
     })
     return@doAnswer realBundle
@@ -65,4 +67,22 @@ fun testJobInfoProvider(): JobInfoProvider {
     return@doAnswer jobInfo
   }
   return provider
+}
+
+fun AppDatabase.setAllSites(vararg sites: Site) {
+  whenever(siteDao().all()).doReturn(listOf(*sites))
+  for (site in sites) {
+    whenever(siteSettingsDao().forSite(site.id))
+        .doReturn(listOf(site.settings!!))
+    if (site.lastResult != null) {
+      whenever(validationResultsDao().forSite(site.id))
+          .doReturn(listOf(site.lastResult!!))
+    }
+    if (site.retryPolicy != null) {
+      whenever(retryPolicyDao().forSite(site.id))
+          .doReturn(listOf(site.retryPolicy!!))
+    }
+    whenever(headerDao().forSite(site.id))
+        .doReturn(site.headers)
+  }
 }
