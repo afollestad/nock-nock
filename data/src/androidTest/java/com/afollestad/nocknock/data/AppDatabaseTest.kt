@@ -181,7 +181,8 @@ class AppDatabaseTest() {
         validationMode = STATUS_CODE,
         validationArgs = null,
         disabled = false,
-        networkTimeout = 10000
+        networkTimeout = 10000,
+        certificate = null
     )
     val newId = settingsDao.insert(model)
     assertThat(newId).isEqualTo(1)
@@ -199,7 +200,8 @@ class AppDatabaseTest() {
             validationMode = STATUS_CODE,
             validationArgs = null,
             disabled = false,
-            networkTimeout = 10000
+            networkTimeout = 10000,
+            certificate = null
         )
     )
 
@@ -227,7 +229,8 @@ class AppDatabaseTest() {
             validationMode = STATUS_CODE,
             validationArgs = null,
             disabled = false,
-            networkTimeout = 10000
+            networkTimeout = 10000,
+            certificate = null
         )
     )
 
