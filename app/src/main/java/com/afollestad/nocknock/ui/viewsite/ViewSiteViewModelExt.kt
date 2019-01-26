@@ -55,7 +55,11 @@ fun ViewSiteViewModel.setModel(site: Site) {
   setCheckInterval(settings.validationIntervalMs)
   setRetryPolicy(site.retryPolicy)
   headers.value = site.headers
-  certificateUri.value = settings.certificate
+  if (settings.certificate == "null") {
+    certificateUri.value = ""
+  } else {
+    certificateUri.value = settings.certificate
+  }
 
   this.disabled.value = settings.disabled
   this.lastResult.value = site.lastResult
@@ -65,22 +69,22 @@ private fun ViewSiteViewModel.setCheckInterval(interval: Long) {
   when {
     interval >= WEEK -> {
       checkIntervalValue.value =
-          getIntervalFromUnit(interval, WEEK)
+        getIntervalFromUnit(interval, WEEK)
       checkIntervalUnit.value = WEEK
     }
     interval >= DAY -> {
       checkIntervalValue.value =
-          getIntervalFromUnit(interval, DAY)
+        getIntervalFromUnit(interval, DAY)
       checkIntervalUnit.value = DAY
     }
     interval >= HOUR -> {
       checkIntervalValue.value =
-          getIntervalFromUnit(interval, HOUR)
+        getIntervalFromUnit(interval, HOUR)
       checkIntervalUnit.value = HOUR
     }
     interval >= MINUTE -> {
       checkIntervalValue.value =
-          getIntervalFromUnit(interval, MINUTE)
+        getIntervalFromUnit(interval, MINUTE)
       checkIntervalUnit.value = MINUTE
     }
     else -> {

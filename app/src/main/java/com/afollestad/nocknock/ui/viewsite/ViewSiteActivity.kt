@@ -84,17 +84,17 @@ class ViewSiteActivity : DarkModeSwitchActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_viewsite)
-    setupUi()
-    setupValidation()
-
-    lifecycle.run {
-      addObserver(viewModel)
-      addObserver(statusUpdateReceiver)
-    }
 
     // Populate view model with initial data
     val model = intent.getSerializableExtra(KEY_SITE) as Site
     viewModel.setModel(model)
+
+    setupUi()
+    setupValidation()
+    lifecycle.run {
+      addObserver(viewModel)
+      addObserver(statusUpdateReceiver)
+    }
 
     // Loading
     loadingProgress.observe(this, viewModel.onIsLoading())
