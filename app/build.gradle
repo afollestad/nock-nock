@@ -55,6 +55,7 @@ dependencies {
 
   // afollestad
   implementation 'com.afollestad.material-dialogs:core:' + versions.materialDialogs
+  implementation 'com.afollestad:vvalidator:' + versions.vvalidator
 
   // Debugging
   implementation 'com.jakewharton.timber:timber:' + versions.timber
