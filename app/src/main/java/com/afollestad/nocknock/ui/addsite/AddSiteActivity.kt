@@ -117,26 +117,6 @@ class AddSiteActivity : DarkModeSwitchActivity() {
     viewModel.onValidationSearchTermVisibility()
         .toViewVisibility(this, responseValidationSearchTerm)
 
-    // Validation script
-    scriptInputLayout.attach(
-        codeData = viewModel.validationScript,
-        visibility = viewModel.onValidationScriptVisibility(),
-        form = validationForm
-    )
-
-    // Check interval
-    checkIntervalLayout.attach(
-        valueData = viewModel.checkIntervalValue,
-        multiplierData = viewModel.checkIntervalUnit,
-        form = validationForm
-    )
-
-    // Retry Policy
-    retryPolicyLayout.attach(
-        timesData = viewModel.retryPolicyTimes,
-        minutesData = viewModel.retryPolicyMinutes
-    )
-
     // SSL certificate
     sslCertificateInput.onTextChanged { viewModel.certificateUri.value = it }
     viewModel.certificateUri.distinct()
@@ -198,7 +178,7 @@ class AddSiteActivity : DarkModeSwitchActivity() {
           isNotEmpty().description(R.string.please_enter_search_term)
         }
       }
-      input(sslCertificateInput, name = "Certificate Path") {
+      input(sslCertificateInput, name = "Certificate Path", optional = true) {
         isUri().hasScheme("file", "content")
             .that { it.host != null }
             .description(R.string.please_enter_validCertUri)
@@ -210,6 +190,27 @@ class AddSiteActivity : DarkModeSwitchActivity() {
         }
       }
     }
+
+    // Validation script
+    scriptInputLayout.attach(
+        codeData = viewModel.validationScript,
+        visibility = viewModel.onValidationScriptVisibility(),
+        form = validationForm
+    )
+
+    // Check interval
+    checkIntervalLayout.attach(
+        valueData = viewModel.checkIntervalValue,
+        multiplierData = viewModel.checkIntervalUnit,
+        form = validationForm
+    )
+
+    // Retry Policy
+    retryPolicyLayout.attach(
+        timesData = viewModel.retryPolicyTimes,
+        minutesData = viewModel.retryPolicyMinutes,
+        form = validationForm
+    )
   }
 
   override fun onResume() {

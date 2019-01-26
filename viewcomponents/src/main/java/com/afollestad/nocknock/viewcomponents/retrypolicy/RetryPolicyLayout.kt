@@ -24,6 +24,7 @@ import com.afollestad.nocknock.viewcomponents.R
 import com.afollestad.nocknock.viewcomponents.ext.asSafeInt
 import com.afollestad.nocknock.viewcomponents.livedata.attachLiveData
 import com.afollestad.nocknock.viewcomponents.livedata.lifecycleOwner
+import com.afollestad.vvalidator.form.Form
 import kotlinx.android.synthetic.main.retry_policy_layout.view.minutes
 import kotlinx.android.synthetic.main.retry_policy_layout.view.times
 import kotlinx.android.synthetic.main.retry_policy_layout.view.retry_policy_desc as description
@@ -41,7 +42,8 @@ class RetryPolicyLayout(
 
   fun attach(
     timesData: MutableLiveData<Int>,
-    minutesData: MutableLiveData<Int>
+    minutesData: MutableLiveData<Int>,
+    form: Form
   ) {
     times.attachLiveData(lifecycleOwner(), timesData)
     minutes.attachLiveData(lifecycleOwner(), minutesData)
@@ -50,6 +52,13 @@ class RetryPolicyLayout(
     minutes.onTextChanged { invalidateDescriptionText() }
 
     invalidateDescriptionText()
+
+    form.input(times, optional = true) {
+      isNumber().greaterThan(0)
+    }
+    form.input(minutes, optional = true) {
+      isNumber().greaterThan(0)
+    }
   }
 
   private fun invalidateDescriptionText() {
