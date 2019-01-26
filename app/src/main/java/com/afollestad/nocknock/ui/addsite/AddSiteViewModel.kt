@@ -39,9 +39,7 @@ import com.afollestad.nocknock.data.putSite
 import com.afollestad.nocknock.engine.validation.ValidationExecutor
 import com.afollestad.nocknock.ui.ScopedViewModel
 import com.afollestad.nocknock.utilities.ext.MINUTE
-import com.afollestad.nocknock.utilities.ext.toUri
 import com.afollestad.nocknock.utilities.livedata.map
-import com.afollestad.nocknock.viewcomponents.ext.isNullOrLessThan
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -83,22 +81,9 @@ class AddSiteViewModel(
     headers.value = emptyList()
   }
 
-  // Private properties
   private val isLoading = MutableLiveData<Boolean>()
-  private val nameError = MutableLiveData<Int?>()
-  private val urlError = MutableLiveData<Int?>()
-  private val timeoutError = MutableLiveData<Int?>()
-  private val validationSearchTermError = MutableLiveData<Int?>()
-  private val validationScriptError = MutableLiveData<Int?>()
-  private val checkIntervalValueError = MutableLiveData<Int?>()
-  private val certificateError = MutableLiveData<Int?>()
 
-  // Expose private properties or calculated properties
   @CheckResult fun onIsLoading(): LiveData<Boolean> = isLoading
-
-  @CheckResult fun onNameError(): LiveData<Int?> = nameError
-
-  @CheckResult fun onUrlError(): LiveData<Int?> = urlError
 
   @CheckResult fun onUrlWarningVisibility(): LiveData<Boolean> {
     return url.map {
@@ -106,8 +91,6 @@ class AddSiteViewModel(
       return@map it.isNotEmpty() && parsed == null
     }
   }
-
-  @CheckResult fun onTimeoutError(): LiveData<Int?> = timeoutError
 
   @CheckResult fun onValidationModeDescription(): LiveData<Int> {
     return validationMode.map {
@@ -119,19 +102,9 @@ class AddSiteViewModel(
     }
   }
 
-  @CheckResult fun onValidationSearchTermError(): LiveData<Int?> = validationSearchTermError
+  @CheckResult fun onValidationSearchTermVisibility() = validationMode.map { it == TERM_SEARCH }
 
-  @CheckResult fun onValidationSearchTermVisibility() =
-    validationMode.map { it == TERM_SEARCH }
-
-  @CheckResult fun onValidationScriptError(): LiveData<Int?> = validationScriptError
-
-  @CheckResult fun onValidationScriptVisibility() =
-    validationMode.map { it == JAVASCRIPT }
-
-  @CheckResult fun onCheckIntervalError(): LiveData<Int?> = checkIntervalValueError
-
-  @CheckResult fun onCertificateError(): LiveData<Int?> = certificateError
+  @CheckResult fun onValidationScriptVisibility() = validationMode.map { it == JAVASCRIPT }
 
   // Actions
   fun commit(done: () -> Unit) {
@@ -171,89 +144,7 @@ class AddSiteViewModel(
   }
 
   private fun generateDbModel(): Site? {
-    var errorCount = 0
-
-    // Validation name
-    if (name.value.isNullOrEmpty()) {
-      nameError.value = R.string.please_enter_name
-      errorCount++
-    } else {
-      nameError.value = null
-    }
-
-    // Validate URL
-    when {
-      url.value.isNullOrEmpty() -> {
-        urlError.value = R.string.please_enter_url
-        errorCount++
-      }
-      HttpUrl.parse(url.value!!) == null -> {
-        urlError.value = R.string.please_enter_valid_url
-        errorCount++
-      }
-      else -> {
-        urlError.value = null
-      }
-    }
-
-    // Validate timeout
     val timeout = timeout.value ?: 10_000
-    if (timeout < 0) {
-      timeoutError.value = R.string.please_enter_networkTimeout
-      errorCount++
-    } else {
-      timeoutError.value = null
-    }
-
-    // Validate check interval
-    if (checkIntervalValue.value.isNullOrLessThan(1)) {
-      checkIntervalValueError.value = R.string.please_enter_check_interval
-      errorCount++
-    } else {
-      checkIntervalValueError.value = null
-    }
-
-    // Validate arguments
-    if (validationMode.value == TERM_SEARCH &&
-        validationSearchTerm.value.isNullOrEmpty()
-    ) {
-      errorCount++
-      validationSearchTermError.value = R.string.please_enter_search_term
-      validationScriptError.value = null
-    } else if (validationMode.value == JAVASCRIPT &&
-        validationScript.value.isNullOrEmpty()
-    ) {
-      errorCount++
-      validationSearchTermError.value = null
-      validationScriptError.value = R.string.please_enter_javaScript
-    } else {
-      validationSearchTermError.value = null
-      validationScriptError.value = null
-    }
-
-    // Validate SSL certificate
-    val certString = certificateUri.value
-    if (certString != null) {
-      val rawCertUri = certString.toUri()
-      val certUri = if (rawCertUri.scheme == null) {
-        rawCertUri.buildUpon()
-            .scheme("file")
-            .build()
-      } else {
-        rawCertUri
-      }
-      if (certUri.scheme != "content" && certUri.scheme != "file") {
-        errorCount++
-        certificateError.value = R.string.please_enter_validCertUri
-      } else {
-        certificateError.value = null
-      }
-    }
-
-    if (errorCount > 0) {
-      return null
-    }
-
     val cleanedTags = tags.value?.split(',')?.joinToString { it.trim() } ?: ""
 
     val newSettings = SiteSettings(
@@ -275,7 +166,8 @@ class AddSiteViewModel(
     val retryPolicyMinutes = retryPolicyMinutes.value ?: 0
     val newRetryPolicy: RetryPolicy? = if (retryPolicyTimes > 0 && retryPolicyMinutes > 0) {
       RetryPolicy(
-          count = retryPolicyTimes, minutes = retryPolicyMinutes
+          count = retryPolicyTimes,
+          minutes = retryPolicyMinutes
       )
     } else {
       null

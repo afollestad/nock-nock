@@ -19,7 +19,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.afollestad.nocknock.utilities.ext.DAY
 import com.afollestad.nocknock.utilities.ext.HOUR
@@ -28,7 +27,7 @@ import com.afollestad.nocknock.utilities.ext.WEEK
 import com.afollestad.nocknock.viewcomponents.R
 import com.afollestad.nocknock.viewcomponents.livedata.attachLiveData
 import com.afollestad.nocknock.viewcomponents.livedata.lifecycleOwner
-import com.afollestad.nocknock.viewcomponents.livedata.toViewError
+import com.afollestad.vvalidator.form.Form
 import kotlinx.android.synthetic.main.validation_interval_layout.view.input
 import kotlinx.android.synthetic.main.validation_interval_layout.view.spinner
 
@@ -66,8 +65,14 @@ class ValidationIntervalLayout(
   fun attach(
     valueData: MutableLiveData<Int>,
     multiplierData: MutableLiveData<Long>,
-    errorData: LiveData<Int?>
+    form: Form
   ) {
+    form.input(input, name = "Interval") {
+      isNotEmpty().description(R.string.please_enter_check_interval)
+      length().greaterThan(0)
+          .description(R.string.check_interval_must_be_greater_zero)
+    }
+
     input.attachLiveData(lifecycleOwner(), valueData)
     spinner.attachLiveData(
         lifecycleOwner = lifecycleOwner(),
@@ -91,10 +96,5 @@ class ValidationIntervalLayout(
           }
         }
     )
-    errorData.toViewError(lifecycleOwner(), this, ::setError)
-  }
-
-  private fun setError(error: String?) {
-    input.error = error
   }
 }

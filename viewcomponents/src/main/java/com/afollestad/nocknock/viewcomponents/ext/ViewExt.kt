@@ -17,17 +17,13 @@ package com.afollestad.nocknock.viewcomponents.ext
 
 import android.view.View
 import android.view.View.GONE
-import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.ViewTreeObserver
 import androidx.annotation.DimenRes
+import com.afollestad.vvalidator.form.Condition
 
 fun View.show() {
   visibility = VISIBLE
-}
-
-fun View.conceal() {
-  visibility = INVISIBLE
 }
 
 fun View.hide() {
@@ -51,3 +47,7 @@ fun View.onLayout(cb: () -> Unit) {
 fun View.dimenFloat(@DimenRes res: Int) = resources.getDimension(res)
 
 fun View.dimenInt(@DimenRes res: Int) = resources.getDimensionPixelSize(res)
+
+fun View.isVisibleCondition(): Condition = {
+  visibility == VISIBLE
+}

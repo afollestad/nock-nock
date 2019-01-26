@@ -31,11 +31,13 @@ import com.afollestad.nocknock.utilities.ext.onTextChanged
 import com.afollestad.nocknock.utilities.ext.setTextAndMaintainSelection
 import com.afollestad.nocknock.utilities.livedata.distinct
 import com.afollestad.nocknock.viewcomponents.ext.dimenFloat
+import com.afollestad.nocknock.viewcomponents.ext.isVisibleCondition
 import com.afollestad.nocknock.viewcomponents.ext.onScroll
 import com.afollestad.nocknock.viewcomponents.livedata.attachLiveData
-import com.afollestad.nocknock.viewcomponents.livedata.toViewError
 import com.afollestad.nocknock.viewcomponents.livedata.toViewText
 import com.afollestad.nocknock.viewcomponents.livedata.toViewVisibility
+import com.afollestad.vvalidator.form
+import com.afollestad.vvalidator.form.Form
 import kotlinx.android.synthetic.main.activity_addsite.checkIntervalLayout
 import kotlinx.android.synthetic.main.activity_addsite.headersLayout
 import kotlinx.android.synthetic.main.activity_addsite.inputName
@@ -64,13 +66,15 @@ class AddSiteActivity : DarkModeSwitchActivity() {
   }
 
   private val viewModel by viewModel<AddSiteViewModel>()
+  private lateinit var validationForm: Form
 
   @SuppressLint("SetTextI18n")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_addsite)
-    setupUi()
 
+    setupUi()
+    setupValidation()
     lifecycle.addObserver(viewModel)
 
     // Populate view model with initial data
@@ -82,23 +86,17 @@ class AddSiteActivity : DarkModeSwitchActivity() {
 
     // Name
     inputName.attachLiveData(this, viewModel.name)
-    viewModel.onNameError()
-        .toViewError(this, inputName)
 
     // Tags
     inputTags.attachLiveData(this, viewModel.tags)
 
     // Url
     inputUrl.attachLiveData(this, viewModel.url)
-    viewModel.onUrlError()
-        .toViewError(this, inputUrl)
     viewModel.onUrlWarningVisibility()
         .toViewVisibility(this, textUrlWarning)
 
     // Timeout
     responseTimeoutInput.attachLiveData(this, viewModel.timeout)
-    viewModel.onTimeoutError()
-        .toViewError(this, responseTimeoutInput)
 
     // Validation mode
     responseValidationMode.attachLiveData(
@@ -107,8 +105,6 @@ class AddSiteActivity : DarkModeSwitchActivity() {
         outTransformer = { ValidationMode.fromIndex(it) },
         inTransformer = { it.toIndex() }
     )
-    viewModel.onValidationSearchTermError()
-        .toViewError(this, responseValidationSearchTerm)
     viewModel.onValidationModeDescription()
         .toViewText(this, validationModeDescription)
 
@@ -124,15 +120,15 @@ class AddSiteActivity : DarkModeSwitchActivity() {
     // Validation script
     scriptInputLayout.attach(
         codeData = viewModel.validationScript,
-        errorData = viewModel.onValidationScriptError(),
-        visibility = viewModel.onValidationScriptVisibility()
+        visibility = viewModel.onValidationScriptVisibility(),
+        form = validationForm
     )
 
     // Check interval
     checkIntervalLayout.attach(
         valueData = viewModel.checkIntervalValue,
         multiplierData = viewModel.checkIntervalUnit,
-        errorData = viewModel.onCheckIntervalError()
+        form = validationForm
     )
 
     // Retry Policy
@@ -145,8 +141,6 @@ class AddSiteActivity : DarkModeSwitchActivity() {
     sslCertificateInput.onTextChanged { viewModel.certificateUri.value = it }
     viewModel.certificateUri.distinct()
         .observe(this, Observer { sslCertificateInput.setTextAndMaintainSelection(it) })
-    viewModel.onCertificateError()
-        .toViewError(this, sslCertificateInput)
 
     // Headers
     headersLayout.attach(viewModel.headers)
@@ -156,15 +150,6 @@ class AddSiteActivity : DarkModeSwitchActivity() {
     toolbarTitle.setText(R.string.add_site)
     toolbar.run {
       inflateMenu(R.menu.menu_addsite)
-      setOnMenuItemClickListener {
-        if (it.itemId == R.id.commit) {
-          viewModel.commit {
-            setResult(RESULT_OK)
-            finish()
-          }
-        }
-        true
-      }
       setNavigationIcon(R.drawable.ic_action_close)
       setNavigationOnClickListener { finish() }
     }
@@ -192,6 +177,38 @@ class AddSiteActivity : DarkModeSwitchActivity() {
         type = "*/*"
       }
       startActivityForResult(intent, SELECT_CERT_FILE_RQ)
+    }
+  }
+
+  private fun setupValidation() {
+    validationForm = form {
+      input(inputName, name = "Name") {
+        isNotEmpty().description(R.string.please_enter_name)
+      }
+      input(inputUrl, name = "URL") {
+        isNotEmpty().description(R.string.please_enter_url)
+        isUrl().description(R.string.please_enter_valid_url)
+      }
+      input(responseTimeoutInput, name = "Timeout", optional = true) {
+        isNumber().greaterThan(0)
+            .description(R.string.please_enter_networkTimeout)
+      }
+      input(responseValidationSearchTerm, name = "Search term") {
+        conditional(responseValidationSearchTerm.isVisibleCondition()) {
+          isNotEmpty().description(R.string.please_enter_search_term)
+        }
+      }
+      input(sslCertificateInput, name = "Certificate Path") {
+        isUri().hasScheme("file", "content")
+            .that { it.host != null }
+            .description(R.string.please_enter_validCertUri)
+      }
+      submitWith(toolbar.menu, R.id.commit) {
+        viewModel.commit {
+          setResult(RESULT_OK)
+          finish()
+        }
+      }
     }
   }
 

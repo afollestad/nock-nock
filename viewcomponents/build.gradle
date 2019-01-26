@@ -18,6 +18,8 @@ dependencies {
   implementation project(':common')
   implementation project(':data')
 
+  api 'com.afollestad:vvalidator:' + versions.vvalidator
+
   implementation 'androidx.appcompat:appcompat:' + versions.androidxCore
   implementation 'com.google.android.material:material:' + versions.googleMaterial
   api 'androidx.lifecycle:lifecycle-extensions:' + versions.lifecycle

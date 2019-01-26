@@ -29,9 +29,7 @@
   <string name="please_enter_name">Please enter a name!</string>
   <string name="please_enter_url">Please enter a URL.</string>
   <string name="please_enter_valid_url">Please enter a valid URL.</string>
-  <string name="please_enter_check_interval">Please input a validation interval.</string>
   <string name="please_enter_search_term">Please input a search term.</string>
-  <string name="please_enter_javaScript">Please input a validation script.</string>
   <string name="please_enter_networkTimeout">Please enter a network timeout greater than 0.</string>
   <string name="please_enter_validCertUri">Certificate should be a valid file or content URI.</string>
 

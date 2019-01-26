@@ -23,4 +23,8 @@
   <string name="header_name">Header Name</string>
   <string name="header_value">Header Value</string>
 
+  <string name="please_enter_check_interval">Please input a validation interval.</string>
+  <string name="check_interval_must_be_greater_zero">The validation interval must be greater than 0.</string>
+  <string name="please_enter_javaScript">Please input a validation script.</string>
+
 </resources>

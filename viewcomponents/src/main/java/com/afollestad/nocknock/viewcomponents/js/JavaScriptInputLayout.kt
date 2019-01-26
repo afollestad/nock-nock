@@ -20,15 +20,17 @@ import android.util.AttributeSet
 import android.widget.HorizontalScrollView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.afollestad.nocknock.viewcomponents.R
 import com.afollestad.nocknock.viewcomponents.R.dimen
 import com.afollestad.nocknock.viewcomponents.R.layout
 import com.afollestad.nocknock.viewcomponents.ext.dimenFloat
 import com.afollestad.nocknock.viewcomponents.ext.dimenInt
+import com.afollestad.nocknock.viewcomponents.ext.isVisibleCondition
 import com.afollestad.nocknock.viewcomponents.ext.showOrHide
 import com.afollestad.nocknock.viewcomponents.livedata.attachLiveData
 import com.afollestad.nocknock.viewcomponents.livedata.lifecycleOwner
-import com.afollestad.nocknock.viewcomponents.livedata.toViewError
 import com.afollestad.nocknock.viewcomponents.livedata.toViewVisibility
+import com.afollestad.vvalidator.form.Form
 import kotlinx.android.synthetic.main.javascript_input_layout.view.error_text
 import kotlinx.android.synthetic.main.javascript_input_layout.view.userInput
 
@@ -55,11 +57,20 @@ class JavaScriptInputLayout(
 
   fun attach(
     codeData: MutableLiveData<String>,
-    errorData: LiveData<Int?>,
-    visibility: LiveData<Boolean>
+    visibility: LiveData<Boolean>,
+    form: Form
   ) {
+    form.input(userInput, name = "Script") {
+      conditional(isVisibleCondition()) {
+        isNotEmpty().description(R.string.please_enter_javaScript)
+      }
+      onErrors { _, errors ->
+        val error = errors.firstOrNull()
+        setError(error.toString())
+      }
+    }
+
     userInput.attachLiveData(lifecycleOwner(), codeData)
-    errorData.toViewError(lifecycleOwner(), this, ::setError)
     visibility.toViewVisibility(lifecycleOwner(), this)
   }
 
