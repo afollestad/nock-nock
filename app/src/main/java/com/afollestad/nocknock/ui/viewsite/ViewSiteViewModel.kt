@@ -231,7 +231,7 @@ class ViewSiteViewModel(
         validationArgs = getValidationArgs(),
         networkTimeout = timeout,
         disabled = false,
-        certificate = certificateUri.value.toString()
+        certificate = certificateUri.value?.toString()
     )
 
     val retryPolicyTimes = retryPolicyTimes.value ?: 0

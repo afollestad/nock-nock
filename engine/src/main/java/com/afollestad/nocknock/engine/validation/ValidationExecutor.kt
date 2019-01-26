@@ -26,6 +26,7 @@ import com.afollestad.nocknock.data.model.Status.OK
 import com.afollestad.nocknock.engine.R
 import com.afollestad.nocknock.engine.ssl.SslManager
 import com.afollestad.nocknock.engine.validation.ValidationJob.Companion.KEY_SITE_ID
+import com.afollestad.nocknock.utilities.ext.isNotNullOrEmpty
 import com.afollestad.nocknock.utilities.providers.BundleProvider
 import com.afollestad.nocknock.utilities.providers.JobInfoProvider
 import com.afollestad.nocknock.utilities.providers.StringProvider
@@ -168,7 +169,7 @@ class RealValidationExecutor(
 
     return try {
       val clientWithTimeout = clientTimeoutChanger(okHttpClient, siteSettings.networkTimeout)
-      val client = if (!siteSettings.certificate.isNullOrEmpty()) {
+      val client = if (siteSettings.certificate.isNotNullOrEmpty()) {
         sslManager.clientForCertificate(
             certUri = siteSettings.certificate!!,
             siteUri = site.url,
@@ -205,6 +206,7 @@ class RealValidationExecutor(
           )
       )
     } catch (ex: Exception) {
+      ex.printStackTrace()
       log("performValidation(${site.id}) = Error: ${ex.message}")
       CheckResult(model = site.withStatus(status = ERROR, reason = ex.message))
     }

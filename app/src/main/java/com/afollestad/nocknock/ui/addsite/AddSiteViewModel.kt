@@ -153,7 +153,7 @@ class AddSiteViewModel(
         validationArgs = getValidationArgs(),
         networkTimeout = timeout,
         disabled = false,
-        certificate = certificateUri.value.toString()
+        certificate = certificateUri.value?.toString()
     )
 
     val newLastResult = ValidationResult(

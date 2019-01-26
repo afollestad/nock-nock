@@ -18,3 +18,10 @@ package com.afollestad.nocknock.utilities.ext
 import android.net.Uri
 
 fun String.toUri() = Uri.parse(this)!!
+
+fun String?.isNotNullOrEmpty(): Boolean {
+  if (this == null || this == "null") {
+    return false
+  }
+  return !isNullOrEmpty()
+}
