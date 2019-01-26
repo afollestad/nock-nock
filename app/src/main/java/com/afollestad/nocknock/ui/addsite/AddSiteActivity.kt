@@ -72,9 +72,9 @@ class AddSiteActivity : DarkModeSwitchActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_addsite)
-
     setupUi()
     setupValidation()
+
     lifecycle.addObserver(viewModel)
 
     // Populate view model with initial data
