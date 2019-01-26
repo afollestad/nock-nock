@@ -36,6 +36,7 @@ import okhttp3.Response
 import org.jetbrains.annotations.TestOnly
 import java.net.SocketTimeoutException
 import java.util.concurrent.TimeUnit.MILLISECONDS
+import kotlin.math.max
 import timber.log.Timber.d as log
 
 /** @author Aidan Follestad (@afollestad) */
@@ -154,21 +155,23 @@ class RealValidationExecutor(
     check(site.id != 0L) { "Cannot schedule validations for jobs with no ID." }
     val siteSettings = site.settings
     requireNotNull(siteSettings) { "Site settings must be populated." }
-    check(siteSettings.networkTimeout > 0) { "Network timeout not set for site ${site.id}" }
     log("performValidation(${site.id}) - GET ${site.url}")
 
     val request = Request.Builder()
         .apply {
           url(site.url)
           get()
-          site.headers.forEach { header ->
-            addHeader(header.key, header.value)
-          }
+          site.headers
+              .filter { header -> header.key.isNotNullOrEmpty() }
+              .forEach { header ->
+                addHeader(header.key, header.value)
+              }
         }
         .build()
 
     return try {
-      val clientWithTimeout = clientTimeoutChanger(okHttpClient, siteSettings.networkTimeout)
+      val timeout = max(siteSettings.networkTimeout, 1)
+      val clientWithTimeout = clientTimeoutChanger(okHttpClient, timeout)
       val client = if (siteSettings.certificate.isNotNullOrEmpty()) {
         sslManager.clientForCertificate(
             certUri = siteSettings.certificate!!,
