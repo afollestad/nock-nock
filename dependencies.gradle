@@ -34,7 +34,7 @@ ext.versions = [
     rxBinding           : '3.0.0-alpha1',
 
     // afollestad
-    materialDialogs     : '2.0.0-rc8',
+    materialDialogs     : '2.0.0-rc9',
     rxkPrefs            : '1.2.2',
 
     // Debugging
