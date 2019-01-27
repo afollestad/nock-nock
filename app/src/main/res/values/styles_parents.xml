@@ -9,6 +9,7 @@
     <item name="toolbarTitleColor">#000000</item>
     <item name="dividerColor">#EEEEEE</item>
     <item name="iconColor">#000000</item>
+    <item name="scriptLayoutBackground">@color/lighterGray</item>
 
     <item name="android:textColorPrimary">#212121</item>
     <item name="android:textColorSecondary">#727272</item>
@@ -33,6 +34,7 @@
     <item name="toolbarTitleColor">#ffffff</item>
     <item name="dividerColor">#303030</item>
     <item name="iconColor">#FFFFFF</item>
+    <item name="scriptLayoutBackground">@color/darkerGray</item>
 
     <item name="android:textColorPrimary">#FFFFFF</item>
     <item name="android:textColorSecondary">#F0F0F0</item>

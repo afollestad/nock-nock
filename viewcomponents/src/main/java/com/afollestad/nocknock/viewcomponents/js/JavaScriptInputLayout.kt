@@ -52,7 +52,7 @@ class JavaScriptInputLayout(
         contentInset // bottom
     )
     elevation = dimenFloat(dimen.default_elevation)
-    inflate(context, layout.javascript_input_layout, this)
+    inflate(context, R.layout.javascript_input_layout, this)
   }
 
   fun attach(

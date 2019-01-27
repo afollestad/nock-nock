@@ -7,7 +7,9 @@
   <color name="colorPrimary_darkTheme">#212121</color>
   <color name="colorPrimaryDark_darkTheme">#252525</color>
 
-  <color name="lighterGray">#303030</color>
+  <color name="darkerGray">#303030</color>
+  <color name="lighterGray">#EEEEEE</color>
+
   <color name="colorAccent">#FF6E40</color>
   <color name="colorAccent_pressed">#E44615</color>
   <color name="colorAccent_translucent">#40FF6E40</color>
