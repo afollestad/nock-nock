@@ -36,7 +36,7 @@ ext.versions = [
     // afollestad
     materialDialogs     : '2.0.0-rc9',
     rxkPrefs            : '1.2.2',
-    vvalidator          : '0.2.2',
+    vvalidator          : '0.3.0',
 
     // Debugging
     timber              : '4.7.1',
