@@ -35,7 +35,8 @@ fun fakeSettingsModel(
     validationMode = validationMode,
     validationArgs = null,
     disabled = false,
-    networkTimeout = 10000
+    networkTimeout = 10000,
+    certificate = null
 )
 
 fun fakeResultModel(

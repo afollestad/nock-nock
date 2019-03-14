@@ -18,6 +18,8 @@ package com.afollestad.nocknock.ui.viewsite
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.afollestad.nocknock.MOCK_MODEL_1
 import com.afollestad.nocknock.R
+import com.afollestad.nocknock.data.model.Header
+import com.afollestad.nocknock.data.model.RetryPolicy
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.SiteSettings
 import com.afollestad.nocknock.data.model.Status.CHECKING
@@ -29,6 +31,7 @@ import com.afollestad.nocknock.data.model.ValidationMode.STATUS_CODE
 import com.afollestad.nocknock.data.model.ValidationMode.TERM_SEARCH
 import com.afollestad.nocknock.data.model.ValidationResult
 import com.afollestad.nocknock.engine.validation.ValidationExecutor
+import com.afollestad.nocknock.fakeRetryPolicy
 import com.afollestad.nocknock.mockDatabase
 import com.afollestad.nocknock.notifications.NockNotificationManager
 import com.afollestad.nocknock.utilities.livedata.test
@@ -38,8 +41,10 @@ import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.doAnswer
+import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -255,6 +260,8 @@ class ViewSiteViewModelTest {
   }
 
   @Test fun commit_success() = runBlocking {
+    whenever(database.retryPolicyDao().forSite(any())).doReturn(listOf(fakeRetryPolicy(1)))
+
     val isLoading = viewModel.onIsLoading()
         .test()
 
@@ -267,11 +274,13 @@ class ViewSiteViewModelTest {
     val siteCaptor = argumentCaptor<Site>()
     val settingsCaptor = argumentCaptor<SiteSettings>()
     val resultCaptor = argumentCaptor<ValidationResult>()
+    val retryPolicyCaptor = argumentCaptor<RetryPolicy>()
 
     isLoading.assertValues(true, false)
     verify(database.siteDao()).update(siteCaptor.capture())
     verify(database.siteSettingsDao()).update(settingsCaptor.capture())
     verify(database.validationResultsDao()).update(resultCaptor.capture())
+    verify(database.retryPolicyDao()).update(retryPolicyCaptor.capture())
 
     // From fillInModel() below
     val updatedSettings = MOCK_MODEL_1.settings!!.copy(
@@ -284,11 +293,13 @@ class ViewSiteViewModelTest {
     val updatedResult = MOCK_MODEL_1.lastResult!!.copy(
         status = WAITING
     )
+    val retryPolicy = retryPolicyCaptor.firstValue
     val updatedModel = MOCK_MODEL_1.copy(
         name = "Hello There",
         url = "https://www.hellothere.com",
         settings = updatedSettings,
-        lastResult = updatedResult
+        lastResult = updatedResult,
+        retryPolicy = retryPolicy
     )
 
     assertThat(siteCaptor.firstValue).isEqualTo(updatedModel)
@@ -373,5 +384,12 @@ class ViewSiteViewModelTest {
     validationScript.value = "throw 'Oh no!'"
     checkIntervalValue.value = 24
     checkIntervalUnit.value = 60000
+    tags.value = "one,two"
+    retryPolicyTimes.value = 5
+    retryPolicyMinutes.value = 5
+    headers.value = listOf(
+        Header(2L, 1L, key = "Content-Type", value = "text/html"),
+        Header(3L, 1L, key = "User-Agent", value = "NockNock")
+    )
   }
 }

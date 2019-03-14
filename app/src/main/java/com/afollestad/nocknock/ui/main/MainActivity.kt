@@ -33,6 +33,7 @@ import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.dialogs.AboutDialog
 import com.afollestad.nocknock.notifications.NockNotificationManager
 import com.afollestad.nocknock.ui.DarkModeSwitchActivity
+import com.afollestad.nocknock.ui.NightMode.UNKNOWN
 import com.afollestad.nocknock.utilities.providers.IntentProvider
 import com.afollestad.nocknock.utilities.ui.toast
 import com.afollestad.nocknock.viewUrl
@@ -93,7 +94,13 @@ class MainActivity : DarkModeSwitchActivity() {
     toolbar.run {
       inflateMenu(R.menu.menu_main)
       menu.findItem(R.id.dark_mode)
-          .isChecked = isDarkMode()
+          .apply {
+            if (getCurrentNightMode() == UNKNOWN) {
+              isVisible = false
+            } else {
+              isChecked = isDarkMode()
+            }
+          }
       setOnMenuItemClickListener { item ->
         when (item.itemId) {
           R.id.about -> AboutDialog.show(this@MainActivity)

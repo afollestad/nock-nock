@@ -17,20 +17,21 @@ package com.afollestad.nocknock.ui.addsite
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.afollestad.nocknock.R
+import com.afollestad.nocknock.data.model.Header
 import com.afollestad.nocknock.data.model.Site
 import com.afollestad.nocknock.data.model.SiteSettings
+import com.afollestad.nocknock.data.model.Status.WAITING
 import com.afollestad.nocknock.data.model.ValidationMode.JAVASCRIPT
 import com.afollestad.nocknock.data.model.ValidationMode.STATUS_CODE
 import com.afollestad.nocknock.data.model.ValidationMode.TERM_SEARCH
+import com.afollestad.nocknock.data.model.ValidationResult
 import com.afollestad.nocknock.engine.validation.ValidationExecutor
 import com.afollestad.nocknock.mockDatabase
 import com.afollestad.nocknock.utilities.ext.MINUTE
 import com.afollestad.nocknock.utilities.livedata.test
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -159,18 +160,23 @@ class AddSiteViewModelTest {
 
     val siteCaptor = argumentCaptor<Site>()
     val settingsCaptor = argumentCaptor<SiteSettings>()
+    val validationResultCaptor = argumentCaptor<ValidationResult>()
 
     isLoading.assertValues(true, false)
     verify(database.siteDao()).insert(siteCaptor.capture())
     verify(database.siteSettingsDao()).insert(settingsCaptor.capture())
-    verify(database.validationResultsDao(), never()).insert(any())
+    verify(database.validationResultsDao()).insert(validationResultCaptor.capture())
 
     val settings = settingsCaptor.firstValue
+    val result = validationResultCaptor.firstValue.copy(siteId = 1)
     val model = siteCaptor.firstValue.copy(
         id = 1, // fill it in because our insert captor doesn't catch this
         settings = settings,
-        lastResult = null
+        lastResult = result
     )
+
+    assertThat(result.reason).isNull()
+    assertThat(result.status).isEqualTo(WAITING)
 
     verify(validationManager).scheduleValidation(
         site = model,
@@ -191,5 +197,10 @@ class AddSiteViewModelTest {
     validationScript.value = null
     checkIntervalValue.value = 60
     checkIntervalUnit.value = 1000
+    tags.value = "one,two"
+    headers.value = listOf(
+        Header(2L, 1L, key = "Content-Type", value = "text/html"),
+        Header(3L, 1L, key = "User-Agent", value = "NockNock")
+    )
   }
 }

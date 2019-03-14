@@ -223,7 +223,7 @@ class ViewSiteViewModel(
 
   private fun getUpdatedDbModel(): Site? {
     val timeout = timeout.value ?: 10_000
-    val cleanedTags = tags.value?.split(',')?.joinToString { it.trim() } ?: ""
+    val cleanedTags = tags.value?.split(',')?.joinToString(separator = ",") ?: ""
 
     val newSettings = site.settings!!.copy(
         validationIntervalMs = getCheckIntervalMs(),

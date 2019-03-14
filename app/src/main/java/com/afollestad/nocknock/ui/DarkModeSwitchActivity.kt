@@ -15,10 +15,15 @@
  */
 package com.afollestad.nocknock.ui
 
+import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.koin.PREF_DARK_MODE
+import com.afollestad.nocknock.ui.NightMode.DISABLED
+import com.afollestad.nocknock.ui.NightMode.ENABLED
+import com.afollestad.nocknock.ui.NightMode.UNKNOWN
 import com.afollestad.nocknock.utilities.rx.attachLifecycle
 import com.afollestad.rxkprefs.Pref
 import org.koin.android.ext.android.inject
@@ -35,13 +40,27 @@ abstract class DarkModeSwitchActivity : AppCompatActivity() {
     setTheme(themeRes())
     super.onCreate(savedInstanceState)
 
-    darkModePref.observe()
-        .filter { it != isDarkModeEnabled }
-        .subscribe {
-          log("Theme changed, recreating Activity.")
-          recreate()
-        }
-        .attachLifecycle(this)
+    if (getCurrentNightMode() == UNKNOWN) {
+      darkModePref.observe()
+          .filter { it != isDarkModeEnabled }
+          .subscribe {
+            log("Theme changed, recreating Activity.")
+            recreate()
+          }
+          .attachLifecycle(this)
+    }
+  }
+
+  protected fun getCurrentNightMode(): NightMode {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+      return UNKNOWN
+    }
+    val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+    return when (currentNightMode) {
+      Configuration.UI_MODE_NIGHT_YES -> return ENABLED
+      Configuration.UI_MODE_NIGHT_NO -> return DISABLED
+      else -> UNKNOWN
+    }
   }
 
   protected fun isDarkMode() = darkModePref.get()
