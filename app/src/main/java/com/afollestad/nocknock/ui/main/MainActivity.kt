@@ -96,9 +96,9 @@ class MainActivity : DarkModeSwitchActivity() {
       menu.findItem(R.id.dark_mode)
           .apply {
             if (getCurrentNightMode() == UNKNOWN) {
-              isVisible = false
-            } else {
               isChecked = isDarkMode()
+            } else {
+              isVisible = false
             }
           }
       setOnMenuItemClickListener { item ->

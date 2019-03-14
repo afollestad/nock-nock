@@ -63,7 +63,13 @@ abstract class DarkModeSwitchActivity : AppCompatActivity() {
     }
   }
 
-  protected fun isDarkMode() = darkModePref.get()
+  protected fun isDarkMode(): Boolean {
+    return when (getCurrentNightMode()) {
+      ENABLED -> true
+      DISABLED -> false
+      else -> darkModePref.get()
+    }
+  }
 
   protected fun toggleDarkMode() = setDarkMode(!isDarkMode())
 
