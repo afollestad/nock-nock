@@ -30,6 +30,7 @@ dependencies {
   implementation 'org.mozilla:rhino:' + versions.rhino
 
   api 'com.afollestad:rxkprefs:' + versions.rxkPrefs
+  api "io.reactivex.rxjava2:rxjava:" + versions.rxJava
 
   testImplementation 'junit:junit:' + versions.junit
   testImplementation 'com.google.truth:truth:' + versions.truth

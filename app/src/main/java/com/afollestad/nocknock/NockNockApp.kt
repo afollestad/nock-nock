@@ -47,10 +47,8 @@ class NockNockApp : Application() {
       Timber.plant(DebugTree())
     }
 
-    if (BuildConfig.FABRIC_API_KEY.isNotEmpty()) {
-      Timber.plant(FabricTree())
-      Fabric.with(this, Crashlytics())
-    }
+    Timber.plant(FabricTree())
+    Fabric.with(this, Crashlytics())
 
     val modules = listOf(
         prefModule,

@@ -4,8 +4,6 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 
-apply from: '../fabric.gradle'
-
 android {
   compileSdkVersion versions.compileSdk
   buildToolsVersion versions.buildTools
@@ -18,14 +16,9 @@ android {
     versionName versions.publishVersion
   }
 
-  buildTypes {
-    debug {
-      ext.enableCrashlytics = false
-      buildConfigField "String", "FABRIC_API_KEY", "\"\""
-    }
-    release {
-      buildConfigField "String", "FABRIC_API_KEY", "\"${getFabricApiKey()}\""
-    }
+  compileOptions {
+    sourceCompatibility 1.8
+    targetCompatibility 1.8
   }
 }
 
@@ -41,6 +34,7 @@ dependencies {
   implementation 'androidx.recyclerview:recyclerview:' + versions.androidxRecyclerView
   implementation 'com.google.android.material:material:' + versions.googleMaterial
   implementation 'androidx.browser:browser:' + versions.androidxBrowser
+  implementation 'com.google.firebase:firebase-core:' + versions.firebaseCore
 
   // Lifecycle
   kapt 'androidx.lifecycle:lifecycle-compiler:' + versions.lifecycle
@@ -75,3 +69,7 @@ dependencies {
 }
 
 apply from: '../spotless.gradle'
+apply from: '../mock/mock.gradle'
+
+apply plugin: "io.fabric"
+apply plugin: 'com.google.gms.google-services'

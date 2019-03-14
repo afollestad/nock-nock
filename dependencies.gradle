@@ -7,13 +7,14 @@ ext.versions = [
     publishVersionCode  : 42,
 
     // Plugins
-    gradlePlugin        : '3.3.1',
-    spotlessPlugin      : '3.18.0',
-    versionPlugin       : '0.20.0',
+    gradlePlugin        : '3.3.2',
+    spotlessPlugin      : '3.19.0',
+    versionPlugin       : '0.21.0',
+    googleServices      : '4.2.0',
     fabricPlugin        : '1.+',
 
     // Misc
-    okHttp              : '3.13.1',
+    okHttp              : '3.14.0',
     rhino               : '1.7.10',
 
     // Kotlin
@@ -22,20 +23,22 @@ ext.versions = [
     koin                : '1.0.2',
 
     // Google/AndroidX
-    androidxAnnotations : '1.0.1',
+    androidxAnnotations : '1.0.2',
     androidxCore        : '1.0.2',
     androidxRecyclerView: '1.0.0',
     androidxBrowser     : '1.0.0',
     googleMaterial      : '1.0.0',
     room                : '2.0.0',
     lifecycle           : '2.0.0',
+    firebaseCore        : '16.0.7',
 
     // Rx
+    rxJava              : '2.2.7',
     rxBinding           : '3.0.0-alpha1',
 
     // afollestad
-    materialDialogs     : '2.0.0',
-    rxkPrefs            : '1.2.4',
+    materialDialogs     : '2.0.3',
+    rxkPrefs            : '1.2.5',
     vvalidator          : '0.3.1',
 
     // Debugging
@@ -44,9 +47,9 @@ ext.versions = [
 
     // Unit testing
     junit               : '4.12',
-    mockito             : '2.24.5',
+    mockito             : '2.25.0',
     mockitoKotlin       : '2.1.0',
-    truth               : '0.42',
+    truth               : '0.43',
 
     // UI testing
     androidxTestRunner  : '1.1.1',
