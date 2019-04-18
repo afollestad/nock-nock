@@ -7,7 +7,7 @@ ext.versions = [
     publishVersionCode  : 43,
 
     // Plugins
-    gradlePlugin        : '3.3.2',
+    gradlePlugin        : '3.4.0',
     spotlessPlugin      : '3.22.0',
     versionPlugin       : '0.21.0',
     googleServices      : '4.2.0',
@@ -37,7 +37,7 @@ ext.versions = [
     rxBinding           : '3.0.0-alpha1',
 
     // afollestad
-    materialDialogs     : '2.7.0',
+    materialDialogs     : '2.8.1',
     rxkPrefs            : '1.2.5',
     vvalidator          : '0.4.1',
 
