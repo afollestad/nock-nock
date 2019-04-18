@@ -24,7 +24,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItems
-import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.afollestad.nocknock.R
 import com.afollestad.nocknock.adapter.SiteAdapter
 import com.afollestad.nocknock.adapter.TagAdapter
@@ -35,9 +34,6 @@ import com.afollestad.nocknock.notifications.NockNotificationManager
 import com.afollestad.nocknock.ui.DarkModeSwitchActivity
 import com.afollestad.nocknock.ui.NightMode.UNKNOWN
 import com.afollestad.nocknock.utilities.providers.IntentProvider
-import com.afollestad.nocknock.utilities.ui.toast
-import com.afollestad.nocknock.viewUrl
-import com.afollestad.nocknock.viewUrlWithApp
 import com.afollestad.nocknock.viewcomponents.livedata.toViewVisibility
 import kotlinx.android.synthetic.main.activity_main.fab
 import kotlinx.android.synthetic.main.activity_main.list
@@ -105,7 +101,6 @@ class MainActivity : DarkModeSwitchActivity() {
         when (item.itemId) {
           R.id.about -> AboutDialog.show(this@MainActivity)
           R.id.dark_mode -> toggleDarkMode()
-          R.id.support_me -> supportMe()
         }
         return@setOnMenuItemClickListener true
       }
@@ -149,22 +144,6 @@ class MainActivity : DarkModeSwitchActivity() {
       }
     } else {
       viewSite(model)
-    }
-  }
-
-  private fun supportMe() {
-    MaterialDialog(this).show {
-      title(R.string.support_me)
-      message(R.string.support_me_message, html = true, lineHeightMultiplier = 1.4f)
-      listItemsSingleChoice(R.array.donation_options) { _, index, _ ->
-        when (index) {
-          0 -> viewUrl("https://paypal.me/AidanFollestad")
-          1 -> viewUrlWithApp("https://cash.me/\$afollestad", pkg = "com.squareup.cash")
-          2 -> viewUrlWithApp("https://venmo.com/afollestad", pkg = "com.venmo")
-        }
-        toast(R.string.thank_you)
-      }
-      positiveButton(R.string.next)
     }
   }
 }

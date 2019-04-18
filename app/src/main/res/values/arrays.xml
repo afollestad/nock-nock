@@ -13,10 +13,4 @@
     <item>JavaScript Evaluation</item>
   </string-array>
 
-  <string-array name="donation_options">
-    <item>via PayPal</item>
-    <item>via Cash App</item>
-    <item>via Venmo</item>
-  </string-array>
-
 </resources>
