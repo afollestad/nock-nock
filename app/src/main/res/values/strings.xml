@@ -85,14 +85,6 @@
     exception to pass custom error messages to Nock Nock.
   </string>
 
-  <string name="support_me">Donate</string>
-  <string name="support_me_message"><![CDATA[
-      <b>Nock Nock</b> was created and is maintained by one person. Donations are <b>much</b>
-      appreciated and encourage continued support.
-  ]]></string>
-  <string name="thank_you">Thank you very much!</string>
-  <string name="next">Next</string>
-
   <string name="install_web_browser">Please install a web browser app, such as Google Chrome.</string>
 
 </resources>
