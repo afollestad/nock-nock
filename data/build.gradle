@@ -14,6 +14,10 @@ android {
 
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
   }
+
+  packagingOptions {
+    exclude 'META-INF/atomicfu.kotlin_module'
+  }
 }
 
 dependencies {
