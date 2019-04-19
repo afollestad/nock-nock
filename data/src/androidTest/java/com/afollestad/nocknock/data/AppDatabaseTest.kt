@@ -431,9 +431,30 @@ class AppDatabaseTest() {
 
     val allSites = db.allSites()
     assertThat(allSites.size).isEqualTo(3)
-    assertThat(allSites[0]).isEqualTo(MOCK_MODEL_1)
-    assertThat(allSites[1]).isEqualTo(MOCK_MODEL_2)
-    assertThat(allSites[2]).isEqualTo(MOCK_MODEL_3)
+    assertThat(allSites[0]).isEqualTo(
+        MOCK_MODEL_1.copy(
+            headers = listOf(
+                MOCK_MODEL_1.headers.first().copy(id = 1),
+                MOCK_MODEL_1.headers.last().copy(id = 2)
+            )
+        )
+    )
+    assertThat(allSites[1]).isEqualTo(
+        MOCK_MODEL_2.copy(
+            headers = listOf(
+                MOCK_MODEL_2.headers.first().copy(id = 3),
+                MOCK_MODEL_2.headers.last().copy(id = 4)
+            )
+        )
+    )
+    assertThat(allSites[2]).isEqualTo(
+        MOCK_MODEL_3.copy(
+            headers = listOf(
+                MOCK_MODEL_3.headers.first().copy(id = 5),
+                MOCK_MODEL_3.headers.last().copy(id = 6)
+            )
+        )
+    )
   }
 
   @Test fun extension_put_getSite() {
@@ -470,10 +491,12 @@ class AppDatabaseTest() {
     )
     val updatedHeaders = listOf(
         modelToUpdate.headers.first().copy(
+            id = 7,
             key = "One",
             value = "Hello"
         ),
         modelToUpdate.headers.last().copy(
+            id = 8,
             key = "Two",
             value = "Hey"
         )
