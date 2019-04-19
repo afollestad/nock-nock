@@ -12,6 +12,10 @@ android {
     versionName versions.publishVersion
   }
 
+  packagingOptions {
+    exclude 'META-INF/atomicfu.kotlin_module'
+  }
+
   // For Mozilla Rhino
   lintOptions {
     abortOnError false
