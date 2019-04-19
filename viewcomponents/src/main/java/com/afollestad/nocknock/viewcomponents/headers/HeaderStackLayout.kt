@@ -56,9 +56,22 @@ class HeaderStackLayout(
 
   override fun onClick(v: View) {
     val index = v.tag as Int
-    list.removeViewAt(index)
-    headers.removeAt(index)
-    postLiveData()
+    check(index >= 0 || index < list.childCount) {
+      "Index $index is out of bounds in the header stack (size ${list.childCount})."
+    }
+    list.post {
+      list.removeViewAt(index)
+      headers.removeAt(index)
+      invalidateTags()
+      postLiveData()
+    }
+  }
+
+  private fun invalidateTags() {
+    for (i in 0 until list.childCount) {
+      val entry = list.getChildAt(i) as HeaderItemLayout
+      entry.btnRemove.tag = i
+    }
   }
 
   private fun addEntry(forHeader: Header) {
@@ -67,9 +80,7 @@ class HeaderStackLayout(
 
     val li = LayoutInflater.from(context)
     val entry = li.inflate(R.layout.header_stack_item, list, false) as HeaderItemLayout
-    list.addView(entry)
-
-    entry.run {
+    list.addView(entry.apply {
       inputKey.setText(forHeader.key)
       inputKey.post { entry.inputKey.requestFocus() }
       attachHeader(forHeader, this@HeaderStackLayout)
@@ -77,6 +88,6 @@ class HeaderStackLayout(
 
       btnRemove.tag = headers.size - 1
       btnRemove.setOnClickListener(this@HeaderStackLayout)
-    }
+    })
   }
 }

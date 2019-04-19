@@ -8,7 +8,7 @@ android:
     - build-tools-28.0.3
     - android-24
     - android-28
-    - sys-img-arm64-v8a-android-24
+    - sys-img-armeabi-v7a-android-24
 
   licenses:
     - '.+'
@@ -21,7 +21,7 @@ env:
 # Emulator Management: Create, Start and Wait
 before_script:
   - android list target
-  - echo no | android create avd --force -n test -t android-24 --abi default/arm64-v8a
+  - echo no | android create avd --force -n test -t android-24 --abi default/armeabi-v7a
   - emulator -avd test -no-audio -no-window &
   - android-wait-for-emulator
   - adb shell input keyevent 82 &

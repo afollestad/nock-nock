@@ -55,8 +55,7 @@ abstract class DarkModeSwitchActivity : AppCompatActivity() {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
       return UNKNOWN
     }
-    val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-    return when (currentNightMode) {
+    return when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
       Configuration.UI_MODE_NIGHT_YES -> return ENABLED
       Configuration.UI_MODE_NIGHT_NO -> return DISABLED
       else -> UNKNOWN
