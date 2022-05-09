@@ -2,6 +2,7 @@
 <TextView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/emptyText"
+    android:textcolor="#000000"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
